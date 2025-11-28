@@ -1,0 +1,20 @@
+We have used db sessions instead of jwt sessions because of these reasons: 
+1.Can revoke instantly
+2.Can track active sessions
+3.Smaller cookie (just session ID)
+4.Database query on every request (but fast with indexes) and we have fast serverless DB (neon). 
+
+When to Use JWT:
+Use JWT sessions when:
+You need stateless auth (no database dependency)
+You're scaling horizontally across many servers
+You need extreme performance (millions of requests/sec)
+You're building a microservice architecture (JWT passed between services)
+
+Use DB sessions when:
+You need instant revocation (sign out, ban user)
+You need fresh session data (permissions change often)
+You have a monolithic app (like MonkArc)
+Database query overhead is acceptable (which it is for most apps)
+
+

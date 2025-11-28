@@ -1,0 +1,15 @@
+Explanation of syntax and concept used in drizzle:
+1. 
+(table) => [
+  unique('uniqueJourneyDate').on(table.journeyId, table.date),
+]
+This means:
+
+“Create a UNIQUE CONSTRAINT that applies to the combination of (journeyId, date).”
+
+So:
+	•	Two rows cannot have the same journeyId AND the same date.
+	•	But same journeyId can exist many times with different dates.
+	•	And the same date can exist with different journeyId.
+
+This is called a composite unique constraint.
