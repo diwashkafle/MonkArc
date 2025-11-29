@@ -1,114 +1,127 @@
-import {
-  boolean,
-  date,
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  text,
-  timestamp,
-  unique,
-  uuid,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, integer, date, timestamp, boolean, pgEnum, primaryKey, jsonb, unique } from 'drizzle-orm/pg-core'
+import type { AdapterAccount } from 'next-auth/adapters'
 
-export const JourneyTypeEnum = pgEnum("journey_type", ["learning", "project"]);
-export const journeyPhaseEnum = pgEnum("journey_phase", ["seed", "arc"]);
-export const journeyStatusEnum = pgEnum("journey_status", [
-  "active",
-  "paused",
-  "frozen",
-  "dead",
-  "completed",
-]);
-export const leafTypeEnum = pgEnum('leaf_type',['link','note','file'])
+// ========================================
+// AUTH.JS TABLES
+// ========================================
 
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  emailVerified: timestamp("email_verified"),
-  image: varchar("image", { length: 1024 }),
-  username: varchar('username', { length: 30 }).unique(),  // Unique username
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  emailVerified: timestamp('email_verified'),
+  image: varchar('image', { length: 1024 }),
+  username: varchar('username', { length: 30 }).unique(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
 
-export const journeys = pgTable("journeys", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }), // when user with specific userId is deleted it's journey deleted as well that responsibility is hold by this onDelete:cascade attribute here.
+export const accounts = pgTable('accounts', {
+  userId: uuid('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  type: varchar('type', { length: 255 }).$type<AdapterAccount['type']>().notNull(),
+  provider: varchar('provider', { length: 255 }).notNull(),
+  providerAccountId: varchar('providerAccountId', { length: 255 }).notNull(),
+  refresh_token: text('refresh_token'),
+  access_token: text('access_token'),
+  expires_at: integer('expires_at'),
+  token_type: varchar('token_type', { length: 255 }),
+  scope: varchar('scope', { length: 255 }),
+  id_token: text('id_token'),
+  session_state: varchar('session_state', { length: 255 }),
+}, (table) => [
+  primaryKey({ columns: [table.provider, table.providerAccountId] })
+])
 
-  // types and content
-  type: JourneyTypeEnum("type").notNull(),
-  title: varchar("title", { length: 500 }).notNull(),
-  description: text("description").notNull(),
-  deliverable: text("description"), // only for project seeds
+export const sessions = pgTable('sessions', {
+  sessionToken: varchar('sessionToken', { length: 255 }).notNull().primaryKey(),
+  userId: uuid('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  expires: timestamp('expires').notNull(),
+})
 
-  //target and dates
-  targetCheckIns: integer("target_check_ins").notNull(),
-  startDate: date("start_date").notNull(),
-  becomeArcAt: timestamp("became_arc_at"),
-  completedAt: timestamp("completed_at"),
+export const verificationTokens = pgTable('verificationTokens', {
+  identifier: varchar('identifier', { length: 255 }).notNull(),
+  token: varchar('token', { length: 255 }).notNull(),
+  expires: timestamp('expires').notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.identifier, table.token] })
+])
 
-  // state
-  phase: journeyPhaseEnum("phase").notNull().default("seed"),
-  status: journeyStatusEnum("status").notNull().default("active"),
+// ========================================
+// MONKARC TABLES
+// ========================================
 
-  // pause tracking
-  pausedAt: timestamp("paused_at"),
-  pausedDays: integer("paused_days").notNull().default(0),
+export const journeyTypeEnum = pgEnum('journey_type', ['learning', 'project'])
+export const journeyPhaseEnum = pgEnum('journey_phase', ['seed', 'arc'])
+export const journeyStatusEnum = pgEnum('journey_status', ['active', 'paused', 'frozen', 'dead', 'completed'])
 
-  // activity tracking
-  lastCheckInDate: date("last_check_in_date"),
-  frozenAt: timestamp("frozen_at"),
-  deadAt: timestamp("dead_at"),
-
-  //metrics
-  totalCheckIns: integer("total_check_ins").notNull().default(0),
-  currentStreak: integer("current_streak").notNull().default(0),
-  longestStreak: integer("longest_streak").notNull().default(0),
-
-  //type-specific fields
-  repoURL: varchar("repo_url", { length: 1024 }),
-  techStack: text("tech_stack").array(),
-  coreResources: varchar("core_resources", { length: 1024 }),
-
-  //privacy
-  isPublic: boolean("is_public").notNull().default(true),
-
-  //timestamps
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+export const journeys = pgTable('journeys', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  
+  // Type & Content
+  type: journeyTypeEnum('type').notNull(),
+  title: varchar('title', { length: 500 }).notNull(),
+  description: text('description').notNull(),
+  deliverable: text('deliverable'),
+  
+  // Targets & Dates
+  targetCheckIns: integer('target_check_ins').notNull(),
+  startDate: date('start_date').notNull(),
+  becameArcAt: timestamp('became_arc_at'),
+  completedAt: timestamp('completed_at'),
+  
+  // State
+  phase: journeyPhaseEnum('phase').notNull().default('seed'),
+  status: journeyStatusEnum('status').notNull().default('active'),
+  
+  // Pause Tracking
+  pausedAt: timestamp('paused_at'),
+  pausedDays: integer('paused_days').notNull().default(0),
+  
+  // Activity Tracking
+  lastCheckInDate: date('last_check_in_date'),
+  frozenAt: timestamp('frozen_at'),
+  deadAt: timestamp('dead_at'),
+  
+  // Metrics
+  totalCheckIns: integer('total_check_ins').notNull().default(0),
+  currentStreak: integer('current_streak').notNull().default(0),
+  longestStreak: integer('longest_streak').notNull().default(0),
+  
+  // Type-Specific Fields
+  repoURL: varchar('repo_url', { length: 1024 }),
+  techStack: text('tech_stack').array(),
+  coreResource: varchar('core_resource', { length: 1024 }),
+  
+  // Privacy
+  isPublic: boolean('is_public').notNull().default(false),
+  
+  // Timestamps
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
 
 export const dailyProgress = pgTable('daily_progress', {
   id: uuid('id').primaryKey().defaultRandom(),
   journeyId: uuid('journey_id').notNull().references(() => journeys.id, { onDelete: 'cascade' }),
   date: date('date').notNull(),
   
-  // Journal
   journal: text('journal').notNull(),
   wordCount: integer('word_count').notNull(),
   promptUsed: varchar('prompt_used', { length: 500 }).notNull(),
   
-  // GitHub (Project only)
   githubCommits: jsonb('github_commits'),
   commitCount: integer('commit_count').notNull().default(0),
   
-  // Metadata
   createdAt: timestamp('created_at').defaultNow().notNull(),
   editedAt: timestamp('edited_at'),
-}, 
-(table) => [
-    // Composite unique constraint
-  unique('uniqueJourneyDate').on(table.journeyId, table.date), // this prevents the duplicate check-ins in same day
+}, (table) => [
+  unique('uniqueJourneyDate').on(table.journeyId, table.date),
 ])
 
-export const milestones = pgTable('milestones',{
-    id:uuid('id').primaryKey().defaultRandom(),
-    journeyId: uuid('journey_id').notNull().references(() => journeys.id, { onDelete: 'cascade' }),
+export const milestones = pgTable('milestones', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  journeyId: uuid('journey_id').notNull().references(() => journeys.id, { onDelete: 'cascade' }),
   
   title: varchar('title', { length: 500 }).notNull(),
   description: text('description'),
@@ -121,6 +134,8 @@ export const milestones = pgTable('milestones',{
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
+export const leafTypeEnum = pgEnum('leaf_type', ['link', 'note', 'file'])
+
 export const leaves = pgTable('leaves', {
   id: uuid('id').primaryKey().defaultRandom(),
   journeyId: uuid('journey_id').notNull().references(() => journeys.id, { onDelete: 'cascade' }),
@@ -128,7 +143,6 @@ export const leaves = pgTable('leaves', {
   type: leafTypeEnum('type').notNull(),
   title: varchar('title', { length: 500 }).notNull(),
   
-  // Type-specific (only one will be filled based on type)
   url: varchar('url', { length: 2048 }),
   content: text('content'),
   fileURL: varchar('file_url', { length: 2048 }),

@@ -1,0 +1,2 @@
+ALTER TABLE "daily_progress" DROP CONSTRAINT "daily_progress_journey_id_date_unique";--> statement-breakpoint
+ALTER TABLE "daily_progress" ADD CONSTRAINT "uniqueJourneyDate" UNIQUE("journey_id","date");
