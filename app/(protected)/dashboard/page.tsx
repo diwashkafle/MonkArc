@@ -1,56 +1,7 @@
 import { auth, signOut } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { db } from '@/db'
-import { users } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { ensureUsername } from '@/lib/server-actions/user-action'
 import Link from 'next/link'
-
-// Helper function
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 30)
-}
-
-async function ensureUsername(userId: string, name: string, email: string) {
-  'use server'
-  
-  // Check if user already has username
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, userId)
-  })
-  
-  if (user?.username) {
-    return // Already has username
-  }
-  
-  // Generate username from name or email
-  const baseUsername = slugify(name || email.split('@')[0] || 'user')
-  
-  // Find available username
-  let username = baseUsername
-  let suffix = 1
-  
-  while (true) {
-    const existing = await db.query.users.findFirst({
-      where: eq(users.username, username)
-    })
-    
-    if (!existing) break
-    
-    username = `${baseUsername}${suffix}`
-    suffix++
-  }
-  
-  // Update user with username
-  await db.update(users)
-    .set({ username })
-    .where(eq(users.id, userId))
-}
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -59,7 +10,7 @@ export default async function DashboardPage() {
     redirect('/login')
   }
   
-  // Ensure user has username (runs once on first visit)
+  // This now runs MUCH faster (3 queries max, not N queries in a loop)
   await ensureUsername(
     session.user.id,
     session.user.name || '',
@@ -67,7 +18,7 @@ export default async function DashboardPage() {
   )
   
   return (
-    <div className="min-h-screen bg-slate-50">
+   <div className="min-h-screen bg-slate-50">
       <nav className="border-b bg-white px-4 py-4">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <Link href="/dashboard" className="text-xl font-bold">
@@ -112,9 +63,8 @@ export default async function DashboardPage() {
       
       <main className="mx-auto max-w-7xl px-4 py-8">
         <h2 className="text-2xl font-bold text-slate-900">
-          Welcome, {session.user.name}! 🎉
+          Welcome, {session.user.name}! 🎉 and username: {session.user.username}
         </h2>
-        
         <p className="mt-2 text-slate-600">
           Your journeys will appear here.
         </p>
@@ -122,3 +72,6 @@ export default async function DashboardPage() {
     </div>
   )
 }
+
+
+ 
