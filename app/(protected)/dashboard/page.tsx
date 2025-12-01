@@ -63,7 +63,7 @@ export default async function DashboardPage() {
       
       <main className="mx-auto max-w-7xl px-4 py-8">
         <h2 className="text-2xl font-bold text-slate-900">
-          Welcome, {session.user.name}! 🎉 and username: {session.user.username}
+          Welcome, {session.user.name}! 🎉
         </h2>
         <p className="mt-2 text-slate-600">
           Your journeys will appear here.

@@ -22,7 +22,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   
   if (!user) {
     console.log('user not found'+user+ ". username from param: "+username)
-    notFound()  // ✅ 404 if username doesn't exist
+    notFound()
   }
   
   // Optional: Check if viewing your own profile

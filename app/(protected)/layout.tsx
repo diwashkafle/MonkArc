@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { auth } from "@/lib/auth";
-import {notFound, redirect } from "next/navigation";
+import {redirect } from "next/navigation";
 import { Toaster } from "sonner";
 
 
@@ -18,9 +18,6 @@ export default async function DashBoardLayout({
     redirect("/auth/signin");
   }
 
-
-
- 
 
   return (
     <div>
