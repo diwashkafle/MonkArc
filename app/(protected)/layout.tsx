@@ -15,7 +15,7 @@ export default async function DashBoardLayout({
 
   const session = await auth();
   if (!session) {
-    redirect("/auth/signin");
+    redirect("/auth/sign-in");
   }
 
 
