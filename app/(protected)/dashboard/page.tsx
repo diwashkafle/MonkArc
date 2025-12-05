@@ -1,24 +1,35 @@
 import { auth, signOut } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { ensureUsername } from '@/lib/server-actions/user-action'
+import { getUserJourneys, getJourneyStats } from '@/lib/queries/journey-queries'
 import Link from 'next/link'
 
 export default async function DashboardPage() {
   const session = await auth()
   
   if (!session) {
-    redirect('/auth/sign-in')
+    redirect('/login')
   }
   
-  // This now runs MUCH faster (3 queries max, not N queries in a loop)
+  // Ensure username exists
   await ensureUsername(
     session.user.id,
     session.user.name || '',
     session.user.email || ''
   )
   
+  // Fetch user's journeys
+  const journeys = await getUserJourneys(session.user.id)
+  const stats = await getJourneyStats(session.user.id)
+  
+  console.log('========== DASHBOARD ==========')
+  console.log('Journeys found:', journeys.length)
+  console.log('Stats:', stats)
+  console.log('===============================')
+  
   return (
-   <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
+      {/* Navigation */}
       <nav className="border-b bg-white px-4 py-4">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <Link href="/dashboard" className="text-xl font-bold">
@@ -61,17 +72,126 @@ export default async function DashboardPage() {
         </div>
       </nav>
       
+      {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8">
-        <h2 className="text-2xl font-bold text-slate-900">
-          Welcome, {session.user.name}! 🎉
-        </h2>
-        <p className="mt-2 text-slate-600">
-          Your journeys will appear here.
-        </p>
+        {/* Welcome Header */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-slate-900">
+            Welcome back, {session.user.name}! 🎉
+          </h2>
+          <p className="mt-1 text-slate-600">
+            Your journey continues.
+          </p>
+        </div>
+        
+        {/* Stats Grid */}
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-lg bg-white p-6 shadow-sm">
+            <div className="text-sm text-slate-600">Active Journeys</div>
+            <div className="mt-2 text-3xl font-bold text-slate-900">
+              {stats.active}
+            </div>
+          </div>
+          
+          <div className="rounded-lg bg-white p-6 shadow-sm">
+            <div className="text-sm text-slate-600">Arcs Achieved</div>
+            <div className="mt-2 text-3xl font-bold text-emerald-600">
+              {stats.arcs} 🎋
+            </div>
+          </div>
+          
+          <div className="rounded-lg bg-white p-6 shadow-sm">
+            <div className="text-sm text-slate-600">Longest Streak</div>
+            <div className="mt-2 text-3xl font-bold text-orange-600">
+              {stats.longestStreak} 🔥
+            </div>
+          </div>
+          
+          <div className="rounded-lg bg-white p-6 shadow-sm">
+            <div className="text-sm text-slate-600">Total Check-ins</div>
+            <div className="mt-2 text-3xl font-bold text-blue-600">
+              {stats.totalCheckIns}
+            </div>
+          </div>
+        </div>
+        
+        {/* Journeys Section */}
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-xl font-bold text-slate-900">Your Journeys</h3>
+            <Link
+              href="/journey/new"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              + New Journey
+            </Link>
+          </div>
+          
+          {/* Journey List (will build in Step 2) */}
+          {journeys.length === 0 ? (
+            <div className="rounded-lg bg-white p-12 text-center shadow-sm">
+              <div className="text-6xl">🌱</div>
+              <h4 className="mt-4 text-lg font-semibold text-slate-900">
+                No journeys yet
+              </h4>
+              <p className="mt-2 text-slate-600">
+                Create your first journey to start your MonkArc experience.
+              </p>
+              <Link
+                href="/journey/new"
+                className="mt-6 inline-block rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700"
+              >
+                Create First Journey
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {journeys.map((journey) => (
+                <div
+                  key={journey.id}
+                  className="rounded-lg bg-white p-6 shadow-sm"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">
+                          {journey.phase === 'arc' ? '🎋' : '🌱'}
+                        </span>
+                        <h4 className="text-lg font-semibold text-slate-900">
+                          {journey.title}
+                        </h4>
+                      </div>
+                      <p className="mt-2 text-sm text-slate-600">
+                        {journey.description}
+                      </p>
+                      <div className="mt-3 flex items-center gap-4 text-sm text-slate-500">
+                        <span>
+                          {journey.totalCheckIns}/{journey.targetCheckIns} check-ins
+                        </span>
+                        <span>•</span>
+                        <span>
+                          {journey.currentStreak > 0 
+                            ? `${journey.currentStreak} day streak 🔥` 
+                            : 'No current streak'}
+                        </span>
+                        <span>•</span>
+                        <span className="capitalize">{journey.status}</span>
+                      </div>
+                    </div>
+                    
+                    <Link
+                      href={`/journey/${journey.id}`}
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      View →
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </main>
     </div>
   )
 }
-
-
- 
