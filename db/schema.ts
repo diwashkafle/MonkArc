@@ -46,9 +46,7 @@ export const verificationTokens = pgTable('verificationTokens', {
   primaryKey({ columns: [table.identifier, table.token] })
 ])
 
-// ========================================
 // MONKARC TABLES
-// ========================================
 
 export const journeyTypeEnum = pgEnum('journey_type', ['learning', 'project'])
 export const journeyPhaseEnum = pgEnum('journey_phase', ['seed', 'arc'])

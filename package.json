@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cron:test": "curl -H 'Authorization: Bearer your-secret-key-here' http://localhost:3000/api/cron/update-journey-statuses",
+    "cron:local": "tsx scripts/test-cron.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.1",

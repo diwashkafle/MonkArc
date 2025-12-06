@@ -1,0 +1,8 @@
+for production this is mandetory
+// In .env.local
+GITHUB_TOKEN=your_personal_access_token
+
+// In github-client.ts
+headers: {
+  'Authorization': process.env.GITHUB_TOKEN ? `token ${process.env.GITHUB_TOKEN}` : undefined,
+}

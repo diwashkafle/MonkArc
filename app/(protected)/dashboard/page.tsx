@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   if (!session) {
     redirect('/login')
   }
-  
+  const now = new Date();
   // Ensure username exists
   await ensureUsername(
     session.user.id,
@@ -126,6 +126,8 @@ export default async function DashboardPage() {
               + New Journey
             </Link>
           </div>
+
+          
           
           {/* Journey List (will build in Step 2) */}
           {journeys.length === 0 ? (
@@ -147,58 +149,87 @@ export default async function DashboardPage() {
           ) : (
             <div className="space-y-4">
              {/* Inside the journey card mapping */}
-{journeys.map((journey) => (
-  <div
-    key={journey.id}
-    className="rounded-lg bg-white p-6 shadow-sm"
-  >
-    <div className="flex items-start justify-between">
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">
-            {journey.phase === 'arc' ? '🎋' : '🌱'}
-          </span>
-          <h4 className="text-lg font-semibold text-slate-900">
-            {journey.title}
-          </h4>
-          {journey.phase === 'arc' && (
-            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
-              Arc
+{journeys.map((journey) => {
+  const daysSince = journey.lastCheckInDate 
+    ? Math.floor((now.getTime() - new Date(journey.lastCheckInDate).getTime()) / (1000 * 60 * 60 * 24))
+    : 0
+  
+  return (
+    <div
+      key={journey.id}
+      className={`rounded-lg bg-white p-6 shadow-sm ${
+        journey.status === 'frozen' ? 'border-2 border-blue-400' : 
+        journey.status === 'dead' ? 'border-2 border-red-400' : ''
+      }`}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">
+              {journey.status === 'dead' ? '💀' : 
+               journey.status === 'frozen' ? '❄️' : 
+               journey.phase === 'arc' ? '🎋' : '🌱'}
             </span>
-          )}
-          {journey.status === 'completed' && (
-            <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">
-              Completed
+            <h4 className="text-lg font-semibold text-slate-900">
+              {journey.title}
+            </h4>
+            {journey.phase === 'arc' && journey.status !== 'dead' && (
+              <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
+                Arc
+              </span>
+            )}
+            {journey.status === 'frozen' && (
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                Frozen
+              </span>
+            )}
+            {journey.status === 'dead' && (
+              <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+                Dead
+              </span>
+            )}
+            {journey.status === 'completed' && (
+              <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">
+                Completed
+              </span>
+            )}
+          </div>
+          
+          <p className="mt-2 text-sm text-slate-600">
+            {journey.description}
+          </p>
+          
+          <div className="mt-3 flex items-center gap-4 text-sm text-slate-500">
+            <span>
+              {journey.totalCheckIns}/{journey.targetCheckIns} check-ins
             </span>
-          )}
+            <span>•</span>
+            <span>
+              {journey.currentStreak > 0 
+                ? `${journey.currentStreak} day streak 🔥` 
+                : 'No current streak'}
+            </span>
+            {journey.status === 'active' && daysSince > 0 && (
+              <>
+                <span>•</span>
+                <span className={daysSince >= 2 ? 'text-yellow-600 font-medium' : ''}>
+                  {daysSince} {daysSince === 1 ? 'day' : 'days'} since last check-in
+                </span>
+              </>
+            )}
+          </div>
         </div>
-        <p className="mt-2 text-sm text-slate-600">
-          {journey.description}
-        </p>
-        <div className="mt-3 flex items-center gap-4 text-sm text-slate-500">
-          <span>
-            {journey.totalCheckIns}/{journey.targetCheckIns} check-ins
-          </span>
-          <span>•</span>
-          <span>
-            {journey.currentStreak > 0 
-              ? `${journey.currentStreak} day streak 🔥` 
-              : 'No current streak'}
-          </span>
-          <span>•</span>
-          <span className="capitalize">{journey.status}</span>
-        </div>
+        
+        <Link
+          href={`/journey/${journey.id}`}
+          className="text-sm text-blue-600 hover:underline"
+        >
+          View →
+        </Link>
       </div>
-      
-      <Link
-        href={`/journey/${journey.id}`}
-        className="text-sm text-blue-600 hover:underline"
-      >
-        View →
-      </Link>
     </div>
-  </div>
-))}
+  )
+})}
             </div>
           )}
         </div>

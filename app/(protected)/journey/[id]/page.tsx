@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { DeleteJourneyButton } from '@/components/ProtectedUiComponents/delete-journey-button'
 import { pauseJourney, resumeJourney, completeJourney } from '@/lib/server-actions/journey-actions'
 import { ArcCelebration } from '@/components/ProtectedUiComponents/arc-celebration'
+import { daysSinceLastCheckIn } from '@/lib/journey/journey-status'
 
 interface JourneyDetailPageProps {
   params: Promise<{
@@ -27,6 +28,8 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
   const checkedInToday = await hasCheckedInToday(id)
   
   const progressPercentage = (journey.totalCheckIns / journey.targetCheckIns) * 100
+
+    const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate)
   
   return (
     <div className="min-h-screen bg-slate-50">
@@ -47,6 +50,63 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
       {/* Main Content */}
       <main className="mx-auto max-w-4xl px-4 py-12">
         {/* Journey Header */}
+
+      {journey.status === 'frozen' && (
+          <div className="mb-6 rounded-lg border-2 border-blue-400 bg-blue-50 p-6">
+            <div className="flex items-start gap-3">
+              <div className="text-3xl">❄️</div>
+              <div className="flex-1">
+                <h3 className="font-bold text-blue-900">Journey Frozen</h3>
+                <p className="mt-1 text-sm text-blue-800">
+                  This journey has been frozen due to {daysSince} days of inactivity.
+                  Check in today to unfreeze and resume your progress!
+                </p>
+                {journey.frozenAt && (
+                  <p className="mt-2 text-xs text-blue-700">
+                    Frozen on {new Date(journey.frozenAt).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {journey.status === 'dead' && (
+          <div className="mb-6 rounded-lg border-2 border-red-400 bg-red-50 p-6">
+            <div className="flex items-start gap-3">
+              <div className="text-3xl">💀</div>
+              <div className="flex-1">
+                <h3 className="font-bold text-red-900">Journey Died</h3>
+                <p className="mt-1 text-sm text-red-800">
+                  This journey has died after {daysSince} days of inactivity.
+                  But it is not over! Check in today to resurrect your journey and start fresh.
+                </p>
+                {journey.deadAt && (
+                  <p className="mt-2 text-xs text-red-700">
+                    Died on {new Date(journey.deadAt).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {journey.status === 'active' && daysSince >= 1 && daysSince < 3 && !checkedInToday && (
+          <div className="mb-6 rounded-lg border-2 border-yellow-400 bg-yellow-50 p-6">
+            <div className="flex items-start gap-3">
+              <div className="text-3xl">⚠️</div>
+              <div className="flex-1">
+                <h3 className="font-bold text-yellow-900">{`Don't Break the Chain!`}</h3>
+                <p className="mt-1 text-sm text-yellow-800">
+                  {`It is been ${daysSince} ${daysSince === 1 ? 'day' : 'days'} since your last check-in.`}
+                  {daysSince === 2 && ' One more day and your journey will freeze!'}
+                  Keep your streak alive by checking in today.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="rounded-xl bg-white p-8 shadow-sm">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">

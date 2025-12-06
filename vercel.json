@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/update-journey-statuses",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}

@@ -8,6 +8,7 @@ import { revalidatePath } from 'next/cache'
 import { eq, and, sql } from 'drizzle-orm'
 import { checkInSchema } from '@/lib/validation/check-in-validation'
 import { getCheckInByDate } from '@/lib/queries/check-in-queries'
+import { getCommitsForDate } from '@/lib/github/github-client'
 
 // HELPER: CALCULATE STREAK
 async function calculateStreak(journeyId: string, newCheckInDate: string): Promise<number> {
@@ -91,14 +92,41 @@ export async function createCheckIn(formData: FormData) {
   // Calculate word count
   const wordCount = data.journal.trim().split(/\s+/).length
   
-  // Create check-in
+  // Fetch GitHub commits if this is a project journey
+  let commitCount = 0
+  let githubCommits = null
+  
+  if (journey.type === 'project' && journey.repoURL) {
+    try {
+      const commits = await getCommitsForDate(journey.repoURL, data.date)
+      commitCount = commits.length
+      
+      // Store commit data (messages, SHAs, etc.)
+      githubCommits = commits.map(c => ({
+        sha: c.sha,
+        message: c.commit.message,
+        author: c.commit.author.name,
+        date: c.commit.author.date,
+        url: c.html_url,
+      }))
+      
+      console.log(`✅ Fetched ${commitCount} commits for ${data.date}`)
+    } catch (error) {
+      console.error('Failed to fetch GitHub commits:', error)
+      // Don't fail the check-in if GitHub fetch fails
+      // Just log and continue with commitCount = 0
+    }
+  }
+  
+ // Create check-in
   await db.insert(dailyProgress).values({
     journeyId: data.journeyId,
     date: data.date,
     journal: data.journal,
     wordCount,
     promptUsed: data.promptUsed,
-    commitCount: 0,
+    commitCount,
+    githubCommits,
   })
   
   // Calculate new streak
@@ -121,8 +149,9 @@ export async function createCheckIn(formData: FormData) {
       lastCheckInDate: data.date,
       phase: shouldBecomeArc ? 'arc' : journey.phase,
       becameArcAt: shouldBecomeArc ? new Date() : journey.becameArcAt,
-      status: 'active',
-      frozenAt: null,
+      status: 'active', //  Unfreeze/revive on check-in
+      frozenAt: null,   //  Clear freeze timestamp
+      deadAt: null,     //  Clear death timestamp (resurrection!)
     })
     .where(eq(journeys.id, data.journeyId))
   

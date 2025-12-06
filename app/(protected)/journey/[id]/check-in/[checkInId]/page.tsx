@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { auth } from '@/lib/auth'
 import { getJourneyById } from '@/lib/queries/journey-queries'
 import { db } from '@/db'
@@ -39,6 +40,9 @@ export default async function CheckInDetailPage({ params }: CheckInDetailPagePro
     month: 'long',
     day: 'numeric'
   })
+  
+  // Parse GitHub commits if available
+  const commits = checkIn.githubCommits as any[] | null
   
   return (
     <div className="min-h-screen bg-slate-50">
@@ -95,6 +99,60 @@ export default async function CheckInDetailPage({ params }: CheckInDetailPagePro
               {checkIn.journal}
             </div>
           </div>
+          
+          {/* GitHub Commits */}
+          {commits && commits.length > 0 && (
+            <div className="mt-6 border-t pt-6">
+              <h2 className="text-lg font-semibold text-slate-900">
+                GitHub Activity ({commits.length} {commits.length === 1 ? 'commit' : 'commits'})
+              </h2>
+              
+              <div className="mt-4 space-y-3">
+                {commits.map((commit: any) => (
+                  <div
+                    key={commit.sha}
+                    className="rounded-lg border border-slate-200 p-4"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="text-xl">💻</div>
+                      <div className="flex-1">
+                        <div className="font-medium text-slate-900">
+                          {commit.message.split('\n')[0]}
+                        </div>
+                        {commit.message.split('\n').length > 1 && (
+                          <div className="mt-1 text-sm text-slate-600">
+                            {commit.message.split('\n').slice(1).join('\n')}
+                          </div>
+                        )}
+                        <div className="mt-2 flex items-center gap-3 text-xs text-slate-500">
+                          <span>{commit.author}</span>
+                          <span>•</span>
+                          <span className="font-mono">{commit.sha.slice(0, 7)}</span>
+                          <span>•</span>
+                          <a
+                            href={commit.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            View on GitHub →
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {journey.type === 'project' && (!commits || commits.length === 0) && (
+            <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm text-slate-600">
+                No commits detected for this day.
+              </p>
+            </div>
+          )}
           
           {/* Metadata */}
           <div className="mt-6 flex items-center gap-6 border-t pt-6 text-sm text-slate-500">
