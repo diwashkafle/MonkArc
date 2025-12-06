@@ -146,48 +146,59 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {journeys.map((journey) => (
-                <div
-                  key={journey.id}
-                  className="rounded-lg bg-white p-6 shadow-sm"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">
-                          {journey.phase === 'arc' ? '🎋' : '🌱'}
-                        </span>
-                        <h4 className="text-lg font-semibold text-slate-900">
-                          {journey.title}
-                        </h4>
-                      </div>
-                      <p className="mt-2 text-sm text-slate-600">
-                        {journey.description}
-                      </p>
-                      <div className="mt-3 flex items-center gap-4 text-sm text-slate-500">
-                        <span>
-                          {journey.totalCheckIns}/{journey.targetCheckIns} check-ins
-                        </span>
-                        <span>•</span>
-                        <span>
-                          {journey.currentStreak > 0 
-                            ? `${journey.currentStreak} day streak 🔥` 
-                            : 'No current streak'}
-                        </span>
-                        <span>•</span>
-                        <span className="capitalize">{journey.status}</span>
-                      </div>
-                    </div>
-                    
-                    <Link
-                      href={`/journey/${journey.id}`}
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      View →
-                    </Link>
-                  </div>
-                </div>
-              ))}
+             {/* Inside the journey card mapping */}
+{journeys.map((journey) => (
+  <div
+    key={journey.id}
+    className="rounded-lg bg-white p-6 shadow-sm"
+  >
+    <div className="flex items-start justify-between">
+      <div>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">
+            {journey.phase === 'arc' ? '🎋' : '🌱'}
+          </span>
+          <h4 className="text-lg font-semibold text-slate-900">
+            {journey.title}
+          </h4>
+          {journey.phase === 'arc' && (
+            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
+              Arc
+            </span>
+          )}
+          {journey.status === 'completed' && (
+            <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">
+              Completed
+            </span>
+          )}
+        </div>
+        <p className="mt-2 text-sm text-slate-600">
+          {journey.description}
+        </p>
+        <div className="mt-3 flex items-center gap-4 text-sm text-slate-500">
+          <span>
+            {journey.totalCheckIns}/{journey.targetCheckIns} check-ins
+          </span>
+          <span>•</span>
+          <span>
+            {journey.currentStreak > 0 
+              ? `${journey.currentStreak} day streak 🔥` 
+              : 'No current streak'}
+          </span>
+          <span>•</span>
+          <span className="capitalize">{journey.status}</span>
+        </div>
+      </div>
+      
+      <Link
+        href={`/journey/${journey.id}`}
+        className="text-sm text-blue-600 hover:underline"
+      >
+        View →
+      </Link>
+    </div>
+  </div>
+))}
             </div>
           )}
         </div>

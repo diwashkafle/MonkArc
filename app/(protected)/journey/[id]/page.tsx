@@ -1,9 +1,11 @@
 import { auth } from '@/lib/auth'
 import { getJourneyById } from '@/lib/queries/journey-queries'
+import { getJourneyCheckIns, hasCheckedInToday } from '@/lib/queries/check-in-queries'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { DeleteJourneyButton } from '@/components/ProtectedUiComponents/delete-journey-button';
-import { pauseJourney, resumeJourney, completeJourney } from '@/lib/server-actions/journey-actions';
+import { DeleteJourneyButton } from '@/components/ProtectedUiComponents/delete-journey-button'
+import { pauseJourney, resumeJourney, completeJourney } from '@/lib/server-actions/journey-actions'
+import { ArcCelebration } from '@/components/ProtectedUiComponents/arc-celebration'
 
 interface JourneyDetailPageProps {
   params: Promise<{
@@ -20,10 +22,19 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
   
   if (!journey) notFound()
   
+  // Get check-ins
+  const checkIns = await getJourneyCheckIns(id)
+  const checkedInToday = await hasCheckedInToday(id)
+  
   const progressPercentage = (journey.totalCheckIns / journey.targetCheckIns) * 100
   
   return (
     <div className="min-h-screen bg-slate-50">
+       <ArcCelebration
+        journeyTitle={journey.title}
+        totalCheckIns={journey.totalCheckIns}
+        targetCheckIns={journey.targetCheckIns}
+      />
       {/* Header */}
       <nav className="border-b bg-white px-4 py-4">
         <div className="mx-auto max-w-4xl">
@@ -160,6 +171,21 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
           
           {/* Action Buttons */}
           <div className="mt-8 flex flex-wrap items-center gap-3 border-t pt-6">
+            {!checkedInToday && journey.status === 'active' && (
+              <Link
+                href={`/journey/${id}/check-in`}
+                className="rounded-lg bg-emerald-600 px-6 py-3 font-medium text-white hover:bg-emerald-700"
+              >
+                ✓ Check-In Today
+              </Link>
+            )}
+            
+            {checkedInToday && (
+              <div className="rounded-lg bg-emerald-50 px-6 py-3 text-sm font-medium text-emerald-700">
+                ✓ Checked in today!
+              </div>
+            )}
+            
             <Link
               href={`/journey/${id}/edit`}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
@@ -206,12 +232,86 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
           </div>
         </div>
         
-        {/* Check-ins Section (placeholder) */}
+        {/* Timeline Section */}
         <div className="mt-8 rounded-xl bg-white p-8 shadow-sm">
-          <h2 className="text-xl font-bold text-slate-900">Check-ins</h2>
-          <p className="mt-4 text-center text-slate-600">
-            No check-ins yet. Check-in system coming in Phase 3!
-          </p>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-slate-900">Timeline</h2>
+            <div className="text-sm text-slate-600">
+              {checkIns.length} {checkIns.length === 1 ? 'check-in' : 'check-ins'}
+            </div>
+          </div>
+          
+          {checkIns.length === 0 ? (
+            <div className="mt-6 text-center py-12">
+              <div className="text-6xl">📝</div>
+              <p className="mt-4 text-slate-600">No check-ins yet.</p>
+              <p className="mt-1 text-sm text-slate-500">
+                Start your journey by checking in today!
+              </p>
+            </div>
+          ) : (
+            <div className="mt-6 space-y-4">
+              {checkIns.map((checkIn) => {
+                const checkInDate = new Date(checkIn.date)
+                const formattedDate = checkInDate.toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })
+                
+                return (
+                  <div
+                    key={checkIn.id}
+                    className="rounded-lg border border-slate-200 p-6 hover:border-slate-300 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <div className="text-2xl">📅</div>
+                          <div>
+                            <div className="font-semibold text-slate-900">
+                              {formattedDate}
+                            </div>
+                            <div className="mt-1 text-sm text-slate-600">
+                              Prompt: {checkIn.promptUsed}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4 text-slate-700 line-clamp-3">
+                          {checkIn.journal}
+                        </div>
+                        
+                        <div className="mt-4 flex items-center gap-4 text-sm text-slate-500">
+                          <span>{checkIn.wordCount} words</span>
+                          {checkIn.commitCount > 0 && (
+                            <>
+                              <span>•</span>
+                              <span>{checkIn.commitCount} commits</span>
+                            </>
+                          )}
+                          {checkIn.editedAt && (
+                            <>
+                              <span>•</span>
+                              <span>Edited</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <Link
+                        href={`/journey/${id}/check-in/${checkIn.id}`}
+                        className="ml-4 text-sm text-blue-600 hover:underline"
+                      >
+                        View →
+                      </Link>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </main>
     </div>
