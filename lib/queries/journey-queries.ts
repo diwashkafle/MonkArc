@@ -100,3 +100,37 @@ export async function getPublicJourney(userId:string){
         orderBy: [desc(journeys.createdAt)]
     })
 }
+
+// GET ALL PUBLIC JOURNEYS (FOR HOMEPAGE)
+
+export async function getPublicJourneysForFeed(limit: number = 20) {
+  return await db.query.journeys.findMany({
+    where: and(
+      eq(journeys.isPublic, true),
+      eq(journeys.phase, 'arc') // Only show Arcs on homepage
+    ),
+    orderBy: [desc(journeys.becameArcAt)], // Most recent Arcs first
+    limit,
+  })
+}
+
+// GET PUBLIC JOURNEY STATS (FOR HOMEPAGE)
+
+export async function getPublicStats() {
+  const allPublicJourneys = await db.query.journeys.findMany({
+    where: eq(journeys.isPublic, true),
+  })
+  
+  const arcs = allPublicJourneys.filter(j => j.phase === 'arc')
+  const learningJourneys = allPublicJourneys.filter(j => j.type === 'learning')
+  const projectJourneys = allPublicJourneys.filter(j => j.type === 'project')
+  const totalCheckIns = allPublicJourneys.reduce((sum, j) => sum + j.totalCheckIns, 0)
+  
+  return {
+    totalPublicJourneys: allPublicJourneys.length,
+    totalArcs: arcs.length,
+    learningJourneys: learningJourneys.length,
+    projectJourneys: projectJourneys.length,
+    totalCheckIns,
+  }
+}
