@@ -12,7 +12,7 @@ export default async function CronAdminPage() {
   // }
   
   return (
-    <div className="min-h-screen bg-slate-50">``
+    <div className="min-h-screen bg-slate-50">
       <nav className="border-b bg-white px-4 py-4">
         <div className="mx-auto max-w-4xl">
           <Link href="/dashboard" className="text-sm text-slate-600 hover:underline">

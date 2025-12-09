@@ -104,7 +104,8 @@ export const dailyProgress = pgTable('daily_progress', {
   journeyId: uuid('journey_id').notNull().references(() => journeys.id, { onDelete: 'cascade' }),
   date: date('date').notNull(),
   
-  journal: text('journal').notNull(),
+  accomplishment:text('accomplishment').notNull(),
+  notes: text('notes'),
   wordCount: integer('word_count').notNull(),
   promptUsed: varchar('prompt_used', { length: 500 }).notNull(),
   

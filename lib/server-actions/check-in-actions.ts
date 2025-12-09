@@ -10,7 +10,10 @@ import { checkInSchema } from '@/lib/validation/check-in-validation'
 import { getCheckInByDate } from '@/lib/queries/check-in-queries'
 import { getCommitsForDate } from '@/lib/github/github-client'
 
+// ========================================
 // HELPER: CALCULATE STREAK
+// ========================================
+
 async function calculateStreak(journeyId: string, newCheckInDate: string): Promise<number> {
   const checkIns = await db.query.dailyProgress.findMany({
     where: eq(dailyProgress.journeyId, journeyId),
@@ -43,7 +46,9 @@ async function calculateStreak(journeyId: string, newCheckInDate: string): Promi
   return streak
 }
 
+// ========================================
 // CREATE CHECK-IN
+// ========================================
 
 export async function createCheckIn(formData: FormData) {
   const session = await auth()
@@ -55,9 +60,9 @@ export async function createCheckIn(formData: FormData) {
   // Parse form data
   const rawData = {
     journeyId: formData.get('journeyId') as string,
-    journal: formData.get('journal') as string,
-    promptUsed: formData.get('promptUsed') as string,
     date: formData.get('date') as string,
+    accomplishment: formData.get('accomplishment') as string,
+    notes: formData.get('notes') as string || '',
   }
   
   // Validate
@@ -89,8 +94,15 @@ export async function createCheckIn(formData: FormData) {
     throw new Error('You have already checked in for this date')
   }
   
-  // Calculate word count
-  const wordCount = data.journal.trim().split(/\s+/).length
+  // Calculate word count from both fields
+  const combinedText = `${data.accomplishment} ${data.notes || ''}`.trim()
+  const wordCount = combinedText.split(/\s+/).length
+  
+  // Create journal text for legacy field (backwards compatibility)
+  const question = journey.type === 'learning' 
+    ? 'What did you learn today?' 
+    : 'What did you build today?'
+  
   
   // Fetch GitHub commits if this is a project journey
   let commitCount = 0
@@ -101,7 +113,7 @@ export async function createCheckIn(formData: FormData) {
       const commits = await getCommitsForDate(journey.repoURL, data.date)
       commitCount = commits.length
       
-      // Store commit data (messages, SHAs, etc.)
+      // Store commit data
       githubCommits = commits.map(c => ({
         sha: c.sha,
         message: c.commit.message,
@@ -114,17 +126,17 @@ export async function createCheckIn(formData: FormData) {
     } catch (error) {
       console.error('Failed to fetch GitHub commits:', error)
       // Don't fail the check-in if GitHub fetch fails
-      // Just log and continue with commitCount = 0
     }
   }
   
- // Create check-in
+  // Create check-in
   await db.insert(dailyProgress).values({
     journeyId: data.journeyId,
     date: data.date,
-    journal: data.journal,
+    accomplishment: data.accomplishment,
+    notes: data.notes || null,
     wordCount,
-    promptUsed: data.promptUsed,
+    promptUsed: question,
     commitCount,
     githubCommits,
   })
@@ -149,9 +161,9 @@ export async function createCheckIn(formData: FormData) {
       lastCheckInDate: data.date,
       phase: shouldBecomeArc ? 'arc' : journey.phase,
       becameArcAt: shouldBecomeArc ? new Date() : journey.becameArcAt,
-      status: 'active', //  Unfreeze/revive on check-in
-      frozenAt: null,   //  Clear freeze timestamp
-      deadAt: null,     //  Clear death timestamp (resurrection!)
+      status: 'active', // Unfreeze/revive on check-in
+      frozenAt: null,   // Clear freeze timestamp
+      deadAt: null,     // Clear death timestamp (resurrection!)
     })
     .where(eq(journeys.id, data.journeyId))
   
@@ -166,7 +178,9 @@ export async function createCheckIn(formData: FormData) {
   }
 }
 
+// ========================================
 // EDIT CHECK-IN
+// ========================================
 
 export async function editCheckIn(checkInId: string, formData: FormData) {
   const session = await auth()
@@ -175,12 +189,20 @@ export async function editCheckIn(checkInId: string, formData: FormData) {
     throw new Error('Unauthorized')
   }
   
-  const journal = formData.get('journal') as string
-  const promptUsed = formData.get('promptUsed') as string
+  const accomplishment = formData.get('accomplishment') as string
+  const notes = formData.get('notes') as string || ''
   
-  // Validate
-  if (!journal || journal.length < 50) {
-    throw new Error('Journal entry must be at least 50 characters')
+  // Validate accomplishment
+  if (!accomplishment || accomplishment.length < 10) {
+    throw new Error('Accomplishment must be at least 10 characters')
+  }
+  
+  if (accomplishment.length > 500) {
+    throw new Error('Accomplishment must be less than 500 characters')
+  }
+  
+  if (notes && notes.length > 2000) {
+    throw new Error('Notes must be less than 2000 characters')
   }
   
   // Get check-in and verify ownership
@@ -204,20 +226,28 @@ export async function editCheckIn(checkInId: string, formData: FormData) {
   }
   
   // Calculate new word count
-  const wordCount = journal.trim().split(/\s+/).length
+  const combinedText = `${accomplishment} ${notes}`.trim()
+  const wordCount = combinedText.split(/\s+/).length
+  
+  // Create journal text for legacy field
+  const question = journey.type === 'learning' 
+    ? 'What did you learn today?' 
+    : 'What did you build today?'
+
   
   // Update check-in
   await db.update(dailyProgress)
     .set({
-      journal,
-      promptUsed,
+      accomplishment,
+      notes: notes || null,
+      promptUsed: question,
       wordCount,
       editedAt: new Date(),
     })
     .where(eq(dailyProgress.id, checkInId))
   
   revalidatePath(`/journey/${checkIn.journeyId}`)
+  revalidatePath(`/journey/${checkIn.journeyId}/check-in/${checkInId}`)
   
-  redirect(`/journey/${checkIn.journeyId}`)
+  redirect(`/journey/${checkIn.journeyId}/check-in/${checkInId}`)
 }
-

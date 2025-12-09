@@ -7,6 +7,7 @@ import { DeleteJourneyButton } from '@/components/ProtectedUiComponents/delete-j
 import { pauseJourney, resumeJourney, completeJourney } from '@/lib/server-actions/journey-actions'
 import { ArcCelebration } from '@/components/ProtectedUiComponents/arc-celebration'
 import { daysSinceLastCheckIn } from '@/lib/journey/journey-status'
+import { CheckInTracker } from '@/components/ProtectedUiComponents/check-in-tracker'
 
 interface JourneyDetailPageProps {
   params: Promise<{
@@ -141,7 +142,7 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
           <p className="mt-6 text-slate-700">{journey.description}</p>
           
           {/* Progress Bar */}
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-600">Progress</span>
               <span className="font-medium text-slate-900">
@@ -154,6 +155,14 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
                 style={{ width: `${Math.min(progressPercentage, 100)}%` }}
               />
             </div>
+          </div> */}
+          <div className="mt-8 border-t pt-8">
+            <CheckInTracker
+              startDate={journey.createdAt}
+              targetCheckIns={journey.targetCheckIns}
+              checkIns={checkIns}
+              currentCheckIns={journey.totalCheckIns}
+            />
           </div>
           
           {/* Stats */}

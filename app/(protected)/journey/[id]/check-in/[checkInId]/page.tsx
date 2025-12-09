@@ -81,22 +81,13 @@ export default async function CheckInDetailPage({ params }: CheckInDetailPagePro
               Edit
             </Link>
           </div>
-          
-          {/* Prompt Used */}
-          <div className="mt-6 rounded-lg bg-slate-50 p-4">
-            <div className="text-sm font-medium text-slate-700">
-              Reflection Prompt:
-            </div>
-            <div className="mt-1 text-slate-900">
-              {checkIn.promptUsed}
-            </div>
-          </div>
+              
           
           {/* Journal Entry */}
           <div className="mt-6">
             <h2 className="text-lg font-semibold text-slate-900">Journal Entry</h2>
             <div className="mt-3 whitespace-pre-wrap text-slate-700 leading-relaxed">
-              {checkIn.journal}
+              {checkIn.accomplishment}
             </div>
           </div>
           
