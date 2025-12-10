@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
-// SHARED FIELDS
+// ========================================
+// SHARED BASE SCHEMA
+// ========================================
 
 const baseJourneySchema = z.object({
   title: z
@@ -12,8 +14,12 @@ const baseJourneySchema = z.object({
   description: z
     .string()
     .min(10, 'Description must be at least 10 characters')
-    .max(2000, 'Description must be less than 2000 characters')
+    .max(5000, 'Description must be less than 5000 characters')
     .trim(),
+  
+  type: z.enum(["learning", "project"], {
+    message: "Invalid type"
+  }),
   
   targetCheckIns: z
     .number()
@@ -21,65 +27,131 @@ const baseJourneySchema = z.object({
     .min(7, 'Minimum 7 check-ins required')
     .max(365, 'Maximum 365 check-ins allowed'),
   
+  isPublic: z.boolean().default(true),
+})
+
+// ========================================
+// RESOURCE SCHEMA
+// ========================================
+
+export const resourceSchema = z.object({
+  id: z.string(),
+  url: z.string().url('Must be a valid URL'),
+  title: z.string().min(1, 'Title is required'),
+  type: z.enum(['video', 'article', 'docs', 'other']),
+  addedAt: z.string(),
+})
+
+export type Resource = z.infer<typeof resourceSchema>
+
+// ========================================
+// UNIFIED JOURNEY CREATION SCHEMA
+// ========================================
+
+export const createJourneySchema = baseJourneySchema.extend({
+  // Start Date
   startDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
   
-  isPublic: z.boolean().default(false),
-})
-
-// LEARNING JOURNEY SCHEMA
-
-export const learningJourneySchema = baseJourneySchema.extend({
-  coreResource: z
-    .string()
-    .url('Must be a valid URL')
-    .optional()
-    .or(z.literal('')), // Allow empty string
-})
-
-export type LearningJourneyInput = z.infer<typeof learningJourneySchema>
-
-// PROJECT JOURNEY SCHEMA
-
-export const projectJourneySchema = baseJourneySchema.extend({
-  deliverable: z
-    .string()
-    .min(10, 'Deliverable must be at least 10 characters')
-    .max(2000, 'Deliverable must be less than 2000 characters')
-    .trim(),
+  // Learning resources (optional)
+  resources: z.array(resourceSchema).optional().default([]),
   
+  // ✅ FIXED: Repo URL - handle empty string and null properly
   repoURL: z
     .string()
-    .url('Must be a valid URL')
+    .nullable()
+    .optional()
+    .transform((val) => {
+      // Convert empty string to null
+      if (!val || val.trim() === '') return null
+      return val
+    })
     .refine(
-      (url) => url.includes('github.com'),
-      'Must be a GitHub repository URL'
+      (url) => {
+        if (!url) return true // null/empty is valid
+        // Validate URL format
+        try {
+          new URL(url)
+          return url.includes('github.com')
+        } catch {
+          return false
+        }
+      },
+      'Must be a valid GitHub repository URL'
     ),
   
+  // ✅ FIXED: Tech Stack - accept ARRAY not string
   techStack: z
     .array(z.string())
-    .max(10, 'Maximum 10 technologies')
     .optional()
     .default([]),
 })
 
-export type ProjectJourneyInput = z.infer<typeof projectJourneySchema>
+export type CreateJourneyInput = z.infer<typeof createJourneySchema>
 
-// EDIT JOURNEY SCHEMA (Can't change immutable fields)
+// ========================================
+// EDIT JOURNEY SCHEMA
+// ========================================
 
 export const editJourneySchema = z.object({
-  title: z.string().min(3).max(500).trim(),
-  description: z.string().min(10).max(2000).trim(),
+  title: z
+    .string()
+    .min(3, 'Title must be at least 3 characters')
+    .max(500, 'Title must be less than 500 characters')
+    .trim(),
+  
+  description: z
+    .string()
+    .min(10, 'Description must be at least 10 characters')
+    .max(5000, 'Description must be less than 5000 characters')
+    .trim(),
+  
   isPublic: z.boolean(),
   
-  // Learning-specific
-  coreResource: z.string().url().optional().or(z.literal('')),
+  // Resources
+  resources: z.array(resourceSchema).optional().default([]),
   
-  // Project-specific
-  deliverable: z.string().min(10).max(2000).trim().optional(),
-  repoURL: z.string().url().optional(),
-  techStack: z.array(z.string()).max(10).optional(),
+  // Repo URL
+  repoURL: z
+    .string()
+    .nullable()
+    .optional()
+    .transform((val) => {
+      if (!val || val.trim() === '') return null
+      return val
+    })
+    .refine(
+      (url) => {
+        if (!url) return true
+        try {
+          new URL(url)
+          return url.includes('github.com')
+        } catch {
+          return false
+        }
+      },
+      'Must be a valid GitHub repository URL'
+    ),
+  
+  // Tech Stack
+  techStack: z
+    .array(z.string())
+    .optional()
+    .default([]),
 })
 
 export type EditJourneyInput = z.infer<typeof editJourneySchema>
+
+// ========================================
+// HELPER: VALIDATE JOURNEY TYPE
+// ========================================
+
+export function validateJourneyByType(data: CreateJourneyInput) {
+  if (data.type === 'project') {
+    if (!data.repoURL) {
+      console.warn('Project journey created without GitHub repo URL')
+    }
+  }
+  return true
+}

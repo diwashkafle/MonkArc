@@ -1,9 +1,7 @@
-import { pgTable, uuid, varchar, text, integer, date, timestamp, boolean, pgEnum, primaryKey, jsonb, unique } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, varchar, text, integer, date, timestamp, boolean, pgEnum, primaryKey, jsonb, unique, json } from 'drizzle-orm/pg-core'
 import type { AdapterAccount } from 'next-auth/adapters'
 
-// ========================================
 // AUTH.JS TABLES
-// ========================================
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -46,6 +44,14 @@ export const verificationTokens = pgTable('verificationTokens', {
   primaryKey({ columns: [table.identifier, table.token] })
 ])
 
+type ResourceItem = {
+  id: string
+  url: string
+  title: string
+  type: 'article' | 'video' | 'course' | 'book' | 'other' | 'docs'
+  addedAt: string
+}
+
 // MONKARC TABLES
 
 export const journeyTypeEnum = pgEnum('journey_type', ['learning', 'project'])
@@ -61,7 +67,9 @@ export const journeys = pgTable('journeys', {
   title: varchar('title', { length: 500 }).notNull(),
   description: text('description').notNull(),
   deliverable: text('deliverable'),
-  
+
+  // Learning Resources
+  resources: json('resources').$type<ResourceItem[]>().default([]),
   // Targets & Dates
   targetCheckIns: integer('target_check_ins').notNull(),
   startDate: date('start_date').notNull(),

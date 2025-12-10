@@ -7,190 +7,88 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { eq, and } from "drizzle-orm";
 import {
-  learningJourneySchema,
-  projectJourneySchema,
-  editJourneySchema,
+  createJourneySchema,
+  validateJourneyByType
 } from "@/lib/validation/journey-validation";
 
-// HELPER: PARSE FORM DATA
+  // Create journey in database
 
-function parseFormData(formData: FormData) {
-  return {
-    title: formData.get("title") as string,
-    description: formData.get("description") as string,
-    targetCheckIns: parseInt(formData.get("targetCheckIns") as string),
-    startDate: formData.get("startDate") as string,
-    isPublic: formData.get("isPublic") === "on",
-  };
-}
-
-// CREATE LEARNING JOURNEY
-
-export async function createLearningJourney(formData: FormData) {
-  const session = await auth();
-
+export async function createJourney(formData: FormData) {
+  const session = await auth()
+  
   if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+    throw new Error('Unauthorized')
+  }
+  
+  // Parse resources
+  const resourcesJson = formData.get('resources') as string
+  let resources = []
+  
+  try {
+    if (resourcesJson) {
+      resources = JSON.parse(resourcesJson)
+    }
+  } catch (error) {
+    console.error('Failed to parse resources:', error)
   }
 
-  const rawData = {
-    ...parseFormData(formData),
-    coreResource: (formData.get("coreResource") as string) || "",
-  };
-
-  const validationResult = learningJourneySchema.safeParse(rawData);
-
-  if (!validationResult.success) {
-    const firstError = validationResult.error.issues[0];
-    throw new Error(firstError.message);
-  }
-
-  const data = validationResult.data;
-
-  const [newJourney] = await db
-    .insert(journeys)
-    .values({
-      userId: session.user.id,
-      type: "learning",
-      title: data.title,
-      description: data.description,
-      targetCheckIns: data.targetCheckIns,
-      startDate: data.startDate,
-      coreResource: data.coreResource || null,
-      isPublic: data.isPublic,
-      phase: "seed",
-      status: "active",
-    })
-    .returning();
-
-  revalidatePath("/dashboard");
-  redirect(`/journey/${newJourney.id}`);
-}
-
-// CREATE PROJECT JOURNEY
-
-export async function createProjectJourney(formData: FormData) {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
+  // Parse tech stack
   const techStackRaw = formData.get("techStack") as string;
   const techStack = techStackRaw
-    ? techStackRaw
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean)
+    ? techStackRaw.split(",").map((t) => t.trim()).filter(Boolean)
     : [];
-
-  const rawData = {
-    ...parseFormData(formData),
-    deliverable: formData.get("deliverable") as string,
-    repoURL: formData.get("repoURL") as string,
-    techStack,
-  };
-
-  const validationResult = projectJourneySchema.safeParse(rawData);
-
-  if (!validationResult.success) {
-    const firstError = validationResult.error.issues[0];
-    throw new Error(firstError.message);
-  }
-
-  const data = validationResult.data;
-
-  const [newJourney] = await db
-    .insert(journeys)
-    .values({
-      userId: session.user.id,
-      type: "project",
-      title: data.title,
-      description: data.description,
-      deliverable: data.deliverable,
-      targetCheckIns: data.targetCheckIns,
-      startDate: data.startDate,
-      repoURL: data.repoURL,
-      techStack: data.techStack,
-      isPublic: data.isPublic,
-      phase: "seed",
-      status: "active",
-    })
-    .returning();
-
-  revalidatePath("/dashboard");
-  redirect(`/journey/${newJourney.id}`);
-}
-
-// EDIT JOURNEY
-
-export async function editJourney(journeyId: string, formData: FormData) {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  // Verify ownership
-  const journey = await db.query.journeys.findFirst({
-    where: and(
-      eq(journeys.id, journeyId),
-      eq(journeys.userId, session.user.id)
-    ),
-  });
-
-  if (!journey) {
-    throw new Error("Journey not found or access denied");
-  }
-
+  
   // Parse form data
-  const techStackRaw = formData.get("techStack") as string;
-  const techStack = techStackRaw
-    ? techStackRaw
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean)
-    : [];
-
   const rawData = {
-    title: formData.get("title") as string,
-    description: formData.get("description") as string,
-    isPublic: formData.get("isPublic") === "on",
-    coreResource: (formData.get("coreResource") as string) || "",
-    deliverable: (formData.get("deliverable") as string) || undefined,
-    repoURL: (formData.get("repoURL") as string) || undefined,
-    techStack: techStack.length > 0 ? techStack : undefined,
-  };
-
+    title: formData.get('title') as string,
+    description: formData.get('description') as string,
+    type: formData.get('type') as 'learning' | 'project',
+    targetCheckIns: parseInt(formData.get('targetCheckIns') as string),
+    startDate: formData.get('startDate') as string,
+    isPublic: formData.get('isPublic') === 'on',
+    repoURL: formData.get('repoURL') as string || null, // ✅ null not empty string
+    techStack, // ✅ Already an array
+    resources,
+  }
+  
   // Validate
-  const validationResult = editJourneySchema.safeParse(rawData);
+  const validationResult = createJourneySchema.safeParse(rawData);
 
   if (!validationResult.success) {
+    // ✅ Better error logging
+    console.error('Validation failed:', validationResult.error.issues)
     const firstError = validationResult.error.issues[0];
-    throw new Error(firstError.message);
+    throw new Error(`${firstError.path.join('.')}: ${firstError.message}`);
   }
 
   const data = validationResult.data;
-
-  // Update database
-  await db
-    .update(journeys)
-    .set({
-      title: data.title,
-      description: data.description,
-      isPublic: data.isPublic,
-      coreResource: data.coreResource || null,
-      deliverable: data.deliverable || journey.deliverable,
-      repoURL: data.repoURL || journey.repoURL,
-      techStack: data.techStack || journey.techStack,
-      updatedAt: new Date(),
-    })
-    .where(eq(journeys.id, journeyId));
-
-  revalidatePath(`/journey/${journeyId}`);
-  revalidatePath("/dashboard");
-  redirect(`/journey/${journeyId}`);
+  
+  // Optional validation by type
+  validateJourneyByType(data)
+  
+  // Create journey
+  const [journey] = await db.insert(journeys).values({
+    userId: session.user.id,
+    title: data.title,
+    description: data.description,
+    type: data.type,
+    targetCheckIns: data.targetCheckIns,
+    startDate: data.startDate, 
+    isPublic: data.isPublic,
+    repoURL: data.repoURL, // Already transformed to null if empty
+    techStack: data.techStack, // Already an array
+    resources: data.resources,
+    phase: 'seed',
+    status: 'active',
+    totalCheckIns: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+  }).returning()
+  
+  revalidatePath('/dashboard')
+  redirect(`/journey/${journey.id}`)
 }
+
 
 // DELETE JOURNEY
 

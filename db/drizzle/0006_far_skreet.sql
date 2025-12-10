@@ -1,0 +1,1 @@
+ALTER TABLE "journeys" ADD COLUMN "resources" json DEFAULT '[]'::json;

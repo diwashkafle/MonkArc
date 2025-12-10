@@ -43,6 +43,13 @@
       "when": 1765269396291,
       "tag": "0005_faulty_magik",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1765299669072,
+      "tag": "0006_far_skreet",
+      "breakpoints": true
     }
   ]
 }
