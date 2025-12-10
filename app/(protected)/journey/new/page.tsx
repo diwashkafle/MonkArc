@@ -9,7 +9,7 @@ type Resource = {
   id: string
   url: string
   title: string
-  type: 'video' | 'article' | 'docs' | 'other'
+  type: 'video' | 'article' | 'docs' | 'other' | 'course' | 'book'
   addedAt: string
 }
 

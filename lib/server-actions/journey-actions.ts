@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { eq, and } from "drizzle-orm";
 import {
   createJourneySchema,
+  editJourneySchema,
   validateJourneyByType
 } from "@/lib/validation/journey-validation";
 
@@ -89,6 +90,84 @@ export async function createJourney(formData: FormData) {
   redirect(`/journey/${journey.id}`)
 }
 
+// EDIT JOURNEY
+
+export async function editJourney(journeyId: string, formData: FormData) {
+  const session = await auth()
+  
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized')
+  }
+  
+  // Verify ownership
+  const journey = await db.query.journeys.findFirst({
+    where: and(
+      eq(journeys.id, journeyId),
+      eq(journeys.userId, session.user.id)
+    )
+  })
+  
+  if (!journey) {
+    throw new Error('Journey not found or access denied')
+  }
+  
+  // Parse resources
+  const resourcesJson = formData.get('resources') as string
+  let resources = []
+  
+  try {
+    if (resourcesJson) {
+      resources = JSON.parse(resourcesJson)
+    }
+  } catch (error) {
+    console.error('Failed to parse resources:', error)
+  }
+  
+  // Parse tech stack
+  const techStackRaw = formData.get('techStack') as string
+  const techStack = techStackRaw
+    ? techStackRaw.split(',').map((t) => t.trim()).filter(Boolean)
+    : []
+  
+  // Parse form data
+  const rawData = {
+    title: formData.get('title') as string,
+    description: formData.get('description') as string,
+    isPublic: formData.get('isPublic') === 'on',
+    resources,
+    repoURL: formData.get('repoURL') as string || null,
+    techStack,
+  }
+  
+  // Validate
+  const validationResult = editJourneySchema.safeParse(rawData)
+  
+  if (!validationResult.success) {
+    console.error('Validation failed:', validationResult.error.issues)
+    const firstError = validationResult.error.issues[0]
+    throw new Error(`${firstError.path.join('.')}: ${firstError.message}`)
+  }
+  
+  const data = validationResult.data
+  
+  // Update journey (can't change: type, targetCheckIns, startDate)
+  await db
+    .update(journeys)
+    .set({
+      title: data.title,
+      description: data.description,
+      isPublic: data.isPublic,
+      resources: data.resources,
+      repoURL: data.repoURL,
+      techStack: data.techStack,
+    })
+    .where(eq(journeys.id, journeyId))
+  
+  revalidatePath(`/journey/${journeyId}`)
+  revalidatePath('/dashboard')
+  
+  redirect(`/journey/${journeyId}`)
+}
 
 // DELETE JOURNEY
 

@@ -38,7 +38,7 @@ export const resourceSchema = z.object({
   id: z.string(),
   url: z.string().url('Must be a valid URL'),
   title: z.string().min(1, 'Title is required'),
-  type: z.enum(['video', 'article', 'docs', 'other']),
+  type: z.enum(['video', 'article', 'docs', 'other', 'course', 'book']),
   addedAt: z.string(),
 })
 

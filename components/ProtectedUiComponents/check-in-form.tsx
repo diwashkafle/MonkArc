@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createCheckIn } from '@/lib/server-actions/check-in-actions';
+import { getErrorMessage } from '@/lib/error/catch-error-funtion';
 
 interface SimpleCheckInFormProps {
   journeyId: string
@@ -40,8 +41,15 @@ export function SimpleCheckInForm({
       await createCheckIn(formData)
       // Action will redirect automatically
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to create check-in')
-      setIsSubmitting(false)
+      const msg =
+    error instanceof Error ? error.message : String(error)
+
+  if (msg.includes("NEXT_REDIRECT")) {
+    throw error
+  }
+
+  alert(msg)
+  setIsSubmitting(false)
     }
   }
   
