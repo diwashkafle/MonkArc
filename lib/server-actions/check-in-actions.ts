@@ -9,6 +9,7 @@ import { eq, and, sql } from 'drizzle-orm'
 import { checkInSchema } from '@/lib/validation/check-in-validation'
 import { getCheckInByDate } from '@/lib/queries/check-in-queries'
 import { getCommitsForDate } from '@/lib/github/github-client'
+import { getGitHubAccessToken } from '../github/github-status'
 
 // ========================================
 // HELPER: CALCULATE STREAK
@@ -110,7 +111,8 @@ export async function createCheckIn(formData: FormData) {
   
   if (journey.type === 'project' && journey.repoURL) {
     try {
-      const commits = await getCommitsForDate(journey.repoURL, data.date)
+      const userToken = await getGitHubAccessToken(session.user.id)
+      const commits = await getCommitsForDate(journey.repoURL, data.date, userToken || undefined)
       commitCount = commits.length
       
       // Store commit data

@@ -5,7 +5,6 @@ import { format, addDays, differenceInDays, startOfDay, isBefore } from 'date-fn
 interface CheckIn {
   id: string
   date: string
-  journal: string
 }
 
 interface CheckInTrackerProps {

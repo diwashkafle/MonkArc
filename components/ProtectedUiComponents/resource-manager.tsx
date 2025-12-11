@@ -3,12 +3,17 @@
 import { useState } from 'react'
 import { Plus, X, ExternalLink } from 'lucide-react'
 import { nanoid } from 'nanoid'
+import { 
+  detectResourceType, 
+  extractTitleFromUrl, 
+  getResourceTypeIcon 
+} from '@/lib/helper/resource-type-detector'
 
 interface Resource {
   id: string
   url: string
   title: string
-  type: 'video' | 'article' | 'docs' | 'other' | 'course' | 'book'
+  type: 'video' | 'article' | 'docs' | 'course' | 'book' | 'other'
   addedAt: string
 }
 
@@ -24,27 +29,21 @@ export function ResourceManager({ initialResources = [], onChange }: ResourceMan
   const [newTitle, setNewTitle] = useState('')
   const [newType, setNewType] = useState<Resource['type']>('article')
   
-  const detectType = (url: string): Resource['type'] => {
-    if (url.includes('youtube.com') || url.includes('youtu.be')) return 'video'
-    if (url.includes('docs.') || url.includes('/docs/')) return 'docs'
-    return 'article'
-  }
-  
-  const extractTitle = (url: string): string => {
-    try {
-      const urlObj = new URL(url)
-      const hostname = urlObj.hostname.replace('www.', '')
-      return hostname.split('.')[0].charAt(0).toUpperCase() + hostname.split('.')[0].slice(1)
-    } catch {
-      return 'Resource'
-    }
-  }
-  
   const addResource = () => {
-    if (!newUrl.trim()) return
+    if (!newUrl.trim()) {
+      alert('Please enter a URL')
+      return
+    }
     
-    const type = detectType(newUrl)
-    const title = newTitle.trim() || extractTitle(newUrl)
+    try {
+      new URL(newUrl)
+    } catch {
+      alert('Please enter a valid URL')
+      return
+    }
+    
+    const type = newType
+    const title = newTitle.trim() || extractTitleFromUrl(newUrl)
     
     const resource: Resource = {
       id: nanoid(),
@@ -71,12 +70,12 @@ export function ResourceManager({ initialResources = [], onChange }: ResourceMan
     onChange(updated)
   }
   
-  const getTypeIcon = (type: Resource['type']) => {
-    switch (type) {
-      case 'video': return '📺'
-      case 'docs': return '📚'
-      case 'article': return '📄'
-      case 'other': return '🔗'
+  // Auto-detect type when URL changes
+  const handleUrlChange = (url: string) => {
+    setNewUrl(url)
+    if (url.trim()) {
+      const detected = detectResourceType(url)
+      setNewType(detected)
     }
   }
   
@@ -90,7 +89,7 @@ export function ResourceManager({ initialResources = [], onChange }: ResourceMan
               key={resource.id}
               className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
             >
-              <div className="text-xl">{getTypeIcon(resource.type)}</div>
+              <div className="text-xl">{getResourceTypeIcon(resource.type)}</div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-slate-900 truncate">
                   {resource.title}
@@ -127,7 +126,7 @@ export function ResourceManager({ initialResources = [], onChange }: ResourceMan
             <input
               type="url"
               value={newUrl}
-              onChange={(e) => setNewUrl(e.target.value)}
+              onChange={(e) => handleUrlChange(e.target.value)}
               placeholder="https://..."
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               autoFocus
@@ -149,21 +148,21 @@ export function ResourceManager({ initialResources = [], onChange }: ResourceMan
           
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Type
+              Type <span className="text-xs text-slate-500">(auto-detected)</span>
             </label>
-            <div className="flex gap-2">
-              {(['video', 'article', 'docs', 'other'] as const).map((type) => (
+            <div className="grid grid-cols-3 gap-2">
+              {(['video', 'article', 'docs', 'course', 'book', 'other'] as const).map((type) => (
                 <button
                   key={type}
                   type="button"
                   onClick={() => setNewType(type)}
-                  className={`flex-1 rounded-lg border-2 px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`rounded-lg border-2 px-2 py-1.5 text-xs font-medium transition-colors ${
                     newType === type
                       ? 'border-blue-500 bg-blue-50 text-blue-700'
                       : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                   }`}
                 >
-                  {getTypeIcon(type)} {type.charAt(0).toUpperCase() + type.slice(1)}
+                  {getResourceTypeIcon(type)} {type.charAt(0).toUpperCase() + type.slice(1)}
                 </button>
               ))}
             </div>

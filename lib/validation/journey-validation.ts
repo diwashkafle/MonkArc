@@ -55,7 +55,20 @@ export const createJourneySchema = baseJourneySchema.extend({
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
   
   // Learning resources (optional)
-  resources: z.array(resourceSchema).optional().default([]),
+  resources: z.array(resourceSchema)
+  .optional()
+  .default([])
+  .transform((resources) => {
+    // Filter out any invalid resources (empty URLs, etc.)
+      return resources.filter((r) => {
+        try {
+          new URL(r.url)
+          return true
+        } catch {
+          return false
+        }
+      })
+  }),
   
   // ✅ FIXED: Repo URL - handle empty string and null properly
   repoURL: z
@@ -110,7 +123,17 @@ export const editJourneySchema = z.object({
   isPublic: z.boolean(),
   
   // Resources
-  resources: z.array(resourceSchema).optional().default([]),
+  resources: z.array(resourceSchema).optional().default([]).transform((resources) => {
+      // Filter out any invalid resources (empty URLs, etc.)
+      return resources.filter((r) => {
+        try {
+          new URL(r.url)
+          return true
+        } catch {
+          return false
+        }
+      })
+    }),
   
   // Repo URL
   repoURL: z

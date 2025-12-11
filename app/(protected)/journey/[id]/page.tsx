@@ -8,6 +8,7 @@ import { pauseJourney, resumeJourney, completeJourney } from '@/lib/server-actio
 import { ArcCelebration } from '@/components/ProtectedUiComponents/arc-celebration'
 import { daysSinceLastCheckIn } from '@/lib/journey/journey-status'
 import { CheckInTracker } from '@/components/ProtectedUiComponents/check-in-tracker'
+import { Resource } from '@/lib/validation/journey-validation'
 
 interface JourneyDetailPageProps {
   params: Promise<{
@@ -28,8 +29,6 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
   const checkIns = await getJourneyCheckIns(id)
   const checkedInToday = await hasCheckedInToday(id)
   
-  const progressPercentage = (journey.totalCheckIns / journey.targetCheckIns) * 100
-
     const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate)
   
   return (
@@ -141,21 +140,6 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
           
           <p className="mt-6 text-slate-700">{journey.description}</p>
           
-          {/* Progress Bar */}
-          {/* <div className="mt-6">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600">Progress</span>
-              <span className="font-medium text-slate-900">
-                {journey.totalCheckIns} / {journey.targetCheckIns} check-ins
-              </span>
-            </div>
-            <div className="mt-2 h-3 w-full rounded-full bg-slate-200">
-              <div
-                className="h-full rounded-full bg-blue-600 transition-all"
-                style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-              />
-            </div>
-          </div> */}
           <div className="mt-8 border-t pt-8">
             <CheckInTracker
               startDate={journey.createdAt}
@@ -300,6 +284,115 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
             </div>
           </div>
         </div>
+
+        {/* Learning Resources Section */}
+{journey.resources && journey.resources.length > 0 && (
+  <div className="mt-8 rounded-xl bg-white p-8 shadow-sm">
+    <div className="flex items-center justify-between mb-6">
+      <h3 className="text-xl font-semibold text-slate-900">
+        📚 Learning Resources
+      </h3>
+      <Link
+        href={`/journey/${journey.id}/edit`}
+        className="text-sm text-blue-600 hover:underline"
+      >
+        Edit Resources
+      </Link>
+    </div>
+    
+    <div className="space-y-3">
+      {journey.resources.map((resource:Resource) => {
+        const getTypeIcon = (type: string) => {
+          switch (type) {
+            case 'video': return '📺'
+            case 'docs': return '📚'
+            case 'article': return '📄'
+            default: return '🔗'
+          }
+        }
+        
+        const getTypeBadge = (type: string) => {
+          switch (type) {
+            case 'video': return 'bg-red-100 text-red-700'
+            case 'docs': return 'bg-blue-100 text-blue-700'
+            case 'article': return 'bg-green-100 text-green-700'
+            default: return 'bg-slate-100 text-slate-700'
+          }
+        }
+        
+        return (
+          <a
+            key={resource.id}
+            href={resource.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-start gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-white hover:border-blue-300 hover:shadow-md"
+          >
+            {/* Icon */}
+            <div className="text-3xl shrink-0 mt-1">
+              {getTypeIcon(resource.type)}
+            </div>
+            
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <h4 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+                  {resource.title}
+                </h4>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium shrink-0 ${getTypeBadge(resource.type)}`}>
+                  {resource.type.charAt(0).toUpperCase() + resource.type.slice(1)}
+                </span>
+              </div>
+              
+              <p className="text-sm text-slate-500 truncate mt-1 group-hover:text-slate-600">
+                {resource.url}
+              </p>
+              
+              <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
+                <span>Added {new Date(resource.addedAt).toLocaleDateString()}</span>
+                <span>•</span>
+                <span className="text-blue-600 group-hover:underline">
+                  Open resource →
+                </span>
+              </div>
+            </div>
+            
+            {/* External link icon */}
+            <div className="text-slate-400 group-hover:text-blue-600 shrink-0 mt-2 transition-colors">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </div>
+          </a>
+        )
+      })}
+    </div>
+    
+    {/* Stats */}
+    <div className="mt-4 flex items-center gap-6 text-sm text-slate-500 pt-4 border-t">
+      <div>
+        <span className="font-medium text-slate-900">
+          {journey.resources.length}
+        </span>{' '}
+        {journey.resources.length === 1 ? 'resource' : 'resources'}
+      </div>
+      <div>•</div>
+      <div className="flex items-center gap-2">
+        <span>
+          {journey.resources.filter((r: {type:string}) => r.type === 'video').length} videos
+        </span>
+        <span>•</span>
+        <span>
+          {journey.resources.filter((r: {type:string}) => r.type === 'article').length} articles
+        </span>
+        <span>•</span>
+        <span>
+          {journey.resources.filter((r: {type:string}) => r.type === 'docs').length} docs
+        </span>
+      </div>
+    </div>
+  </div>
+)}
         
         {/* Timeline Section */}
         <div className="mt-8 rounded-xl bg-white p-8 shadow-sm">
@@ -349,7 +442,7 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
                         </div>
                         
                         <div className="mt-4 text-slate-700 line-clamp-3">
-                          {checkIn.journal}
+                          {checkIn.accomplishment}
                         </div>
                         
                         <div className="mt-4 flex items-center gap-4 text-sm text-slate-500">

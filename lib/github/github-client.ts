@@ -43,10 +43,15 @@ export function parseGitHubRepoURL(url: string): { owner: string; repo: string }
   return null
 }
 
-// FETCH COMMITS FROM GITHUB
+interface FetchCommitsOptions {
+  repoURL: string
+  since?: string
+  until?: string
+  userToken?: string // ✅ ADD THIS
+}
 
 export async function fetchGitHubCommits(options: FetchCommitsOptions): Promise<GitHubCommit[]> {
-  const { repoURL, since, until } = options
+  const { repoURL, since, until, userToken } = options
   
   // Parse repo URL
   const parsed = parseGitHubRepoURL(repoURL)
@@ -68,13 +73,22 @@ export async function fetchGitHubCommits(options: FetchCommitsOptions): Promise<
   
   console.log('Fetching commits from:', url)
   
+  // Build headers
+  const headers: HeadersInit = {
+    'Accept': 'application/vnd.github.v3+json',
+    'User-Agent': 'MonkArc-App',
+  }
+  
+  // ✅ PRIORITY: User token > Environment token
+  const token = userToken || process.env.GITHUB_TOKEN
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+  
   try {
     const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'MonkArc-App', // GitHub requires User-Agent
-      },
-      // Cache for 5 minutes to avoid rate limits
+      headers,
       next: { revalidate: 300 }
     })
     
@@ -84,6 +98,9 @@ export async function fetchGitHubCommits(options: FetchCommitsOptions): Promise<
       }
       if (response.status === 403) {
         throw new Error('GitHub API rate limit exceeded')
+      }
+      if (response.status === 401) {
+        throw new Error('GitHub authentication failed - please reconnect your account')
       }
       throw new Error(`GitHub API error: ${response.statusText}`)
     }
@@ -97,10 +114,12 @@ export async function fetchGitHubCommits(options: FetchCommitsOptions): Promise<
   }
 }
 
-// GET COMMITS FOR A SPECIFIC DATE
-
-export async function getCommitsForDate(repoURL: string, date: string): Promise<GitHubCommit[]> {
-  // date should be YYYY-MM-DD
+// ✅ UPDATE getCommitsForDate too
+export async function getCommitsForDate(
+  repoURL: string, 
+  date: string,
+  userToken?: string
+): Promise<GitHubCommit[]> {
   const dayStart = new Date(date)
   dayStart.setHours(0, 0, 0, 0)
   
@@ -111,6 +130,7 @@ export async function getCommitsForDate(repoURL: string, date: string): Promise<
     repoURL,
     since: dayStart.toISOString(),
     until: dayEnd.toISOString(),
+    userToken, // ✅ Pass user token
   })
   
   return commits
