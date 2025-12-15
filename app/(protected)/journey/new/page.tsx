@@ -15,7 +15,7 @@ export default async function NewJourneyPage() {
   const githubConnected = await hasGitHubConnected(session.user.id)
   
   // ✅ Get GitHub username if connected
-  let githubUsername: string | null = null
+  let githubUsername: string | null = null;
   if (githubConnected) {
     const githubAccount = await db.query.accounts.findFirst({
       where: and(
