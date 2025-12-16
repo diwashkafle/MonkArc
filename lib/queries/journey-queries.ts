@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { journeys, users } from "@/db/schema";
+import { journeys } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 
 // get all journey for a user

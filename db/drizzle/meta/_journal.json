@@ -50,6 +50,13 @@
       "when": 1765299669072,
       "tag": "0006_far_skreet",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1765864286283,
+      "tag": "0007_lush_naoko",
+      "breakpoints": true
     }
   ]
 }

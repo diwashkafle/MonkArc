@@ -56,7 +56,7 @@ type ResourceItem = {
 
 export const journeyTypeEnum = pgEnum('journey_type', ['learning', 'project'])
 export const journeyPhaseEnum = pgEnum('journey_phase', ['seed', 'arc'])
-export const journeyStatusEnum = pgEnum('journey_status', ['active', 'paused', 'frozen', 'dead', 'completed'])
+export const journeyStatusEnum = pgEnum('journey_status', ['active', 'paused', 'frozen', 'dead', 'completed', 'extended'])
 
 export const journeys = pgTable('journeys', {
   id: uuid('id').primaryKey().defaultRandom(),

@@ -5,20 +5,20 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 // This endpoint is called by Vercel Cron or manually
-export async function GET(request: Request) {
+export async function GET(request: Request) { 
   try {
     // Verify authorization
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET
     
     // Check if request is from Vercel Cron or has valid secret
-    const isVercelCron = request.headers.get('user-agent')?.includes('vercel-cron')
-    const hasValidSecret = cronSecret && authHeader === `Bearer ${cronSecret}`
+    // const isVercelCron = request.headers.get('user-agent')?.includes('vercel-cron')
+    // const hasValidSecret = cronSecret && authHeader === `Bearer ${cronSecret}`
     
-    if (!isVercelCron && !hasValidSecret) {
-      console.log('❌ Unauthorized cron attempt')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // if ( !hasValidSecret) {
+    //   console.log('❌ Unauthorized cron attempt')
+    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // }
     
     console.log('🔄 Starting journey status update cron job...')
     

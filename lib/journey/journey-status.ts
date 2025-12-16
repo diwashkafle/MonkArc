@@ -27,13 +27,13 @@ export function daysSinceLastCheckIn(lastCheckInDate: string | null): number {
 // DETERMINE JOURNEY STATUS
 
 export function determineJourneyStatus(
-  currentStatus: 'active' | 'paused' | 'frozen' | 'dead' | 'completed',
+  currentStatus: 'active' | 'paused' | 'frozen' | 'dead' | 'completed' | 'extended',
   daysSinceCheckIn: number,
   isPaused: boolean
-): 'active' | 'frozen' | 'dead' {
+): 'active' | 'paused' | 'frozen' | 'dead' {
   // Don't change status if completed or manually paused
   if (currentStatus === 'completed') return 'active' // Keep completed as-is
-  if (isPaused) return 'active' // Keep paused as-is
+  if (isPaused) return 'paused' // Keep paused as-is
   
   // Apply freeze/death rules
   if (daysSinceCheckIn >= 7) {
