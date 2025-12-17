@@ -17,6 +17,7 @@ interface Journey {
   resources: Resource[] | null
   repoURL: string | null
   techStack: string[] | null
+  status: 'active' | 'paused' | 'frozen' | 'dead' | 'completed' | 'extended' | 'scheduled';
 }
 
 interface EditJourneyFormProps {
@@ -91,7 +92,8 @@ export function EditJourneyForm({ journey }: EditJourneyFormProps) {
         />
       </div>
       
-      {/* Target & Start Date (Read-only) */}
+    { journey.status !== "scheduled" ? 
+    ( <div>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-900 mb-2">
@@ -113,6 +115,43 @@ export function EditJourneyForm({ journey }: EditJourneyFormProps) {
           </div>
         </div>
       </div>
+    </div>) :  
+     (<div>
+       <div>
+        <label className="block text-sm font-medium text-slate-900 mb-2">
+          Target Check-ins <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="number"
+          name="targetCheckIns"
+          required
+          min={7}
+          max={365}
+          defaultValue={journey.targetCheckIns}
+          className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+        />
+        <p className="mt-1 text-xs text-slate-500">
+          How many days do you want to work on this? (7-365 days)
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-900 mb-2">
+          Start Date <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="date"
+          name="startDate"
+          required
+          min={new Date().toISOString().split("T")[0]}
+          defaultValue={new Date(journey.startDate).toISOString().split("T")[0]}
+          className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+        />
+        <p className="mt-1 text-xs text-slate-500">
+          When do you want to start this journey?
+        </p>
+      </div>
+     </div>)}
       
       {/* Learning Resources */}
       <div>

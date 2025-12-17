@@ -138,9 +138,11 @@ export async function editJourney(journeyId: string, formData: FormData) {
     title: formData.get('title') as string,
     description: formData.get('description') as string,
     isPublic: formData.get('isPublic') === 'on',
-    resources,
+   targetCheckIns: parseInt(formData.get('targetCheckIns') as string) || null,
+    startDate: formData.get('startDate') as string || null,
     repoURL: formData.get('repoURL') as string || null,
     techStack,
+    resources
   }
   
   // Validate
@@ -164,6 +166,8 @@ export async function editJourney(journeyId: string, formData: FormData) {
       resources: data.resources,
       repoURL: data.repoURL,
       techStack: data.techStack,
+      targetCheckIns:data.targetCheckIns,
+      startDate: data.startDate,
     })
     .where(eq(journeys.id, journeyId))
   

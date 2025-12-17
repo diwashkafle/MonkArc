@@ -87,7 +87,7 @@ export function CheckInTracker({
         <div className="text-right">
           <div className="text-2xl font-bold text-slate-900">
             {currentCheckIns} / {targetCheckIns}
-          </div>
+          </div> 
           <div className="text-sm text-slate-600">
             {Math.round((currentCheckIns / targetCheckIns) * 100)}% complete
           </div>

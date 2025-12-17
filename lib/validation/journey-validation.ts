@@ -125,7 +125,16 @@ export const editJourneySchema = z.object({
     .trim(),
   
   isPublic: z.boolean(),
-  
+
+  targetCheckIns: z
+    .number()
+    .int('Must be a whole number')
+    .min(7, 'Minimum 7 check-ins required')
+    .max(365, 'Maximum 365 check-ins allowed'),
+
+    startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
   // Resources
   resources: z.array(resourceSchema).optional().default([]).transform((resources) => {
       // Filter out any invalid resources (empty URLs, etc.)
