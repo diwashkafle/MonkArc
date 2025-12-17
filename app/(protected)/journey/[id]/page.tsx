@@ -29,7 +29,7 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
   const checkIns = await getJourneyCheckIns(id)
   const checkedInToday = await hasCheckedInToday(id)
   
-    const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate)
+    const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate, journey.startDate)
   
   return (
     <div className="min-h-screen bg-slate-50">

@@ -5,13 +5,13 @@ import { eq } from 'drizzle-orm'
 
 // CALCULATE DAYS SINCE LAST CHECK-IN
 
-export function daysSinceLastCheckIn(lastCheckInDate: string | null): number {
-  if (!lastCheckInDate) {
-    // No check-ins yet, use start date
-    return 0
+export function daysSinceLastCheckIn(lastCheckInDate: string | null, startDateInDate: string | null): number {
+  const baseDate = lastCheckInDate ?? startDateInDate;
+
+  if(!baseDate){
+    return 0;
   }
-  
-  const last = new Date(lastCheckInDate)
+  const last = new Date(baseDate)
   const today = new Date()
   
   // Reset time to midnight for accurate day calculation
@@ -63,7 +63,7 @@ export async function updateJourneyStatusByActivity(journeyId: string) {
 
   const checkIsPaused = ()=> journey.status === 'paused';
   
-  const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate)
+  const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate, journey.startDate)
   const newStatus = determineJourneyStatus(
     journey.status,
     daysSince,
@@ -117,7 +117,7 @@ export async function updateAllJourneyStatuses() {
   let updatedCount = 0
   
   for (const journey of allJourneys) {
-    const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate)
+    const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate, journey.startDate)
     const newStatus = determineJourneyStatus(
       journey.status,
       daysSince,
