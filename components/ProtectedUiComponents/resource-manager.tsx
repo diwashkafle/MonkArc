@@ -198,7 +198,7 @@ export function ResourceManager({ initialResources = [], onChange }: ResourceMan
           className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600 hover:border-slate-400 hover:bg-slate-100 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          Add Learning Resource
+          Add Resources
         </button>
       )}
     </div>

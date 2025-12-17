@@ -28,6 +28,10 @@ const baseJourneySchema = z.object({
     .max(365, 'Maximum 365 check-ins allowed'),
   
   isPublic: z.boolean().default(true),
+
+  status: z.enum(["active", "paused", "frozen", "dead", "completed", "extended", "scheduled"], {
+    message: "Invalid status"
+  })
 })
 
 // ========================================

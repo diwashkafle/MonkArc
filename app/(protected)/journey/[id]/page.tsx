@@ -142,7 +142,7 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
           
           <div className="mt-8 border-t pt-8">
             <CheckInTracker
-              startDate={journey.createdAt}
+              startDate={journey.startDate}
               targetCheckIns={journey.targetCheckIns}
               checkIns={checkIns}
               currentCheckIns={journey.totalCheckIns}
@@ -224,7 +224,7 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
           
           {/* Action Buttons */}
           <div className="mt-8 flex flex-wrap items-center gap-3 border-t pt-6">
-            {!checkedInToday && journey.status === 'active' && (
+            {!checkedInToday && (journey.status === 'active' || journey.status === 'frozen' || journey.status === 'extended') && (
               <Link
                 href={`/journey/${id}/check-in`}
                 className="rounded-lg bg-emerald-600 px-6 py-3 font-medium text-white hover:bg-emerald-700"

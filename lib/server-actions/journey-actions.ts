@@ -38,7 +38,10 @@ export async function createJourney(formData: FormData) {
   const techStack = techStackRaw
     ? techStackRaw.split(",").map((t) => t.trim()).filter(Boolean)
     : [];
-  
+  const startingDate = formData.get('startDate') as string;
+  const status = new Date(startingDate) > new Date() ? 'scheduled' : 'active';
+  console.log('Determined status:', status);
+
   // Parse form data
   const rawData = {
     title: formData.get('title') as string,
@@ -50,6 +53,7 @@ export async function createJourney(formData: FormData) {
     repoURL: formData.get('repoURL') as string || null, // ✅ null not empty string
     techStack, // ✅ Already an array
     resources,
+    status,
   }
   
   // Validate
@@ -76,11 +80,11 @@ export async function createJourney(formData: FormData) {
     targetCheckIns: data.targetCheckIns,
     startDate: data.startDate, 
     isPublic: data.isPublic,
-    repoURL: data.repoURL, // Already transformed to null if empty
-    techStack: data.techStack, // Already an array
+    repoURL: data.repoURL, 
+    techStack: data.techStack, 
     resources: data.resources,
     phase: 'seed',
-    status: 'active',
+    status: data.status,
     totalCheckIns: 0,
     currentStreak: 0,
     longestStreak: 0,

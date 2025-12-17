@@ -162,10 +162,10 @@ export function NewJourneyForm({ githubConnected, githubUsername }: NewJourneyFo
       </div>
 
       {/* Learning Resources */}
-      {type === "learning" && (
+      
         <div>
           <label className="block text-sm font-medium text-slate-900 mb-3">
-            Learning Resources{" "}
+            Resources{" "}
             <span className="text-slate-400">(Optional)</span>
           </label>
           <ResourceManager
@@ -176,7 +176,6 @@ export function NewJourneyForm({ githubConnected, githubUsername }: NewJourneyFo
             {`Add videos, articles, or documentation you're learning from`}
           </p>
         </div>
-      )}
 
       {/* GitHub Repo (for projects) */}
       {type === "project" && (
