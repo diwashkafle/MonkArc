@@ -52,6 +52,13 @@ type ResourceItem = {
   addedAt: string
 }
 
+type ExtendedHistory = {
+  id:string
+  date:Date
+  daysAdded:number
+  newTarget:number
+}
+
 // MONKARC TABLES
 
 export const journeyPhaseEnum = pgEnum('journey_phase', ['seed', 'arc'])
@@ -64,7 +71,6 @@ export const journeys = pgTable('journeys', {
   // Type & Content
   title: varchar('title', { length: 500 }).notNull(),
   description: text('description').notNull(),
-  deliverable: text('deliverable'),
 
   // Learning Resources
   resources: json('resources').$type<ResourceItem[]>().default([]),
@@ -95,10 +101,17 @@ export const journeys = pgTable('journeys', {
   // Type-Specific Fields
   repoURL: varchar('repo_url', { length: 1024 }),
   techStack: text('tech_stack').array(),
-  coreResource: varchar('core_resource', { length: 1024 }),
   
   // Privacy
   isPublic: boolean('is_public').notNull().default(false),
+
+  //Extension Tracking
+  isExtended:boolean('is_extended').notNull().default(false),
+  extendedTarget:integer('extended_target').notNull().default(0),
+  originalTarget:integer('original_target'),
+  timesExtended:integer('times_extended').notNull().default(0),
+  lastExtendedAt: timestamp('last_extended_at'),
+  extensionHistory: json('extension_history').$type<ExtendedHistory[]>().default([]),
   
   // Timestamps
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -137,21 +150,4 @@ export const milestones = pgTable('milestones', {
   
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
-
-export const leafTypeEnum = pgEnum('leaf_type', ['link', 'note', 'file'])
-
-export const leaves = pgTable('leaves', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  journeyId: uuid('journey_id').notNull().references(() => journeys.id, { onDelete: 'cascade' }),
-  
-  type: leafTypeEnum('type').notNull(),
-  title: varchar('title', { length: 500 }).notNull(),
-  
-  url: varchar('url', { length: 2048 }),
-  content: text('content'),
-  fileURL: varchar('file_url', { length: 2048 }),
-  fileName: varchar('file_name', { length: 255 }),
-  
-  attachedAt: timestamp('attached_at').defaultNow().notNull(),
 })

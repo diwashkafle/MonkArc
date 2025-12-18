@@ -27,7 +27,7 @@ export function daysSinceLastCheckIn(lastCheckInDate: string | null, startDateIn
 // DETERMINE JOURNEY STATUS
 
 export function determineJourneyStatus(
-  currentStatus: 'active' | 'paused' | 'frozen' | 'dead' | 'completed' | 'extended',
+  currentStatus: 'active' | 'paused' | 'frozen' | 'dead' | 'completed' | 'extended' | 'scheduled',
   daysSinceCheckIn: number,
   isPaused: boolean
 ): 'active' | 'paused' | 'frozen' | 'dead' {

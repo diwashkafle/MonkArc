@@ -1,0 +1,1 @@
+ALTER TABLE "journeys" ADD COLUMN "extended_target" integer DEFAULT 0 NOT NULL;

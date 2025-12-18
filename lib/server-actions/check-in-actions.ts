@@ -100,16 +100,14 @@ export async function createCheckIn(formData: FormData) {
   const wordCount = combinedText.split(/\s+/).length
   
   // Create journal text for legacy field (backwards compatibility)
-  const question = journey.type === 'learning' 
-    ? 'What did you learn today?' 
-    : 'What did you build today?'
+  const question = "What's your progress today?"
   
   
   // Fetch GitHub commits if this is a project journey
   let commitCount = 0
   let githubCommits = null
   
-  if (journey.type === 'project' && journey.repoURL) {
+  if (journey.repoURL) {
     try {
       const userToken = await getGitHubAccessToken(session.user.id)
       const commits = await getCommitsForDate(journey.repoURL, data.date, userToken || undefined)
@@ -232,9 +230,7 @@ export async function editCheckIn(checkInId: string, formData: FormData) {
   const wordCount = combinedText.split(/\s+/).length
   
   // Create journal text for legacy field
-  const question = journey.type === 'learning' 
-    ? 'What did you learn today?' 
-    : 'What did you build today?'
+  const question = "What's your progress today ?"
 
   
   // Update check-in

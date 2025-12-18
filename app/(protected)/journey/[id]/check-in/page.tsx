@@ -3,7 +3,7 @@ import { getJourneyById } from '@/lib/queries/journey-queries'
 import { hasCheckedInToday } from '@/lib/queries/check-in-queries'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { SimpleCheckInForm } from '@/components/ProtectedUiComponents/check-in-form'
+import { SimpleCheckInForm } from '@/components/ProtectedUiComponents/journeys/check-in-form'
 
 interface NewCheckInPageProps {
   params: Promise<{

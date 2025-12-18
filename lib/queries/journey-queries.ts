@@ -10,7 +10,6 @@ export async function getUserJourneys(userId: string) {
         orderBy: [desc(journeys.createdAt)],
     })
 }
-
 // get journey by status
 
 export async function getActiveJourneys(userId: string) {
@@ -28,27 +27,6 @@ export async function getCompleteJourneys(userId: string) {
         where: and(
             eq(journeys.userId, userId),
             eq(journeys.status, 'completed')
-        ),
-        orderBy: [desc(journeys.createdAt)],
-    })
-}
-
-// get journey by type
-export async function getLearningJourneys(userId: string) {
-    return await db.query.journeys.findMany({
-        where: and(
-            eq(journeys.userId, userId),
-            eq(journeys.type, 'learning')
-        ),
-        orderBy: [desc(journeys.createdAt)],
-    })
-}
-
-export async function getProjectJourneys(userId: string) {
-    return await db.query.journeys.findMany({
-        where: and(
-            eq(journeys.userId, userId),
-            eq(journeys.type, 'project')
         ),
         orderBy: [desc(journeys.createdAt)],
     })
@@ -122,15 +100,12 @@ export async function getPublicStats() {
   })
   
   const arcs = allPublicJourneys.filter(j => j.phase === 'arc')
-  const learningJourneys = allPublicJourneys.filter(j => j.type === 'learning')
-  const projectJourneys = allPublicJourneys.filter(j => j.type === 'project')
+
   const totalCheckIns = allPublicJourneys.reduce((sum, j) => sum + j.totalCheckIns, 0)
   
   return {
     totalPublicJourneys: allPublicJourneys.length,
     totalArcs: arcs.length,
-    learningJourneys: learningJourneys.length,
-    projectJourneys: projectJourneys.length,
     totalCheckIns,
   }
 }

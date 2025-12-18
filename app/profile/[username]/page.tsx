@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { auth } from '@/lib/auth'
-import { ShareProfileButton } from '@/components/ProtectedUiComponents/share-profile-button'
+import { ShareProfileButton } from '@/components/ProtectedUiComponents/journeys/share-profile-button'
 
 interface ProfilePageProps {
   params: Promise<{

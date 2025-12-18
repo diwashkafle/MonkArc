@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { hasGitHubConnected } from "@/lib/github/github-status";
-import { NewJourneyForm } from "@/components/ProtectedUiComponents/new-journey-form";
+import { NewJourneyForm } from "@/components/ProtectedUiComponents/journeys/new-journey-form";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import { eq, and } from "drizzle-orm";

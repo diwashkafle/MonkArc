@@ -1,5 +1,6 @@
 // Run this with: npx ts-node scripts/test-cron.ts
 
+
 async function testCron() {
   const cronSecret = process.env.CRON_SECRET
   
@@ -8,6 +9,7 @@ async function testCron() {
   
   try {
     const response = await fetch('http://localhost:3000/api/cron/update-journey-statuses', {
+      method:'POST',
       headers: {
         'Authorization': `Bearer ${cronSecret}`
       }

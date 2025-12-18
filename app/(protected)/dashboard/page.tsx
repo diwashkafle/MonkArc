@@ -2,7 +2,7 @@ import { auth, signOut } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { ensureUsername } from '@/lib/server-actions/user-action'
 import { getUserJourneys, getJourneyStats } from '@/lib/queries/journey-queries'
-import { DashboardFilters } from '@/components/ProtectedUiComponents/dashboard-filters'
+import { DashboardFilters } from '@/components/ProtectedUiComponents/journeys/dashboard-filters'
 import Link from 'next/link'
 
 export default async function DashboardPage() {

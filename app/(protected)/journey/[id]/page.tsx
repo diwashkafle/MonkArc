@@ -3,11 +3,11 @@ import { getJourneyById } from '@/lib/queries/journey-queries'
 import { getJourneyCheckIns, hasCheckedInToday } from '@/lib/queries/check-in-queries'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { DeleteJourneyButton } from '@/components/ProtectedUiComponents/delete-journey-button'
+import { DeleteJourneyButton } from '@/components/ProtectedUiComponents/journeys/delete-journey-button'
 import { pauseJourney, resumeJourney, completeJourney } from '@/lib/server-actions/journey-actions'
-import { ArcCelebration } from '@/components/ProtectedUiComponents/arc-celebration'
+import { ArcCelebration } from '@/components/ProtectedUiComponents/journeys/arc-celebration'
 import { daysSinceLastCheckIn } from '@/lib/journey/journey-status'
-import { CheckInTracker } from '@/components/ProtectedUiComponents/check-in-tracker'
+import { CheckInTracker } from '@/components/ProtectedUiComponents/journeys/check-in-tracker'
 import { Resource } from '@/lib/validation/journey-validation'
 import { SiCodefresh } from "react-icons/si";
 import { SiCodeigniter } from "react-icons/si";
@@ -205,21 +205,6 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
                 </div>
               )}
             </div>
-          
-          
-          {journey.coreResource && (
-            <div className="mt-6 border-t pt-6">
-              <h3 className="font-semibold text-slate-900">Core Resource:</h3>
-              <a
-                href={journey.coreResource}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-block text-blue-600 hover:underline"
-              >
-                {journey.coreResource}
-              </a>
-            </div>
-          )}
           
           {/* Action Buttons */}
           <div className="mt-8 flex flex-wrap items-center gap-3 border-t pt-6">

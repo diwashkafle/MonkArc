@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createCheckIn } from '@/lib/server-actions/check-in-actions';
-import { getErrorMessage } from '@/lib/error/catch-error-funtion';
 
 interface SimpleCheckInFormProps {
   journeyId: string

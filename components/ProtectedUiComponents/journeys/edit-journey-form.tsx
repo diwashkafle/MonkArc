@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { editJourney } from '@/lib/server-actions/journey-actions'
-import { ResourceManager } from '@/components/ProtectedUiComponents/resource-manager'
+import { ResourceManager } from '@/components/ProtectedUiComponents/journeys/resource-manager'
 import type { Resource } from '@/lib/validation/journey-validation'
 import { LinkGitHubButton } from './link-github-button'
+import clsx from 'clsx'
+import { Loader2 } from 'lucide-react'
 
 interface Journey {
   id: string
@@ -235,17 +237,31 @@ export function EditJourneyForm({ journey,githubConnected,githubUsername }: Edit
       {/* Submit */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t">
         <Link
-          href={`/journey/${journey.id}`}
-          className="rounded-lg border border-slate-300 bg-white px-6 py-3 font-medium text-slate-700 hover:bg-slate-50"
+          href="/dashboard"
+          aria-disabled={isSubmitting}
+          tabIndex={isSubmitting ? -1 : 0}
+          className={clsx(
+            "inline-flex items-center rounded-md px-4 py-2",
+            isSubmitting
+              ? "pointer-events-none opacity-50"
+              : "hover:bg-gray-100"
+          )}
         >
           Cancel
         </Link>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-lg bg-black px-6 py-2 font-medium text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? 'Saving...' : 'Save Changes'}
+          {isSubmitting ? (
+            <div className="flex items-center gap-1">
+              <Loader2 className="h-4 w-4 animate-spin" />{" "}
+              <span> Saving</span>
+            </div>
+          ) : (
+            "Save"
+          )}
         </button>
       </div>
     </form>

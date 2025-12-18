@@ -3,33 +3,18 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
 import Link from 'next/link'
-
-interface Journey {
-  id: string
-  title: string
-  description: string
-  type: 'learning' | 'project'
-  phase: 'seed' | 'arc'
-  status: 'active' | 'paused' | 'frozen' | 'dead' | 'completed'
-  totalCheckIns: number
-  targetCheckIns: number
-  currentStreak: number
-  longestStreak: number
-  techStack: string[] | null
-  lastCheckInDate: string | null
-}
+import { InferSelectModel } from 'drizzle-orm'
+import { journeys } from '@/db/schema'
 
 interface DashboardFiltersProps {
-  journeys: Journey[]
+  journeys: InferSelectModel<typeof journeys>[]
 }
 
 type StatusFilter = 'all' | 'active' | 'frozen' | 'dead' | 'completed'
-type TypeFilter = 'all' | 'learning' | 'project'
 type PhaseFilter = 'all' | 'seed' | 'arc'
 
 export function DashboardFilters({ journeys }: DashboardFiltersProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
-  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [phaseFilter, setPhaseFilter] = useState<PhaseFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
   
@@ -47,11 +32,6 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
   const filteredJourneys = journeys.filter((journey) => {
     // Status filter
     if (statusFilter !== 'all' && journey.status !== statusFilter) {
-      return false
-    }
-    
-    // Type filter
-    if (typeFilter !== 'all' && journey.type !== typeFilter) {
       return false
     }
     
@@ -167,44 +147,6 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
         
         {/* Type & Phase Filters */}
         <div className="grid grid-cols-2 gap-4">
-          {/* Type Filter */}
-          <div>
-            <div className="text-sm font-medium text-slate-700 mb-2">Type</div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setTypeFilter('all')}
-                className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  typeFilter === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-                All
-              </button>
-              
-              <button
-                onClick={() => setTypeFilter('learning')}
-                className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  typeFilter === 'learning'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-                📚 Learning
-              </button>
-              
-              <button
-                onClick={() => setTypeFilter('project')}
-                className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  typeFilter === 'project'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-                💻 Project
-              </button>
-            </div>
-          </div>
           
           {/* Phase Filter */}
           <div>

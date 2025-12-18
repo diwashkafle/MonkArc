@@ -137,13 +137,12 @@ export default async function CheckInDetailPage({ params }: CheckInDetailPagePro
             </div>
           )}
           
-          {journey.type === 'project' && (!commits || commits.length === 0) && (
+         
             <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
               <p className="text-sm text-slate-600">
                 No commits detected for this day.
               </p>
             </div>
-          )}
           
           {/* Metadata */}
           <div className="mt-6 flex items-center gap-6 border-t pt-6 text-sm text-slate-500">

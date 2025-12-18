@@ -82,7 +82,7 @@ export function ArcCelebration({
           </DialogTitle>
           <DialogDescription className="text-center text-base pt-4">
             Congratulations! Your journey <strong>{`"${journeyTitle}"`}</strong>{" "}
-            has transformed from a Seed 🌱 into an Arc 🎋!
+            has transformed from a Seed into an Arc!
           </DialogDescription>
         </DialogHeader>
 
@@ -97,19 +97,6 @@ export function ArcCelebration({
             <div className="mt-2 text-sm text-emerald-700">
               {` You've reached your target and proven your commitment!`}
             </div>
-          </div>
-
-          <div className="space-y-2 text-sm text-slate-600">
-            <p>
-              🌱 <strong>Seed</strong> → 🎋 <strong>Arc</strong>
-            </p>
-            <p>
-              Your consistent effort has transformed this journey into an Arc.
-              This is a testament to your dedication and growth.
-            </p>
-            <p className="text-xs text-slate-500">
-              You can continue checking in or mark this Arc as complete.
-            </p>
           </div>
         </div>
 
