@@ -76,7 +76,6 @@ export async function createJourney(formData: FormData) {
     userId: session.user.id,
     title: data.title,
     description: data.description,
-    type: data.type,
     targetCheckIns: data.targetCheckIns,
     startDate: data.startDate, 
     isPublic: data.isPublic,
@@ -166,8 +165,8 @@ export async function editJourney(journeyId: string, formData: FormData) {
       resources: data.resources,
       repoURL: data.repoURL,
       techStack: data.techStack,
-      targetCheckIns:data.targetCheckIns,
-      startDate: data.startDate,
+      targetCheckIns: data.targetCheckIns || journey.targetCheckIns,
+      startDate: data.startDate || journey.startDate,
     })
     .where(eq(journeys.id, journeyId))
   

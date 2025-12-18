@@ -45,53 +45,11 @@ export function NewJourneyForm({ githubConnected, githubUsername }: NewJourneyFo
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-      {/* Journey Type */}
-      <div>
-        <label className="block text-sm font-medium text-slate-900 mb-3">
-          Journey Type <span className="text-red-500">*</span>
-        </label>
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            type="button"
-            onClick={() => setType("learning")}
-            className={`flex flex-col items-center gap-2 rounded-lg border-2 p-6 transition-all ${
-              type === "learning"
-                ? "border-blue-500 bg-blue-50"
-                : "border-slate-200 bg-white hover:border-slate-300"
-            }`}
-          >
-            <div className="text-4xl">📚</div>
-            <div className="font-semibold text-slate-900">
-              Learning Journey
-            </div>
-            <div className="text-xs text-slate-600 text-center">
-              Learn a new skill, language, or topic
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setType("project")}
-            className={`flex flex-col items-center gap-2 rounded-lg border-2 p-6 transition-all ${
-              type === "project"
-                ? "border-blue-500 bg-blue-50"
-                : "border-slate-200 bg-white hover:border-slate-300"
-            }`}
-          >
-            <div className="text-4xl">💻</div>
-            <div className="font-semibold text-slate-900">Project</div>
-            <div className="text-xs text-slate-600 text-center">
-              Build something, track commits
-            </div>
-          </button>
-        </div>
-        <input type="hidden" name="type" value={type} />
-      </div>
 
       {/* Title */}
       <div>
         <label className="block text-sm font-medium text-slate-900 mb-2">
-          Journey Name <span className="text-red-500">*</span>
+          Name <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -99,11 +57,7 @@ export function NewJourneyForm({ githubConnected, githubUsername }: NewJourneyFo
           required
           minLength={3}
           maxLength={500}
-          placeholder={
-            type === "learning"
-              ? "e.g., Learn React Hooks"
-              : "e.g., Build Todo App"
-          }
+          placeholder={`Building e-commerece to master MERN`}
           className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
       </div>
@@ -119,7 +73,7 @@ export function NewJourneyForm({ githubConnected, githubUsername }: NewJourneyFo
           minLength={10}
           maxLength={5000}
           rows={4}
-          placeholder="What do you want to achieve?"
+          placeholder={`I want to learn Frontend, Backend, System design and basic of devlops to master MERN and fullstack development.`}
           className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
         />
       </div>
@@ -173,12 +127,11 @@ export function NewJourneyForm({ githubConnected, githubUsername }: NewJourneyFo
             onChange={setResources}
           />
           <p className="mt-2 text-xs text-slate-500">
-            {`Add videos, articles, or documentation you're learning from`}
+            {`Add videos, articles, or documentation you're using or learning from`}
           </p>
         </div>
 
       {/* GitHub Repo (for projects) */}
-      {type === "project" && (
         <div>
           <label className="block text-sm font-medium text-slate-900 mb-2">
             GitHub Repository{" "}
@@ -217,10 +170,8 @@ export function NewJourneyForm({ githubConnected, githubUsername }: NewJourneyFo
             Track commits automatically. {!githubConnected && 'Connect GitHub to access private repositories.'}
           </p>
         </div>
-      )}
 
       {/* Tech Stack (for projects) */}
-      {type === "project" && (
         <div>
           <label className="block text-sm font-medium text-slate-900 mb-2">
             Tech Stack <span className="text-slate-400">(Optional)</span>
@@ -235,7 +186,6 @@ export function NewJourneyForm({ githubConnected, githubUsername }: NewJourneyFo
             Separate technologies with commas
           </p>
         </div>
-      )}
 
       {/* Privacy */}
       <div>

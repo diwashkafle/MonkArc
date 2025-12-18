@@ -9,6 +9,9 @@ import { ArcCelebration } from '@/components/ProtectedUiComponents/arc-celebrati
 import { daysSinceLastCheckIn } from '@/lib/journey/journey-status'
 import { CheckInTracker } from '@/components/ProtectedUiComponents/check-in-tracker'
 import { Resource } from '@/lib/validation/journey-validation'
+import { SiCodefresh } from "react-icons/si";
+import { SiCodeigniter } from "react-icons/si";
+
 
 interface JourneyDetailPageProps {
   params: Promise<{
@@ -119,7 +122,7 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
                 </h1>
                 <div className="mt-1 flex items-center gap-3 text-sm text-slate-600">
                   <span>
-                    {journey.type === 'learning' ? '📚 Learning' : '💻 Project'} Journey
+                   {journey.phase ==="seed"?(<div className='flex gap-1 items-center'><SiCodefresh/> <span>Seed</span></div>):(<div><SiCodeigniter/> <span>Arc</span></div>)}
                   </span>
                   <span>•</span>
                   <span className="capitalize font-medium">
@@ -174,11 +177,7 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
           </div>
           
           {/* Type-specific info */}
-          {journey.type === 'project' && (
-            <div className="mt-6 border-t pt-6">
-              <h3 className="font-semibold text-slate-900">Deliverable:</h3>
-              <p className="mt-2 text-slate-700">{journey.deliverable}</p>
-              
+            <div className={journey.repoURL ===null && journey.techStack ? "":"mt-6 border-t pt-6"}>
               {journey.repoURL && (
                 <a
                   href={journey.repoURL}
@@ -206,9 +205,9 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
                 </div>
               )}
             </div>
-          )}
           
-          {journey.type === 'learning' && journey.coreResource && (
+          
+          {journey.coreResource && (
             <div className="mt-6 border-t pt-6">
               <h3 className="font-semibold text-slate-900">Core Resource:</h3>
               <a

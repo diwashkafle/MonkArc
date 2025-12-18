@@ -17,10 +17,6 @@ const baseJourneySchema = z.object({
     .max(5000, 'Description must be less than 5000 characters')
     .trim(),
   
-  type: z.enum(["learning", "project"], {
-    message: "Invalid type"
-  }),
-  
   targetCheckIns: z
     .number()
     .int('Must be a whole number')
@@ -130,11 +126,13 @@ export const editJourneySchema = z.object({
     .number()
     .int('Must be a whole number')
     .min(7, 'Minimum 7 check-ins required')
-    .max(365, 'Maximum 365 check-ins allowed'),
+    .max(365, 'Maximum 365 check-ins allowed')
+    .nullable(),
 
     startDate: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format')
+    .nullable(),
   // Resources
   resources: z.array(resourceSchema).optional().default([]).transform((resources) => {
       // Filter out any invalid resources (empty URLs, etc.)
@@ -184,10 +182,8 @@ export type EditJourneyInput = z.infer<typeof editJourneySchema>
 // ========================================
 
 export function validateJourneyByType(data: CreateJourneyInput) {
-  if (data.type === 'project') {
     if (!data.repoURL) {
       console.warn('Project journey created without GitHub repo URL')
     }
-  }
   return true
 }

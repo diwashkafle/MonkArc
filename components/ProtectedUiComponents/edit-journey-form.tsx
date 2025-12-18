@@ -5,12 +5,12 @@ import Link from 'next/link'
 import { editJourney } from '@/lib/server-actions/journey-actions'
 import { ResourceManager } from '@/components/ProtectedUiComponents/resource-manager'
 import type { Resource } from '@/lib/validation/journey-validation'
+import { LinkGitHubButton } from './link-github-button'
 
 interface Journey {
   id: string
   title: string
   description: string
-  type: 'learning' | 'project'
   targetCheckIns: number
   startDate: string
   isPublic: boolean
@@ -22,9 +22,13 @@ interface Journey {
 
 interface EditJourneyFormProps {
   journey: Journey
+  githubConnected: boolean
+  githubUsername?: string | null
+
 }
 
-export function EditJourneyForm({ journey }: EditJourneyFormProps) {
+
+export function EditJourneyForm({ journey,githubConnected,githubUsername }: EditJourneyFormProps) {
   const [resources, setResources] = useState<Resource[]>(journey.resources || [])
   const [isSubmitting, setIsSubmitting] = useState(false)
   
@@ -49,16 +53,6 @@ export function EditJourneyForm({ journey }: EditJourneyFormProps) {
   
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-      {/* Journey Type (Read-only) */}
-      <div>
-        <label className="block text-sm font-medium text-slate-900 mb-2">
-          Journey Type
-        </label>
-        <div className="rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-slate-600">
-          {journey.type === 'learning' ? '📚 Learning Journey' : '💻 Project'}
-          <span className="ml-2 text-xs">(Cannot be changed)</span>
-        </div>
-      </div>
       
       {/* Title */}
       <div>
@@ -164,27 +158,47 @@ export function EditJourneyForm({ journey }: EditJourneyFormProps) {
         />
       </div>
       
-      {/* GitHub Repo (for projects) */}
-      {journey.type === 'project' && (
-        <div>
-          <label className="block text-sm font-medium text-slate-900 mb-2">
-            GitHub Repository <span className="text-slate-400">(Optional)</span>
-          </label>
-          <input
-            type="url"
-            name="repoURL"
-            defaultValue={journey.repoURL || ''}
-            placeholder="https://github.com/username/repo"
-            className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-          />
-          <p className="mt-2 text-xs text-slate-500">
-            Update your GitHub repository URL
-          </p>
-        </div>
-      )}
+      <div>
+               <label className="block text-sm font-medium text-slate-900 mb-2">
+                 GitHub Repository{" "}
+                 <span className="text-slate-400">(Optional)</span>
+               </label>
+               <input
+                 type="url"
+                 name="repoURL"
+                 defaultValue={journey.repoURL || " "}
+                 placeholder="https://github.com/username/repo"
+                 className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+               />
+               
+               {/* GitHub Connection Status */}
+               <div className="mt-3">
+                 {githubConnected ? (
+                   <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg p-3 border border-green-200">
+                     <svg className="h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                     </svg>
+                     <div className="flex-1">
+                       <span className="font-medium">GitHub Connected</span>
+                       {githubUsername && (
+                         <span className="text-green-600 ml-1">@{githubUsername}</span>
+                       )}
+                       <p className="text-xs text-green-600 mt-0.5">
+                         Can access private repositories
+                       </p>
+                     </div>
+                   </div>
+                 ) : (
+                   <LinkGitHubButton variant="card" />
+                 )}
+               </div>
+               
+               <p className="mt-2 text-xs text-slate-500">
+                 Track commits automatically. {!githubConnected && 'Connect GitHub to access private repositories.'}
+               </p>
+             </div>
       
       {/* Tech Stack (for projects) */}
-      {journey.type === 'project' && (
         <div>
           <label className="block text-sm font-medium text-slate-900 mb-2">
             Tech Stack <span className="text-slate-400">(Optional)</span>
@@ -197,7 +211,6 @@ export function EditJourneyForm({ journey }: EditJourneyFormProps) {
             className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
           />
         </div>
-      )}
       
       {/* Privacy */}
       <div>

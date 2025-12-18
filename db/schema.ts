@@ -54,7 +54,6 @@ type ResourceItem = {
 
 // MONKARC TABLES
 
-export const journeyTypeEnum = pgEnum('journey_type', ['learning', 'project'])
 export const journeyPhaseEnum = pgEnum('journey_phase', ['seed', 'arc'])
 export const journeyStatusEnum = pgEnum('journey_status', ['active', 'paused', 'frozen', 'dead', 'completed', 'extended', 'scheduled'])
 
@@ -63,7 +62,6 @@ export const journeys = pgTable('journeys', {
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   
   // Type & Content
-  type: journeyTypeEnum('type').notNull(),
   title: varchar('title', { length: 500 }).notNull(),
   description: text('description').notNull(),
   deliverable: text('deliverable'),
