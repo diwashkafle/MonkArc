@@ -1,4 +1,4 @@
-import { auth, signOut } from '@/lib/auth'
+import { auth} from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { ensureUsername } from '@/lib/server-actions/user-action'
 import { getUserJourneys, getJourneyStats } from '@/lib/queries/journey-queries'
@@ -26,48 +26,6 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Navigation */}
-      <nav className="border-b bg-white px-4 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <Link href="/dashboard" className="text-xl font-bold">
-            🧘‍♂️ MonkArc
-          </Link>
-          
-          <div className="flex items-center gap-4">
-            <Link
-              href={`/profile/${session.user.username}`}
-              className="text-sm text-blue-600 hover:underline"
-            >
-              View Profile
-            </Link>
-            
-            <Link
-              href="/settings"
-              className="text-sm text-slate-600 hover:underline"
-            >
-              Settings
-            </Link>
-            
-            <span className="text-sm text-slate-600">
-              {session.user.name}
-            </span>
-            
-            <form
-              action={async () => {
-                'use server'
-                await signOut({ redirectTo: '/login' })
-              }}
-            >
-              <button
-                type="submit"
-                className="rounded-lg bg-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-300"
-              >
-                Sign Out
-              </button>
-            </form>
-          </div>
-        </div>
-      </nav>
-      
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* Welcome Header */}

@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { auth } from "@/lib/auth";
 import {redirect } from "next/navigation";
 import { Toaster } from "sonner";
+import Header from "@/components/ProtectedUiComponents/ProtectedHeader/Header";
 
 
 
@@ -21,6 +22,7 @@ export default async function DashBoardLayout({
 
   return (
     <div>
+      <Header session={session}/>
       <main className="">{children}</main>
       <Toaster/>
     </div>

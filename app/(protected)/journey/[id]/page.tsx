@@ -12,6 +12,7 @@ import { Resource } from '@/lib/validation/journey-validation'
 import { SiCodefresh } from "react-icons/si";
 import { SiCodeigniter } from "react-icons/si";
 import { ExtendJourney } from '@/components/ProtectedUiComponents/journeys/extend-journey-modal'
+import { GiAzulFlake } from 'react-icons/gi'
 
 
 interface JourneyDetailPageProps {
@@ -131,7 +132,7 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
                 </h1>
                 <div className="mt-1 flex items-center gap-3 text-sm text-slate-600">
                   <span>
-                   {journey.phase ==="seed"?(<div className='flex gap-1 items-center'><SiCodefresh/> <span>Seed</span></div>):(<div className='flex gap-1 items-center'><SiCodeigniter/> <span>Arc</span></div>)}
+                   {journey.phase ==="seed"?(<div className='flex gap-1 items-center'><SiCodefresh/> <span>Seed</span></div>):(<div className='flex gap-1 items-center'><GiAzulFlake/> <span>Arc</span></div>)}
                   </span>
                   <span>•</span>
                   <span className="capitalize font-medium">

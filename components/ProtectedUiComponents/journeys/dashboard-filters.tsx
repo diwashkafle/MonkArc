@@ -6,9 +6,16 @@ import Link from 'next/link'
 import { InferSelectModel } from 'drizzle-orm'
 import { journeys } from '@/db/schema'
 import { SiCodefresh, SiCodeigniter } from 'react-icons/si'
-import { MdSevereCold } from "react-icons/md";
-import { GiDeathNote } from "react-icons/gi";
-import { GiAzulFlake } from "react-icons/gi";
+import { MdSevereCold } from "react-icons/md"
+import { IoCheckmarkDoneCircleSharp } from "react-icons/io5";
+import { GiDeathNote, GiAzulFlake } from "react-icons/gi"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface DashboardFiltersProps {
   journeys: InferSelectModel<typeof journeys>[]
@@ -86,110 +93,78 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
         </div>
       </div>
       
-      {/* Filter Tabs */}
-      <div className="mb-6 space-y-4">
+      {/* Filter Selects */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Status Filter */}
         <div>
-          <div className="text-sm font-medium text-slate-700 mb-2">Status</div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setStatusFilter('all')}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                statusFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-              }`}
-            >
-              All ({counts.all})
-            </button>
-            
-            <button
-              onClick={() => setStatusFilter('active')}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                statusFilter === 'active'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-              }`}
-            >
-              Active ({counts.active})
-            </button>
-            
-            <button
-              onClick={() => setStatusFilter('frozen')}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                statusFilter === 'frozen'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-              }`}
-            >
-              Frozen ({counts.frozen})
-            </button>
-            
-            <button
-              onClick={() => setStatusFilter('dead')}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                statusFilter === 'dead'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-              }`}
-            >
-              Dead ({counts.dead})
-            </button>
-            
-            <button
-              onClick={() => setStatusFilter('completed')}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                statusFilter === 'completed'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-              }`}
-            >
-              Completed ({counts.completed})
-            </button>
-          </div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            Status
+          </label>
+          <Select 
+            value={statusFilter} 
+            onValueChange={(value) => setStatusFilter(value as StatusFilter)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                All ({counts.all})
+              </SelectItem>
+              <SelectItem value="active">
+                <span className="flex items-center gap-2">
+                  Active ({counts.active})
+                </span>
+              </SelectItem>
+              <SelectItem value="frozen">
+                <span className="flex items-center gap-2">
+                  Frozen ({counts.frozen})
+                </span>
+              </SelectItem>
+              <SelectItem value="dead">
+                <span className="flex items-center gap-2">
+                  Dead ({counts.dead})
+                </span>
+              </SelectItem>
+              <SelectItem value="completed">
+                <span className="flex items-center gap-2">
+                  Completed ({counts.completed})
+                </span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         
-        {/* Type & Phase Filters */}
-        <div className="grid grid-cols-2 gap-4">
-          
-          {/* Phase Filter */}
-          <div>
-            <div className="text-sm font-medium text-slate-700 mb-2">Phase</div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPhaseFilter('all')}
-                className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  phaseFilter === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-                All
-              </button>
-              
-              <button
-                onClick={() => setPhaseFilter('seed')}
-                className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  phaseFilter === 'seed'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-               <span className='flex gap-1 justify-center items-center'> <SiCodefresh /> Seed</span>
-              </button>
-        
-              <button
-                onClick={() => setPhaseFilter('arc')}
-                className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  phaseFilter === 'arc'
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-              <span className='flex gap-1 justify-center items-center'><GiAzulFlake /> Arc</span>
-              </button>
-            </div>
-          </div>
+        {/* Phase Filter */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            Phase
+          </label>
+          <Select 
+            value={phaseFilter} 
+            onValueChange={(value) => setPhaseFilter(value as PhaseFilter)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter by phase" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                All Phases
+              </SelectItem>
+              <SelectItem value="seed">
+                <span className="flex items-center gap-2">
+                  <SiCodefresh className="h-4 w-4" />
+                  Seed
+                </span>
+              </SelectItem>
+              <SelectItem value="arc">
+                <span className="flex items-center gap-2">
+                  <GiAzulFlake className="h-4 w-4" />
+                  Arc
+                </span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
       
@@ -217,40 +192,37 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
             return (
               <div
                 key={journey.id}
-                className={`rounded-lg bg-white p-6 shadow-sm ${
-                  journey.status === 'frozen' ? 'border-2 border-blue-400' : 
-                  journey.status === 'dead' ? 'border-2 border-red-400' : ''
-                }`}
+                className={`rounded-lg bg-white p-6 shadow-sm`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">
-                        {journey.status === 'dead' ? <GiDeathNote /> : 
-                         journey.status === 'frozen' ? <MdSevereCold/> : 
-                         journey.phase === 'arc' ? <GiAzulFlake/> : <SiCodefresh/>}
-                      </span>
                       <h4 className="text-lg font-semibold text-slate-900">
                         {journey.title}
                       </h4>
+                      {journey.phase === 'seed' && (
+                        <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                         <span className='text-base'><SiCodefresh/></span> Seed
+                        </span>
+                      )}
                       {journey.phase === 'arc' && journey.status !== 'dead' && (
-                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
-                          Arc
+                        <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                         <span className='text-base'><GiAzulFlake/></span> Arc
                         </span>
                       )}
                       {journey.status === 'frozen' && (
-                        <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
-                          Frozen
+                        <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                         <span className='text-base'> <MdSevereCold/></span>Frozen
                         </span>
                       )}
                       {journey.status === 'dead' && (
-                        <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
-                          Dead
+                        <span className="rounded-full flex items-center gap-1 bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+                         <span className='text-base'><GiDeathNote /></span> Dead
                         </span>
                       )}
                       {journey.status === 'completed' && (
-                        <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">
-                          Completed
+                        <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 font-medium text-gray-700">
+                          <IoCheckmarkDoneCircleSharp/> <span className='text-xs py-1'>Completed</span>
                         </span>
                       )}
                     </div>
@@ -266,7 +238,9 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                       <span>•</span>
                       <span>
                         {journey.currentStreak > 0 
-                          ? `${journey.currentStreak} day streak 🔥` 
+                          ? (<div className='flex gap-1 items-center'>
+                            <h1>{journey.currentStreak} day streak</h1> <span className='text-gray-800'><SiCodeigniter/></span>
+                          </div>)
                           : 'No current streak'}
                       </span>
                       {journey.status === 'active' && daysSince > 0 && (
