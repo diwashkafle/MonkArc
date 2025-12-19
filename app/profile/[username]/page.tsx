@@ -71,8 +71,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     completedJourneys: userJourneys.filter(j => j.status === 'completed').length,
     totalCheckIns: userJourneys.reduce((sum, j) => sum + j.totalCheckIns, 0),
     longestStreak: Math.max(...userJourneys.map(j => j.longestStreak), 0),
-    learningJourneys: userJourneys.filter(j => j.type === 'learning').length,
-    projectJourneys: userJourneys.filter(j => j.type === 'project').length,
   }
   
   const profileUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/profile/${username}`
@@ -190,12 +188,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           <div className="rounded-lg bg-white p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <span className="text-3xl">📚</span>
-              <div>
-                <div className="text-2xl font-bold text-slate-900">
-                  {stats.learningJourneys}
-                </div>
-                <div className="text-sm text-slate-600">Learning Journeys</div>
-              </div>
             </div>
           </div>
           
@@ -204,7 +196,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               <span className="text-3xl">💻</span>
               <div>
                 <div className="text-2xl font-bold text-slate-900">
-                  {stats.projectJourneys}
+                  {stats.totalJourneys}
                 </div>
                 <div className="text-sm text-slate-600">Projects Built</div>
               </div>
@@ -303,7 +295,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                       
                       <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
                         <span>
-                          {journey.type === 'learning' ? '📚 Learning' : '💻 Project'}
+                         Project
                         </span>
                         <span>•</span>
                         <span>

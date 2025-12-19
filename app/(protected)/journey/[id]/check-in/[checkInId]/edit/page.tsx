@@ -110,7 +110,7 @@ export default async function EditCheckInPage({ params }: EditCheckInPageProps) 
                 name="journal"
                 required
                 rows={12}
-                defaultValue={checkIn.journal}
+                defaultValue={checkIn.accomplishment}
                 className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <p className="mt-2 text-xs text-slate-500">

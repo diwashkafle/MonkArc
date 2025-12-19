@@ -62,16 +62,9 @@ export default async function HomePage() {
             
             <div className="text-center">
               <div className="text-4xl font-bold text-purple-600">
-                {stats.learningJourneys}
+                {stats.totalPublicJourneys}
               </div>
-              <div className="mt-2 text-sm text-slate-600">Learning Journeys</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-4xl font-bold text-orange-600">
-                {stats.projectJourneys}
-              </div>
-              <div className="mt-2 text-sm text-slate-600">Projects Built</div>
+              <div className="mt-2 text-sm text-slate-600">Building Journeys</div>
             </div>
           </div>
         </div>
@@ -174,7 +167,7 @@ export default async function HomePage() {
                     
                     <div className="mt-4 flex items-center gap-4 text-xs text-slate-500">
                       <span>
-                        {journey.type === 'learning' ? '📚 Learning' : '💻 Project'}
+                        Project
                       </span>
                       <span>•</span>
                       <span>

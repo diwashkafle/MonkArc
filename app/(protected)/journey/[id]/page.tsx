@@ -11,6 +11,7 @@ import { CheckInTracker } from '@/components/ProtectedUiComponents/journeys/chec
 import { Resource } from '@/lib/validation/journey-validation'
 import { SiCodefresh } from "react-icons/si";
 import { SiCodeigniter } from "react-icons/si";
+import { ExtendJourney } from '@/components/ProtectedUiComponents/journeys/extend-journey-modal'
 
 
 interface JourneyDetailPageProps {
@@ -21,7 +22,9 @@ interface JourneyDetailPageProps {
 
 export default async function JourneyDetailPage({ params }: JourneyDetailPageProps) {
   const session = await auth()
-  if (!session) redirect('/login')
+  if (!session?.user?.id) redirect('/login')
+
+  
   
   const { id } = await params
   const journey = await getJourneyById(id, session.user.id)
@@ -37,6 +40,15 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
   return (
     <div className="min-h-screen bg-slate-50">
        <ArcCelebration
+       journeyId={journey.id}
+       username= {session?.user?.name}
+        journeyTitle={journey.title}
+        totalCheckIns={journey.totalCheckIns}
+        targetCheckIns={journey.targetCheckIns}
+      />
+      <ExtendJourney
+       journeyId={journey.id}
+       username= {session?.user?.name}
         journeyTitle={journey.title}
         totalCheckIns={journey.totalCheckIns}
         targetCheckIns={journey.targetCheckIns}
@@ -113,16 +125,13 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
         <div className="rounded-xl bg-white p-8 shadow-sm">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-5xl">
-                {journey.phase === 'arc' ? '🎋' : '🌱'}
-              </span>
               <div>
                 <h1 className="text-3xl font-bold text-slate-900">
                   {journey.title}
                 </h1>
                 <div className="mt-1 flex items-center gap-3 text-sm text-slate-600">
                   <span>
-                   {journey.phase ==="seed"?(<div className='flex gap-1 items-center'><SiCodefresh/> <span>Seed</span></div>):(<div><SiCodeigniter/> <span>Arc</span></div>)}
+                   {journey.phase ==="seed"?(<div className='flex gap-1 items-center'><SiCodefresh/> <span>Seed</span></div>):(<div className='flex gap-1 items-center'><SiCodeigniter/> <span>Arc</span></div>)}
                   </span>
                   <span>•</span>
                   <span className="capitalize font-medium">

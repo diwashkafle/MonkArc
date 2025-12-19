@@ -6,14 +6,12 @@ import { createCheckIn } from '@/lib/server-actions/check-in-actions';
 
 interface SimpleCheckInFormProps {
   journeyId: string
-  journeyType: 'learning' | 'project'
   journeyTitle: string
   date: string
 }
 
 export function SimpleCheckInForm({ 
   journeyId, 
-  journeyType, 
   journeyTitle,
   date 
 }: SimpleCheckInFormProps) {
@@ -22,9 +20,7 @@ export function SimpleCheckInForm({
   const [notes, setNotes] = useState('')
   const router = useRouter()
   
-  const question = journeyType === 'learning' 
-    ? 'What did you learn today?' 
-    : 'What did you build today?'
+  const question = 'What did you build today?'
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -59,9 +55,6 @@ export function SimpleCheckInForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Journey Info */}
       <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
-        <div className="text-sm text-slate-600">
-          {journeyType === 'learning' ? '📚 Learning Journey' : '💻 Project'}
-        </div>
         <div className="font-semibold text-slate-900 mt-1">
           {journeyTitle}
         </div>

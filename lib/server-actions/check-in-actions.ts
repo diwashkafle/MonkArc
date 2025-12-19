@@ -148,10 +148,12 @@ export async function createCheckIn(formData: FormData) {
   const newTotalCheckIns = journey.totalCheckIns + 1
   const newLongestStreak = Math.max(journey.longestStreak, newStreak)
   
-  // Check if journey should become Arc
   const shouldBecomeArc = 
-    journey.phase === 'seed' && 
-    newTotalCheckIns >= journey.targetCheckIns
+  journey.phase === 'seed' && 
+  newTotalCheckIns >= journey.targetCheckIns
+
+  const shouldCompletion =   newTotalCheckIns >= journey.targetCheckIns;
+
   
   await db.update(journeys)
     .set({
@@ -160,10 +162,9 @@ export async function createCheckIn(formData: FormData) {
       longestStreak: newLongestStreak,
       lastCheckInDate: data.date,
       phase: shouldBecomeArc ? 'arc' : journey.phase,
-      becameArcAt: shouldBecomeArc ? new Date() : journey.becameArcAt,
-      status: 'active', // Unfreeze/revive on check-in
-      frozenAt: null,   // Clear freeze timestamp
-      deadAt: null,     // Clear death timestamp (resurrection!)
+      status: 'active', 
+      frozenAt: null,   
+      deadAt: null,
     })
     .where(eq(journeys.id, data.journeyId))
   
@@ -173,7 +174,10 @@ export async function createCheckIn(formData: FormData) {
   // Redirect with celebration flag if became Arc
   if (shouldBecomeArc) {
     redirect(`/journey/${data.journeyId}?became-arc=true`)
-  } else {
+  } else if(shouldCompletion){
+    redirect(`/journey/${data.journeyId}?should-complete=true`)
+  }
+  else {
     redirect(`/journey/${data.journeyId}`)
   }
 }
@@ -249,3 +253,4 @@ export async function editCheckIn(checkInId: string, formData: FormData) {
   
   redirect(`/journey/${checkIn.journeyId}/check-in/${checkInId}`)
 }
+

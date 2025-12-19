@@ -55,7 +55,6 @@ export default async function NewCheckInPage({ params }: NewCheckInPageProps) {
           {/* Form */}
           <SimpleCheckInForm 
             journeyId={id}
-            journeyType={journey.type}
             journeyTitle={journey.title}
             date={today}
           />

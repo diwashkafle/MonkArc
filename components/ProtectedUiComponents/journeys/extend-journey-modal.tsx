@@ -1,8 +1,6 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import confetti from "canvas-confetti";
 import {
   Dialog,
   DialogContent,
@@ -11,14 +9,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { SiCodefresh, SiCodeigniter } from "react-icons/si";
-import { MdArrowRightAlt } from "react-icons/md";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { completeJourney, extendJourney } from "@/lib/server-actions/journey-actions";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 
-interface ArcCelebrationProps {
+interface ExtendJourneyProp {
   username:string | null | undefined;
   journeyTitle: string;
   totalCheckIns: number;
@@ -26,56 +23,25 @@ interface ArcCelebrationProps {
   journeyId:string;
 }
 
-export function ArcCelebration({
+export function ExtendJourney({
   username,
   journeyId,
   journeyTitle,
   totalCheckIns,
   targetCheckIns,
-}: ArcCelebrationProps) {
+}: ExtendJourneyProp) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isExtendJourney, setIsExtendJourney] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // ✅ Derive state directly from URL - no useState needed!
-  const isOpen = searchParams.get("became-arc") === "true";
-
-  // Only use useEffect for SIDE EFFECTS (confetti)
-  useEffect(() => {
-    if (isOpen) {
-      // Trigger confetti - this is a valid side effect
-      const duration = 3000;
-      const end = Date.now() + duration;
-
-      const frame = () => {
-        confetti({
-          particleCount: 2,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 },
-          colors: ["#10b981", "#34d399", "#6ee7b7"],
-        });
-
-        confetti({
-          particleCount: 2,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 },
-          colors: ["#10b981", "#34d399", "#6ee7b7"],
-        });
-
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      };
-
-      frame();
-    }
-  }, [isOpen]); // Only fire when isOpen changes
+  const isOpen = searchParams.get("should-complete") === "true";
 
   const handleClose = async () => {
+    setIsSubmitting(true);
     await completeJourney(journeyId);
     router.replace(window.location.pathname);
+    setIsSubmitting(false);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -112,10 +78,7 @@ export function ArcCelebration({
           <DialogDescription className="text-center text-base pt-4">
              {!isExtendJourney ? <div className="flex items-center flex-col">
               <h1>Congratulations {username}</h1>
-              <div className="flex items-center justify-center gap-2">
-               <span className="flex gap-1 items-center"><SiCodefresh /> seed</span>  <MdArrowRightAlt size={25}/>  <span className="flex gap-1 items-center"><SiCodeigniter /> arc</span>
-              </div>
-               <h1>Arc phase achieved for <strong>{journeyTitle}</strong></h1>
+               <h1>Extended target reached for <strong>{journeyTitle}</strong>!</h1>
               </div>: <div>
                 <h1>Add new target days to extend your journey. You can complete it anytime you want when you are in extended state.</h1>
                 </div>}
@@ -146,12 +109,12 @@ export function ArcCelebration({
           
         </div>
 
-        <div className="flex  justify-evenly">
-          <Button onClick={()=>setIsExtendJourney(true)} className="cursor-pointer">
+        <div className="flex  justify-end gap-5">
+          <Button disabled={isSubmitting} onClick={()=>setIsExtendJourney(true)} className="cursor-pointer">
             Extend journey
           </Button>
-          <Button onClick={handleClose} className="cursor-pointer">
-            Complete journey
+          <Button disabled={isSubmitting} onClick={handleClose} className="cursor-pointer">
+            {isSubmitting?<p className="flex gap-1 items-center"><Loader2 className="animate-spin"/> Completing</p>:<p>Complete journey</p>}
           </Button>
         </div>
         </section> : <section>

@@ -93,7 +93,7 @@ export function NewJourneyForm({
           type="number"
           name="targetCheckIns"
           required
-          min={7}
+          min={1}
           max={365}
           defaultValue={30}
           className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"

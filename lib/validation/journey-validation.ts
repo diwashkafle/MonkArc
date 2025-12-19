@@ -177,13 +177,11 @@ export const editJourneySchema = z.object({
 
 export type EditJourneyInput = z.infer<typeof editJourneySchema>
 
-// ========================================
-// HELPER: VALIDATE JOURNEY TYPE
-// ========================================
+export const extendedJourneySchema = z.object({
+  daysToAdd:z
+    .number()
+    .int('Must be a whole number')
+    .min(1, 'Minimum extend 1 required')
+    .max(30, 'Maximum 30 check-ins allowed')
 
-export function validateJourneyByType(data: CreateJourneyInput) {
-    if (!data.repoURL) {
-      console.warn('Project journey created without GitHub repo URL')
-    }
-  return true
-}
+})

@@ -5,6 +5,10 @@ import { Search } from 'lucide-react'
 import Link from 'next/link'
 import { InferSelectModel } from 'drizzle-orm'
 import { journeys } from '@/db/schema'
+import { SiCodefresh, SiCodeigniter } from 'react-icons/si'
+import { MdSevereCold } from "react-icons/md";
+import { GiDeathNote } from "react-icons/gi";
+import { GiAzulFlake } from "react-icons/gi";
 
 interface DashboardFiltersProps {
   journeys: InferSelectModel<typeof journeys>[]
@@ -171,9 +175,9 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                     : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
                 }`}
               >
-                🌱 Seed
+               <span className='flex gap-1 justify-center items-center'> <SiCodefresh /> Seed</span>
               </button>
-              
+        
               <button
                 onClick={() => setPhaseFilter('arc')}
                 className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
@@ -182,7 +186,7 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                     : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
                 }`}
               >
-                🎋 Arc
+              <span className='flex gap-1 justify-center items-center'><GiAzulFlake /> Arc</span>
               </button>
             </div>
           </div>
@@ -222,9 +226,9 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">
-                        {journey.status === 'dead' ? '💀' : 
-                         journey.status === 'frozen' ? '❄️' : 
-                         journey.phase === 'arc' ? '🎋' : '🌱'}
+                        {journey.status === 'dead' ? <GiDeathNote /> : 
+                         journey.status === 'frozen' ? <MdSevereCold/> : 
+                         journey.phase === 'arc' ? <GiAzulFlake/> : <SiCodefresh/>}
                       </span>
                       <h4 className="text-lg font-semibold text-slate-900">
                         {journey.title}

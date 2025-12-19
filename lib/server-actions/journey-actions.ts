@@ -9,8 +9,15 @@ import { eq, and } from "drizzle-orm";
 import {
   createJourneySchema,
   editJourneySchema,
-  validateJourneyByType
+  extendedJourneySchema,
 } from "@/lib/validation/journey-validation";
+
+type ExtendedHistory = {
+  id:string;
+  date:Date;
+  daysAdded:number;
+  newTarget:number;
+}
 
   // Create journey in database
 
@@ -46,12 +53,11 @@ export async function createJourney(formData: FormData) {
   const rawData = {
     title: formData.get('title') as string,
     description: formData.get('description') as string,
-    type: formData.get('type') as 'learning' | 'project',
     targetCheckIns: parseInt(formData.get('targetCheckIns') as string),
     startDate: formData.get('startDate') as string,
     isPublic: formData.get('isPublic') === 'on',
     repoURL: formData.get('repoURL') as string || null, // ✅ null not empty string
-    techStack, // ✅ Already an array
+    techStack, 
     resources,
     status,
   }
@@ -68,8 +74,6 @@ export async function createJourney(formData: FormData) {
 
   const data = validationResult.data;
   
-  // Optional validation by type
-  validateJourneyByType(data)
   
   // Create journey
   const [journey] = await db.insert(journeys).values({
@@ -320,6 +324,10 @@ export async function completeJourney(journeyId: string) {
     throw new Error("Only Arc journeys can be marked as complete");
   }
 
+  if (journey.status === "completed") {
+    throw new Error("Journey is already completed")
+  }
+
   // Update to completed
   await db
     .update(journeys)
@@ -331,4 +339,81 @@ export async function completeJourney(journeyId: string) {
 
   revalidatePath(`/journey/${journeyId}`);
   revalidatePath("/dashboard");
+}
+
+// ========================================
+// Extend journey
+// ========================================
+
+export async function extendJourney(journeyId: string, formData: FormData) {
+  const session = await auth()
+
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized')
+  }
+
+  const journey = await db.query.journeys.findFirst({
+    where: and(
+      eq(journeys.id, journeyId),
+      eq(journeys.userId, session.user.id)
+    ),
+  })
+
+  if (!journey) {
+    throw new Error("Journey not found or access denied")
+  }
+
+  const daysToAddStr = formData.get('daysToAdd')
+  
+  if (!daysToAddStr) {
+    throw new Error('Days to add is required')
+  }
+  
+  const daysToAddNum = parseInt(daysToAddStr as string, 10)
+  
+  if (isNaN(daysToAddNum)) {
+    throw new Error('Days to add must be a valid number')
+  }
+
+  const rawData = {
+    daysToAdd: daysToAddNum,
+  }
+
+  const validationResult = extendedJourneySchema.safeParse(rawData)
+
+  if (!validationResult.success) {
+    console.error('Validation Failed:', validationResult.error.issues)
+    const firstError = validationResult.error.issues[0]
+    throw new Error(`${firstError.path.join('.')}: ${firstError.message}`)
+  }
+
+  const data = validationResult.data
+  const newTarget = journey.targetCheckIns + data.daysToAdd
+
+  // ✅ FIXED: Update with proper types
+  await db.update(journeys)
+    .set({
+      isExtended: true,  // ✅ Add this
+      extendedTarget: newTarget,  
+      targetCheckIns: newTarget,
+      originalTarget: journey.originalTarget || journey.targetCheckIns,
+      timesExtended: journey.timesExtended + 1,
+      lastExtendedAt: new Date(),
+      extensionHistory: [
+        ...(journey.extensionHistory || []),
+        {
+          id: crypto.randomUUID(),
+          date: new Date(),
+          daysAdded: data.daysToAdd,  // ✅ Now guaranteed to be number
+          newTarget: newTarget
+        }
+      ],
+    })
+    .where(eq(journeys.id, journeyId))
+
+  // ✅ Add revalidation and redirect
+  revalidatePath(`/journey/${journeyId}`)
+  revalidatePath('/dashboard')
+
+  redirect(`/journey/${journeyId}`)
 }
