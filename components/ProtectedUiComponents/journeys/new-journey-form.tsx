@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { createJourney } from "@/lib/server-actions/journey-actions";
 import { ResourceManager } from "@/components/ProtectedUiComponents/journeys/resource-manager";
-import { LinkGitHubButton } from "@/components/ProtectedUiComponents/journeys/link-github-button";
+import { LinkGitHubButton } from "@/components/ProtectedUiComponents/journeys/github/link-github-button";
 import { Loader2 } from "lucide-react";
 import clsx from "clsx";
 
@@ -26,8 +26,9 @@ export function NewJourneyForm({
   githubUsername,
 }: NewJourneyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [type, setType] = useState<"learning" | "project">("learning");
   const [resources, setResources] = useState<Resource[]>([]);
+  const [selectedRepo, setSelectedRepo] = useState<string>('')
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -138,43 +139,17 @@ export function NewJourneyForm({
         <label className="block text-sm font-medium text-slate-900 mb-2">
           GitHub Repository <span className="text-slate-400">(Optional)</span>
         </label>
-        <input
-          type="url"
-          name="repoURL"
-          placeholder="https://github.com/username/repo"
-          className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+
+        
+        <LinkGitHubButton
+          variant="card"
+          isConnected={githubConnected}
+          onRepoSelect={(repoUrl) => setSelectedRepo(repoUrl)}
+          currentRepo={selectedRepo}
         />
-
-        {/* GitHub Connection Status */}
-        <div className="mt-3">
-          {githubConnected ? (
-            <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg p-3 border border-green-200">
-              <svg
-                className="h-5 w-5 shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <div className="flex-1">
-                <span className="font-medium">GitHub Connected</span>
-                {githubUsername && (
-                  <span className="text-green-600 ml-1">@{githubUsername}</span>
-                )}
-                <p className="text-xs text-green-600 mt-0.5">
-                  Can access private repositories
-                </p>
-              </div>
-            </div>
-          ) : (
-            <LinkGitHubButton variant="card" />
-          )}
-        </div>
-
+        
+        {/* Hidden input to submit with form */}
+        <input type="hidden" name="repoURL" value={selectedRepo} />
         <p className="mt-2 text-xs text-slate-500">
           Track commits automatically.{" "}
           {!githubConnected && "Connect GitHub to access private repositories."}

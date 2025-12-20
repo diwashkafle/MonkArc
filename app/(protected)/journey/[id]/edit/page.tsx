@@ -53,10 +53,10 @@ export default async function EditJourneyPage({ params }: EditJourneyPageProps) 
           <Tabs defaultValue="edit">
         <TabsList>
           <TabsTrigger value="edit">Edit</TabsTrigger>
-          <TabsTrigger value="advance_setting">Advance setting</TabsTrigger>
+          <TabsTrigger value="setting">Setting</TabsTrigger>
         </TabsList>
         <TabsContent value="edit">
-          <main className='grid mt-5'>
+          <main className='grid grid-6'>
             <section className='flex flex-col gap-2'>
               <h1 className='text-xl font-semibold'>
                 Edit Journey
@@ -67,9 +67,14 @@ export default async function EditJourneyPage({ params }: EditJourneyPageProps) 
           </main>
 
         </TabsContent>
-        <TabsContent value="advance_setting">
-         
+        <TabsContent value="setting">
              <main className='grid gap-6'>
+             <section className='flex flex-col gap-2'>
+              <h1 className='text-xl font-semibold'>
+                {"Journey's Settings"}
+              </h1>
+              <p className='text-sm text-gray-600'>You can make changes for your journey</p>
+            </section>
               <PauseAndResume status={journey.status} id={id} />
                <Separator className="" />
                <div className='flex flex-col gap-3'>

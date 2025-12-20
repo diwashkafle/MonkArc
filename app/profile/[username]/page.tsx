@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { auth } from '@/lib/auth'
 import { ShareProfileButton } from '@/components/ProtectedUiComponents/journeys/share-profile-button'
+import Header from '@/components/ProtectedUiComponents/ProtectedHeader/Header'
 
 interface ProfilePageProps {
   params: Promise<{
@@ -77,42 +78,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Navigation */}
-      <nav className="border-b bg-white px-4 py-4">
-        <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold">
-            🧘‍♂️ MonkArc
-          </Link>
-          
-          <div className="flex items-center gap-4">
-            {session ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="text-sm text-slate-600 hover:underline"
-                >
-                  Dashboard
-                </Link>
-                {isOwnProfile && (
-                  <Link
-                    href="/settings"
-                    className="text-sm text-slate-600 hover:underline"
-                  >
-                    Settings
-                  </Link>
-                )}
-              </>
-            ) : (
-              <Link
-                href="/login"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                Sign In
-              </Link>
-            )}
-          </div>
-        </div>
-      </nav>
+      <Header session={session}/>
       
       {/* Main Content */}
       <main className="mx-auto max-w-6xl px-4 py-12">
@@ -152,7 +118,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </div>
           
           {/* Stats Grid */}
-          <div className="mt-8 grid grid-cols-2 gap-4 border-t pt-6 md:grid-cols-4">
+          <div className="mt-8 flex justify-between items-center  gap-2 border-t pt-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-emerald-600">
                 {stats.arcs}
@@ -179,6 +145,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 {stats.activeJourneys}
               </div>
               <div className="mt-1 text-sm text-slate-600">Active Journeys</div>
+            </div>
+             <div className="text-center">
+              <div className="text-3xl font-bold text-purple-600">
+                {stats.completedJourneys}
+              </div>
+              <div className="mt-1 text-sm text-slate-600">completed Journeys</div>
             </div>
           </div>
         </div>

@@ -2,12 +2,22 @@
 
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
+import { RepoSelector } from './repo-selector'
+import { CheckCircle } from 'lucide-react'
 
 interface LinkGitHubButtonProps {
   variant?: 'inline' | 'card'
+  isConnected: boolean
+  onRepoSelect?: (repoUrl: string) => void
+  currentRepo?: string | null
 }
 
-export function LinkGitHubButton({ variant = 'inline' }: LinkGitHubButtonProps) {
+export function LinkGitHubButton({ 
+  variant = 'inline', 
+  isConnected,
+  onRepoSelect,
+  currentRepo 
+}: LinkGitHubButtonProps) {
   const [isConnecting, setIsConnecting] = useState(false)
   
   const handleConnect = async () => {
@@ -19,7 +29,32 @@ export function LinkGitHubButton({ variant = 'inline' }: LinkGitHubButtonProps) 
       setIsConnecting(false)
     }
   }
+
+  // If connected, show repo selector
+  if (isConnected) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-sm text-emerald-600">
+          <CheckCircle className="h-4 w-4" />
+          <span className="font-medium">GitHub Connected</span>
+        </div>
+        
+        {onRepoSelect && (
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Select Repository
+            </label>
+            <RepoSelector 
+              onSelect={onRepoSelect}
+              selectedRepo={currentRepo}
+            />
+          </div>
+        )}
+      </div>
+    )
+  }
   
+  // Not connected - show connect button
   if (variant === 'card') {
     return (
       <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-4">
@@ -27,10 +62,10 @@ export function LinkGitHubButton({ variant = 'inline' }: LinkGitHubButtonProps) 
           <div className="text-2xl">🔐</div>
           <div className="flex-1">
             <h4 className="font-semibold text-blue-900">
-              Private Repository Access
+              Connect GitHub
             </h4>
             <p className="text-sm text-blue-800 mt-1">
-              Link your GitHub account to track commits from private repositories
+              Link your GitHub account to select repositories and track commits
             </p>
             <button
               onClick={handleConnect}

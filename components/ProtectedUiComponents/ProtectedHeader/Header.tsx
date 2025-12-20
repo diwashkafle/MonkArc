@@ -46,7 +46,7 @@ const Header = ({ session }: HeaderProp) => {
     </Tooltip>
           </Link>
 
-          <DropdownMenuHeader image={session?.user.image} />
+          <DropdownMenuHeader username={session?.user.username} image={session?.user.image} />
         </div>
       </div>
     </nav>

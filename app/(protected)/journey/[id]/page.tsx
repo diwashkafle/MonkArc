@@ -6,12 +6,6 @@ import {
 } from "@/lib/queries/check-in-queries";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { DeleteJourneyButton } from "@/components/ProtectedUiComponents/journeys/delete-journey-button";
-import {
-  pauseJourney,
-  resumeJourney,
-  completeJourney,
-} from "@/lib/server-actions/journey-actions";
 import { ArcCelebration } from "@/components/ProtectedUiComponents/journeys/arc-celebration";
 import { daysSinceLastCheckIn } from "@/lib/journey/journey-status";
 import { CheckInTracker } from "@/components/ProtectedUiComponents/journeys/check-in-tracker";

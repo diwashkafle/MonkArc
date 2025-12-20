@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { editJourney } from '@/lib/server-actions/journey-actions'
 import { ResourceManager } from '@/components/ProtectedUiComponents/journeys/resource-manager'
 import type { Resource } from '@/lib/validation/journey-validation'
-import { LinkGitHubButton } from './link-github-button'
+import { LinkGitHubButton } from './github/link-github-button'
 import clsx from 'clsx'
 import { Loader2 } from 'lucide-react'
 
