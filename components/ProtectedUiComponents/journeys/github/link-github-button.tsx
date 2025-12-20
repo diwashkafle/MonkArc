@@ -68,6 +68,7 @@ export function LinkGitHubButton({
               Link your GitHub account to select repositories and track commits
             </p>
             <button
+            type='button'
               onClick={handleConnect}
               disabled={isConnecting}
               className="mt-3 flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
@@ -86,6 +87,7 @@ export function LinkGitHubButton({
   // Inline variant
   return (
     <button
+    type='button'
       onClick={handleConnect}
       disabled={isConnecting}
       className="flex items-center gap-2 rounded-lg border-2 border-slate-900 bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"

@@ -14,6 +14,13 @@ import { SiCodefresh } from "react-icons/si";
 import { ExtendJourney } from "@/components/ProtectedUiComponents/journeys/extend-journey-modal";
 import { GiAzulFlake } from "react-icons/gi";
 import { IoSettingsOutline } from "react-icons/io5";
+import { PiNotePencilLight } from "react-icons/pi";
+import { SlCalender } from "react-icons/sl";
+import { RiVideoFill } from "react-icons/ri";
+import { IoIosDocument } from "react-icons/io";
+import { CgWebsite } from "react-icons/cg";
+import { FaLink } from "react-icons/fa6";
+import { FaBook, FaGraduationCap } from "react-icons/fa";
 
 interface JourneyDetailPageProps {
   params: Promise<{
@@ -242,7 +249,7 @@ export default async function JourneyDetailPage({
           <div className="mt-8 rounded-xl bg-white p-8 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-slate-900">
-                📚 Learning Resources
+               Learning Resources
               </h3>
               <Link
                 href={`/journey/${journey.id}/edit`}
@@ -252,18 +259,23 @@ export default async function JourneyDetailPage({
               </Link>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 text-gray-700">
               {journey.resources.map((resource: Resource) => {
                 const getTypeIcon = (type: string) => {
                   switch (type) {
                     case "video":
-                      return "📺";
+                      return <RiVideoFill/>
                     case "docs":
-                      return "📚";
+                      return <IoIosDocument/>
                     case "article":
-                      return "📄";
+                      return <CgWebsite/>
+                     case 'course': 
+                          return <FaGraduationCap/>
+                        case 'book': 
+                          return <FaBook/>
+                        case 'other': 
                     default:
-                      return "🔗";
+                      return <FaLink/>
                   }
                 };
 
@@ -398,8 +410,8 @@ export default async function JourneyDetailPage({
           </div>
 
           {checkIns.length === 0 ? (
-            <div className="mt-6 text-center py-12">
-              <div className="text-6xl">📝</div>
+            <div className="mt-6 text-center flex flex-col items-center py-12">
+              <div className="text-6xl"><PiNotePencilLight/></div>
               <p className="mt-4 text-slate-600">No check-ins yet.</p>
               <p className="mt-1 text-sm text-slate-500">
                 Start your journey by checking in today!
@@ -424,7 +436,7 @@ export default async function JourneyDetailPage({
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
-                          <div className="text-2xl">📅</div>
+                          <div className="text-2xl"><SlCalender/></div>
                           <div>
                             <div className="font-semibold text-slate-900">
                               {formattedDate}

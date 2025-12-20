@@ -102,6 +102,7 @@ export function RepoSelector({ onSelect, selectedRepo }: RepoSelectorProps) {
             
             return (
               <button
+              type='button'
                 key={repo.id}
                 onClick={() => handleSelectRepo(repo)}
                 className={`w-full text-left rounded-lg border p-3 transition-all ${

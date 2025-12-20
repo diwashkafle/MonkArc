@@ -29,16 +29,7 @@ export default async function NewCheckInPage({ params }: NewCheckInPageProps) {
   const today = new Date().toISOString().split('T')[0]
   
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Navigation */}
-      <nav className="border-b bg-white px-4 py-4">
-        <div className="mx-auto max-w-3xl">
-          <Link href={`/journey/${id}`} className="text-sm text-slate-600 hover:underline">
-            ← Back to Journey
-          </Link>
-        </div>
-      </nav>
-      
+    <div className="min-h-screen bg-slate-50">    
       {/* Main Content */}
       <main className="mx-auto max-w-3xl px-4 py-12">
         <div className="rounded-xl bg-white p-8 shadow-sm">

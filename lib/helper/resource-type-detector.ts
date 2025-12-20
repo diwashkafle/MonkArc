@@ -1,3 +1,11 @@
+  import { FaGraduationCap } from "react-icons/fa";
+import { FaBook } from "react-icons/fa";
+import { RiVideoFill } from "react-icons/ri";
+import { IoIosDocument } from "react-icons/io";
+import { CgWebsite } from "react-icons/cg";
+import { FaLink } from "react-icons/fa6";
+import { IconType } from 'react-icons'
+
 type ResourceType = 'video' | 'article' | 'docs' | 'course' | 'book' | 'other'
 
 interface ResourcePattern {
@@ -223,14 +231,22 @@ export function extractTitleFromUrl(url: string): string {
 // GET TYPE ICON
 // ========================================
 
-export function getResourceTypeIcon(type: ResourceType): string {
+export function getResourceTypeIcon(type: ResourceType): IconType {
   switch (type) {
-    case 'video': return '📺'
-    case 'docs': return '📚'
-    case 'article': return '📄'
-    case 'course': return '🎓'
-    case 'book': return '📖'
-    case 'other': return '🔗'
+    case 'video': 
+      return RiVideoFill
+    case 'docs': 
+      return IoIosDocument
+    case 'article': 
+      return CgWebsite
+    case 'course': 
+      return FaGraduationCap
+    case 'book': 
+      return FaBook
+    case 'other': 
+      return FaLink
+    default:
+      return FaLink
   }
 }
 

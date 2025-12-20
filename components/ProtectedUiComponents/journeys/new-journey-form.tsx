@@ -23,7 +23,6 @@ interface NewJourneyFormProps {
 
 export function NewJourneyForm({
   githubConnected,
-  githubUsername,
 }: NewJourneyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resources, setResources] = useState<Resource[]>([]);
