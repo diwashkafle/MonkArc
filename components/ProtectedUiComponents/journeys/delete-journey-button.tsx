@@ -44,9 +44,8 @@ export function DeleteJourneyButton({ journeyId, journeyTitle }: DeleteJourneyBu
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Delete</Button>
+        <Button className='cursor-pointer w-fit' variant="destructive">Delete</Button>
       </DialogTrigger>
-      
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Delete <span className='text-red-600'>{journeyTitle}</span>?</DialogTitle>

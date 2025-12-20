@@ -1,6 +1,11 @@
 'use client'
 
 import { format, addDays, differenceInDays, startOfDay, isBefore } from 'date-fns'
+import { SiCodefresh, SiCodeigniter } from 'react-icons/si'
+import { FaCheckCircle } from "react-icons/fa";
+import { RxCross2 } from "react-icons/rx";
+import { LiaCalendarDaySolid } from "react-icons/lia";
+import { IoMdCloseCircle } from "react-icons/io";
 
 interface CheckIn {
   id: string
@@ -78,11 +83,6 @@ export function CheckInTracker({
           <h3 className="text-lg font-semibold text-slate-900">
             Progress Tracker
           </h3>
-          {currentStreak > 0 && (
-            <p className="text-sm text-orange-600 mt-1">
-              🔥 {currentStreak} day streak
-            </p>
-          )}
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-slate-900">
@@ -210,32 +210,32 @@ export function CheckInTracker({
       
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
-        <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-3 text-center">
-          <div className="text-2xl font-bold text-emerald-700">
+        <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-center">
+          <div className="text-2xl font-bold text-green-700">
             {completedCount}
           </div>
-          <div className="text-xs text-emerald-600 mt-1">Completed</div>
+          <div className="text-xs text-green-600 flex items-center justify-center gap-1 mt-1"> Completed <FaCheckCircle size={12}/> </div>
         </div>
         
         <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-center">
           <div className="text-2xl font-bold text-red-700">
             {missedCount}
           </div>
-          <div className="text-xs text-red-600 mt-1">Missed</div>
+          <div className="text-xs text-red-600 flex items-center justify-center gap-1 mt-1">Missed <IoMdCloseCircle size={13}/></div>
         </div>
         
         <div className="rounded-lg bg-orange-50 border border-orange-200 p-3 text-center">
           <div className="text-2xl font-bold text-orange-700">
             {currentStreak}
           </div>
-          <div className="text-xs text-orange-600 mt-1">Streak</div>
+          <div className="text-xs text-orange-600 flex items-center justify-center gap-1 mt-1">Streak <SiCodeigniter/></div>
         </div>
         
         <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-center">
           <div className="text-2xl font-bold text-slate-700">
             {remainingCount}
           </div>
-          <div className="text-xs text-slate-600 mt-1">Remaining</div>
+          <div className="text-xs text-slate-600 flex justify-center items-center gap-1 mt-1">Remaining <LiaCalendarDaySolid size={15}/></div>
         </div>
       </div>
     </div>
