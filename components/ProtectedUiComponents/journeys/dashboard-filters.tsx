@@ -197,7 +197,7 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h4 className="text-lg font-semibold text-slate-900">
-                        {journey.title}
+                      {journey.title.length > 40 ? journey.title.slice(0,30)+"...":journey.title}
                       </h4>
                       {journey.phase === 'seed' && (
                         <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">

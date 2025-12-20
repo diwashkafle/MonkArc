@@ -7,6 +7,12 @@ import Image from 'next/image'
 import { auth } from '@/lib/auth'
 import { ShareProfileButton } from '@/components/ProtectedUiComponents/journeys/share-profile-button'
 import Header from '@/components/ProtectedUiComponents/ProtectedHeader/Header'
+import { SiAlwaysdata, SiCodefresh, SiCodeigniter } from "react-icons/si"
+import { FaCalendarCheck } from "react-icons/fa"
+import { DiCodeigniter } from "react-icons/di"
+import { MdSevereCold } from "react-icons/md"
+import { GiAzulFlake, GiDeathNote } from 'react-icons/gi'
+import { IoCheckmarkDoneCircleSharp } from "react-icons/io5"
 
 interface ProfilePageProps {
   params: Promise<{
@@ -63,6 +69,16 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     orderBy: (journeys, { desc }) => [desc(journeys.createdAt)],
   })
   
+  // Helper function to calculate days since last check-in
+  const daysSinceLastCheckIn = (lastCheckInDate: string | null) => {
+    if (!lastCheckInDate) return 0
+    const last = new Date(lastCheckInDate)
+    const today = new Date()
+    last.setHours(0, 0, 0, 0)
+    today.setHours(0, 0, 0, 0)
+    return Math.floor((today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24))
+  }
+  
   // Calculate stats
   const stats = {
     totalJourneys: userJourneys.length,
@@ -81,7 +97,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       <Header session={session}/>
       
       {/* Main Content */}
-      <main className="mx-auto max-w-6xl px-4 py-12">
+      <main className="mx-auto max-w-7xl px-4 py-12">
         {/* Profile Header */}
         <div className="rounded-xl bg-white p-8 shadow-sm">
           <div className="flex items-start justify-between">
@@ -118,59 +134,49 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </div>
           
           {/* Stats Grid */}
-          <div className="mt-8 flex justify-between items-center  gap-2 border-t pt-6">
+          <div className="mt-8 flex flex-wrap justify-between items-center gap-4 border-t pt-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-emerald-600">
+              <div className="text-3xl font-bold text-gray-600">
                 {stats.arcs}
               </div>
-              <div className="mt-1 text-sm text-slate-600">Arcs Achieved</div>
+              <div className="mt-1 text-sm text-gray-600 flex items-center gap-1">
+                Arcs <GiAzulFlake/>
+              </div>
             </div>
             
             <div className="text-center">
-              <div className="text-3xl font-bold text-orange-600">
+              <div className="text-3xl font-bold text-gray-600">
                 {stats.longestStreak}
               </div>
-              <div className="mt-1 text-sm text-slate-600">Longest Streak</div>
+              <div className="mt-1 text-sm text-gray-600 flex items-center gap-1">
+                Longest Streak <DiCodeigniter/>
+              </div>
             </div>
             
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600">
+              <div className="text-3xl font-bold text-gray-600">
                 {stats.totalCheckIns}
               </div>
-              <div className="mt-1 text-sm text-slate-600">Total Check-ins</div>
+              <div className="mt-1 text-sm text-gray-600 flex items-center gap-1">
+                Total Check-ins <FaCalendarCheck/>
+              </div>
             </div>
             
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600">
+              <div className="text-3xl font-bold text-gray-600">
                 {stats.activeJourneys}
               </div>
-              <div className="mt-1 text-sm text-slate-600">Active Journeys</div>
+              <div className="mt-1 text-sm text-gray-600 flex items-center gap-1">
+                Active Journeys <SiAlwaysdata/>
+              </div>
             </div>
-             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600">
+            
+            <div className="text-center">
+              <div className="text-3xl font-bold text-gray-600">
                 {stats.completedJourneys}
               </div>
-              <div className="mt-1 text-sm text-slate-600">completed Journeys</div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Journey Type Stats */}
-        <div className="mt-6 grid grid-cols-2 gap-4">
-          <div className="rounded-lg bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">📚</span>
-            </div>
-          </div>
-          
-          <div className="rounded-lg bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">💻</span>
-              <div>
-                <div className="text-2xl font-bold text-slate-900">
-                  {stats.totalJourneys}
-                </div>
-                <div className="text-sm text-slate-600">Projects Built</div>
+              <div className="mt-1 text-sm text-gray-600 flex items-center gap-1">
+                Completed <IoCheckmarkDoneCircleSharp/>
               </div>
             </div>
           </div>
@@ -178,14 +184,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         
         {/* Journeys Section */}
         <div className="mt-8">
-          <div className="flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold text-slate-900">
               {isOwnProfile ? 'Your Journeys' : 'Public Journeys'}
             </h2>
             {isOwnProfile && (
               <Link
                 href="/journey/new"
-                className="text-sm text-blue-600 hover:underline"
+                className="rounded-lg bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
               >
                 + New Journey
               </Link>
@@ -193,124 +199,137 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </div>
           
           {userJourneys.length === 0 ? (
-            <div className="mt-6 rounded-lg bg-white p-12 text-center shadow-sm">
-              <div className="text-6xl">🌱</div>
-              <p className="mt-4 text-slate-600">
+            <div className="rounded-lg bg-white p-12 text-center shadow-sm">
+              <h4 className="mt-4 text-lg font-semibold text-slate-900">
+                {isOwnProfile ? 'No journeys yet' : 'No public journeys yet'}
+              </h4>
+              <p className="mt-2 text-slate-600">
                 {isOwnProfile 
-                  ? "You haven't created any journeys yet." 
-                  : "No public journeys yet."}
+                  ? "Create your first journey to start your MonkArc experience." 
+                  : `${user.name} hasn't shared any public journeys yet.`}
               </p>
               {isOwnProfile && (
                 <Link
                   href="/journey/new"
-                  className="mt-4 inline-block rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700"
+                  className="mt-6 inline-block rounded-lg bg-gray-600 px-6 py-3 font-medium text-white hover:bg-gray-700"
                 >
                   Create First Journey
                 </Link>
               )}
             </div>
           ) : (
-            <div className="mt-6 grid gap-6 md:grid-cols-2">
-              {userJourneys.map((journey) => (
-                <div
-                  key={journey.id}
-                  className={`rounded-lg bg-white p-6 shadow-sm ${
-                    journey.status === 'frozen' ? 'border-2 border-blue-400' : 
-                    journey.status === 'dead' ? 'border-2 border-red-400' : 
-                    'border border-slate-200'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">
-                          {journey.status === 'dead' ? '💀' : 
-                           journey.status === 'frozen' ? '❄️' : 
-                           journey.phase === 'arc' ? '🎋' : '🌱'}
-                        </span>
-                        <h3 className="font-semibold text-slate-900">
-                          {journey.title}
-                        </h3>
-                      </div>
-                      
-                      <p className="mt-2 line-clamp-2 text-sm text-slate-600">
-                        {journey.description}
-                      </p>
-                      
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {journey.phase === 'arc' && (
-                          <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700">
-                            Arc
-                          </span>
-                        )}
-                        {journey.status === 'frozen' && (
-                          <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
-                            Frozen
-                          </span>
-                        )}
-                        {journey.status === 'dead' && (
-                          <span className="rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-700">
-                            Dead
-                          </span>
-                        )}
-                        {journey.status === 'completed' && (
-                          <span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">
-                            Completed
-                          </span>
-                        )}
-                        {!journey.isPublic && isOwnProfile && (
-                          <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
-                            Private
-                          </span>
-                        )}
-                      </div>
-                      
-                      <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
-                        <span>
-                         Project
-                        </span>
-                        <span>•</span>
-                        <span>
-                          {journey.totalCheckIns}/{journey.targetCheckIns} check-ins
-                        </span>
-                        <span>•</span>
-                        <span>
-                          {journey.longestStreak} day streak 🔥
-                        </span>
-                      </div>
-                      
-                      {journey.techStack && journey.techStack.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-1">
-                          {journey.techStack.slice(0, 3).map((tech) => (
-                            <span
-                              key={tech}
-                              className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600"
-                            >
-                              {tech}
+            <div className="gap-4 grid grid-cols-1 sm:grid-cols-2">
+              {userJourneys.map((journey) => {
+                const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate)
+                
+                return (
+                  <div
+                    key={journey.id}
+                    className="rounded-lg bg-white p-6 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-lg font-semibold text-slate-900">
+                            {journey.title.length > 30 ? journey.title.slice(0,30)+"...":journey.title}
+                          </h4>
+                          
+                          {/* Phase Badge */}
+                          {journey.phase === 'seed' && (
+                            <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                              <span className='text-base'><SiCodefresh/></span> Seed
                             </span>
-                          ))}
-                          {journey.techStack.length > 3 && (
-                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                              +{journey.techStack.length - 3}
+                          )}
+                          {journey.phase === 'arc' && journey.status !== 'dead' && (
+                            <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                              <span className='text-base'><GiAzulFlake/></span> Arc
+                            </span>
+                          )}
+                          
+                          {/* Status Badges */}
+                          {journey.status === 'frozen' && (
+                            <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                              <span className='text-base'><MdSevereCold/></span> Frozen
+                            </span>
+                          )}
+                          {journey.status === 'dead' && (
+                            <span className="rounded-full flex items-center gap-1 bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+                              <span className='text-base'><GiDeathNote/></span> Dead
+                            </span>
+                          )}
+                          {journey.status === 'completed' && (
+                            <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 font-medium text-gray-700">
+                              <IoCheckmarkDoneCircleSharp/> <span className='text-xs py-1'>Completed</span>
+                            </span>
+                          )}
+                          
+                          {/* Private Badge (only for own profile) */}
+                          {!journey.isPublic && isOwnProfile && (
+                            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                              🔒 Private
                             </span>
                           )}
                         </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {isOwnProfile && (
-                    <div className="mt-4 border-t pt-4">
+                        
+                        <p className="mt-2 text-sm text-slate-600">
+                          {journey.description}
+                        </p>
+                        
+                        <div className="mt-3 flex items-center gap-4 text-sm text-slate-500">
+                          <span>
+                            {journey.totalCheckIns}/{journey.targetCheckIns} check-ins
+                          </span>
+                          <span>•</span>
+                          <span>
+                            {journey.currentStreak > 0 
+                              ? (
+                                <div className='flex gap-1 items-center'>
+                                  <h1>{journey.currentStreak} day streak</h1> 
+                                  <span className='text-gray-800'><SiCodeigniter/></span>
+                                </div>
+                              )
+                              : 'No current streak'}
+                          </span>
+                          {journey.status === 'active' && daysSince > 0 && (
+                            <>
+                              <span>•</span>
+                              <span className={daysSince >= 2 ? 'text-yellow-600 font-medium' : ''}>
+                                {daysSince} {daysSince === 1 ? 'day' : 'days'} since last check-in
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        
+                        {/* Tech Stack */}
+                        {journey.techStack && journey.techStack.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-1">
+                            {journey.techStack.slice(0, 3).map((tech) => (
+                              <span
+                                key={tech}
+                                className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                            {journey.techStack.length > 3 && (
+                              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+                                +{journey.techStack.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      
                       <Link
                         href={`/journey/${journey.id}`}
                         className="text-sm text-blue-600 hover:underline"
                       >
-                        View Details →
+                        View →
                       </Link>
                     </div>
-                  )}
-                </div>
-              ))}
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>
