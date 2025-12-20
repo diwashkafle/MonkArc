@@ -28,17 +28,6 @@ export default async function NewJourneyPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Navigation */}
-      <nav className="border-b bg-white px-4 py-4">
-        <div className="mx-auto max-w-3xl">
-          <Link
-            href="/dashboard"
-            className="text-sm text-slate-600 hover:underline"
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
-      </nav>
 
       {/* Main Content */}
       <main className="mx-auto max-w-3xl px-4 py-12">

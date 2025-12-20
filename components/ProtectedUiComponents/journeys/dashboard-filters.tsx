@@ -176,7 +176,6 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
       {/* Journey Cards */}
       {filteredJourneys.length === 0 ? (
         <div className="rounded-lg bg-white p-12 text-center shadow-sm">
-          <div className="text-6xl">🔍</div>
           <h4 className="mt-4 text-lg font-semibold text-slate-900">
             No journeys match your filters
           </h4>

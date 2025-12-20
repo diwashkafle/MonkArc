@@ -10,7 +10,6 @@ import { daysSinceLastCheckIn } from '@/lib/journey/journey-status'
 import { CheckInTracker } from '@/components/ProtectedUiComponents/journeys/check-in-tracker'
 import { Resource } from '@/lib/validation/journey-validation'
 import { SiCodefresh } from "react-icons/si";
-import { SiCodeigniter } from "react-icons/si";
 import { ExtendJourney } from '@/components/ProtectedUiComponents/journeys/extend-journey-modal'
 import { GiAzulFlake } from 'react-icons/gi'
 
@@ -54,14 +53,6 @@ export default async function JourneyDetailPage({ params }: JourneyDetailPagePro
         totalCheckIns={journey.totalCheckIns}
         targetCheckIns={journey.targetCheckIns}
       />
-      {/* Header */}
-      <nav className="border-b bg-white px-4 py-4">
-        <div className="mx-auto max-w-4xl">
-          <Link href="/dashboard" className="text-sm text-slate-600 hover:underline">
-            ← Back to Dashboard
-          </Link>
-        </div>
-      </nav>
       
       {/* Main Content */}
       <main className="mx-auto max-w-4xl px-4 py-12">
