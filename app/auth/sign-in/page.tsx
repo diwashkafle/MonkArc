@@ -1,11 +1,16 @@
 import GithubSignInButton  from '@/components/auth/github-signin-button'
 import GoogleSignInButton  from '@/components/auth/google-signin-button';
+import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>
 }) {
+
+  const session = await auth();
+  if(session) redirect('/dashboard')
   const {error} = await searchParams
 
   return (

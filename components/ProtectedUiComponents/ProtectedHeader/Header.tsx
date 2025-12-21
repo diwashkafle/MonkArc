@@ -13,7 +13,7 @@ import { MdOutlineDashboard } from "react-icons/md";
 type HeaderProp = {
   session: Session | null;
 };
-const Header = ({ session }: HeaderProp) => {
+const Header = ({ session }: HeaderProp) => { 
   return (
     <nav className="border-b bg-white px-4 py-4">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
