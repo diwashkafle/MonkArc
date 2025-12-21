@@ -13,6 +13,7 @@ import { DiCodeigniter } from "react-icons/di"
 import { MdSevereCold } from "react-icons/md"
 import { GiAzulFlake, GiDeathNote } from 'react-icons/gi'
 import { IoCheckmarkDoneCircleSharp } from "react-icons/io5"
+import PublicHeader from '@/components/PublicComponents/PublicHeader'
 
 interface ProfilePageProps {
   params: Promise<{
@@ -94,7 +95,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header session={session}/>
+     {
+      session ?  <Header session={session}/> : <PublicHeader/>
+     }
       
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-12">
