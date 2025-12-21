@@ -1,17 +1,13 @@
-'use client'
-import React, { useState } from 'react'
 import { 
   Code2,      // Represents coding/development
   Rocket,     // Represents launching/shipping projects
   Flame       // Represents streak/momentum
 } from 'lucide-react'
 import { ArrowRight, CheckCircle, Zap, Target, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 
 const HeroSection = () => {
 
-     const handleGetStarted = () => {
-    window.location.href = '/auth/sign-in';
-  }; 
   return (
     <main>
  <section className="relative pt-32 pb-20 px-4 overflow-hidden">
@@ -57,13 +53,14 @@ const HeroSection = () => {
 
       {/* CTA */}
       <div className="flex justify-center max-w-lg mx-auto mb-6">
+       <Link href={'/auth/sign-in'}>
         <button
-          onClick={handleGetStarted}
           className="px-7 py-3.5 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 whitespace-nowrap shadow-lg shadow-slate-900/10 hover:shadow-xl hover:shadow-slate-900/20"
         >
           Start Building
           <ArrowRight className="h-5 w-5" />
         </button>
+       </Link>
       </div>
 
       <p className="text-sm text-slate-500">

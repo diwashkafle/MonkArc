@@ -1,5 +1,3 @@
-'use client'
-import { ArrowRight, CheckCircle, Github, Zap, Target, TrendingUp, Users } from 'lucide-react';
 import PublicHeader from './PublicHeader';
 import HeroSection from './Herosection';
 import FeaturesSection from './FeatureSection';

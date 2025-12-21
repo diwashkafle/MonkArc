@@ -1,4 +1,5 @@
-import { Sprout, Code2, Trophy, ArrowRight, Sparkles, Link } from 'lucide-react'
+import { Sprout, Code2, Trophy, ArrowRight, Sparkles } from 'lucide-react'
+import Link from 'next/link'
 
 export default function HowItWorksSection() {
   return (
