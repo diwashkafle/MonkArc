@@ -15,7 +15,7 @@ type HeaderProp = {
 };
 const Header = ({ session }: HeaderProp) => { 
   return (
-    <nav className="border-b bg-white px-4 py-4">
+    <nav className=" px-4 py-4 border-b border-slate-200 bg-white/50 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link href="/dashboard" className="text-xl font-bold">
           <Image src={"/MonkArc.svg"} alt="MonkArc" height={80} width={40} />

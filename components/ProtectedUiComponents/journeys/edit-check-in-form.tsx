@@ -2,23 +2,28 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createCheckIn } from '@/lib/server-actions/check-in-actions';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react'
 
-interface SimpleCheckInFormProps {
+interface EditCheckInFormProps {
+  checkInId: string
   journeyId: string
   journeyTitle: string
   date: string
+  initialAccomplishment: string
+  initialNotes: string
 }
 
-export function SimpleCheckInForm({ 
-  journeyId, 
+export function EditCheckInForm({ 
+  checkInId,
+  journeyId,
   journeyTitle,
-  date 
-}: SimpleCheckInFormProps) {
+  date,
+  initialAccomplishment,
+  initialNotes
+}: EditCheckInFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [accomplishment, setAccomplishment] = useState('')
-  const [notes, setNotes] = useState('')
+  const [accomplishment, setAccomplishment] = useState(initialAccomplishment)
+  const [notes, setNotes] = useState(initialNotes)
   const router = useRouter()
   
   const question = 'What did you build today?'
@@ -28,24 +33,23 @@ export function SimpleCheckInForm({
     setIsSubmitting(true)
     
     const formData = new FormData()
-    formData.append('journeyId', journeyId)
-    formData.append('date', date)
     formData.append('accomplishment', accomplishment)
     formData.append('notes', notes)
     
     try {
-      await createCheckIn(formData)
+      // Call your editCheckIn server action
+      const editCheckIn = (await import('@/lib/server-actions/check-in-actions')).editCheckIn
+      await editCheckIn(checkInId, formData)
       // Action will redirect automatically
     } catch (error) {
-      const msg =
-    error instanceof Error ? error.message : String(error)
+      const msg = error instanceof Error ? error.message : String(error)
 
-  if (msg.includes("NEXT_REDIRECT")) {
-    throw error
-  }
+      if (msg.includes("NEXT_REDIRECT")) {
+        throw error
+      }
 
-  alert(msg)
-  setIsSubmitting(false)
+      alert(msg)
+      setIsSubmitting(false)
     }
   }
   
@@ -66,6 +70,9 @@ export function SimpleCheckInForm({
             day: 'numeric',
             year: 'numeric'
           })}
+        </div>
+        <div className="text-xs text-slate-400 mt-2">
+          The date cannot be changed
         </div>
       </div>
       
@@ -129,7 +136,7 @@ export function SimpleCheckInForm({
       <div className="flex items-center justify-end gap-3 pt-4 border-t">
         <button
           type="button"
-          onClick={() => router.back()}
+          onClick={() => router.push(`/journey/${journeyId}/check-in/${checkInId}`)}
           className="rounded-lg border border-slate-300 bg-white px-6 py-3 font-medium text-slate-700 hover:bg-slate-50"
         >
           Cancel
@@ -139,7 +146,13 @@ export function SimpleCheckInForm({
           disabled={isSubmitting || accomplishmentLength < 10}
           className="rounded-lg bg-slate-800 px-6 py-3 font-medium text-white hover:bg-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? <span className='flex items-center gap-1'> <Loader2 className='animate-spin' /> Saving...</span>: 'Complete Check-in'}
+          {isSubmitting ? (
+            <span className='flex items-center gap-1'>
+              <Loader2 className='animate-spin' /> Saving...
+            </span>
+          ) : (
+            'Save Changes'
+          )}
         </button>
       </div>
     </form>

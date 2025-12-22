@@ -6,6 +6,7 @@ import { dailyProgress } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import { SlCalender } from 'react-icons/sl'
 
 interface CheckInDetailPageProps {
   params: Promise<{
@@ -47,14 +48,11 @@ export default async function CheckInDetailPage({ params }: CheckInDetailPagePro
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <nav className="border-b bg-white px-4 py-4">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto mt-2 max-w-4xl">
           <Link href={`/journey/${id}`} className="text-sm text-slate-600 hover:underline">
             ← Back to Journey
           </Link>
-        </div>
-      </nav>
-      
+        </div>      
       {/* Main Content */}
       <main className="mx-auto max-w-4xl px-4 py-12">
         <div className="rounded-xl bg-white p-8 shadow-sm">
@@ -62,7 +60,7 @@ export default async function CheckInDetailPage({ params }: CheckInDetailPagePro
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <span className="text-4xl">📅</span>
+                <span className="text-4xl"><SlCalender/></span>
                 <div>
                   <h1 className="text-2xl font-bold text-slate-900">
                     {formattedDate}
@@ -76,7 +74,7 @@ export default async function CheckInDetailPage({ params }: CheckInDetailPagePro
             
             <Link
               href={`/journey/${id}/check-in/${checkInId}/edit`}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900"
             >
               Edit
             </Link>

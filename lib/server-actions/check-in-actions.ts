@@ -188,69 +188,64 @@ export async function createCheckIn(formData: FormData) {
 
 export async function editCheckIn(checkInId: string, formData: FormData) {
   const session = await auth()
-  
   if (!session?.user?.id) {
     throw new Error('Unauthorized')
   }
-  
-  const accomplishment = formData.get('accomplishment') as string
-  const notes = formData.get('notes') as string || ''
-  
-  // Validate accomplishment
-  if (!accomplishment || accomplishment.length < 10) {
-    throw new Error('Accomplishment must be at least 10 characters')
-  }
-  
-  if (accomplishment.length > 500) {
-    throw new Error('Accomplishment must be less than 500 characters')
-  }
-  
-  if (notes && notes.length > 2000) {
-    throw new Error('Notes must be less than 2000 characters')
-  }
-  
-  // Get check-in and verify ownership
+
+  // Get the check-in to verify ownership
   const checkIn = await db.query.dailyProgress.findFirst({
     where: eq(dailyProgress.id, checkInId),
   })
-  
+
   if (!checkIn) {
     throw new Error('Check-in not found')
   }
-  
-  const journey = await db.query.journeys.findFirst({
-    where: and(
-      eq(journeys.id, checkIn.journeyId),
-      eq(journeys.userId, session.user.id)
-    )
-  })
-  
-  if (!journey) {
-    throw new Error('Access denied')
-  }
-  
-  // Calculate new word count
-  const combinedText = `${accomplishment} ${notes}`.trim()
-  const wordCount = combinedText.split(/\s+/).length
-  
-  // Create journal text for legacy field
-  const question = "What's your progress today ?"
 
-  
-  // Update check-in
-  await db.update(dailyProgress)
+  // Verify journey ownership
+  const journey = await db.query.journeys.findFirst({
+    where: eq(journeys.id, checkIn.journeyId),
+  })
+
+  if (!journey || journey.userId !== session.user.id) {
+    throw new Error('Unauthorized')
+  }
+
+  // Extract form data
+  const accomplishment = formData.get('accomplishment') as string
+  const notes = formData.get('notes') as string
+
+  // Validate
+  if (!accomplishment || accomplishment.length < 10) {
+    throw new Error('Accomplishment must be at least 10 characters')
+  }
+
+  if (accomplishment.length > 500) {
+    throw new Error('Accomplishment cannot exceed 500 characters')
+  }
+
+  if (notes && notes.length > 2000) {
+    throw new Error('Notes cannot exceed 2000 characters')
+  }
+
+  // Calculate word count
+  const wordCount = accomplishment.trim().split(/\s+/).length
+
+  // Update the check-in
+  await db
+    .update(dailyProgress)
     .set({
       accomplishment,
       notes: notes || null,
-      promptUsed: question,
       wordCount,
       editedAt: new Date(),
     })
     .where(eq(dailyProgress.id, checkInId))
-  
+
+  // Revalidate paths
   revalidatePath(`/journey/${checkIn.journeyId}`)
   revalidatePath(`/journey/${checkIn.journeyId}/check-in/${checkInId}`)
-  
+
+  // Redirect back to check-in view
   redirect(`/journey/${checkIn.journeyId}/check-in/${checkInId}`)
 }
 
