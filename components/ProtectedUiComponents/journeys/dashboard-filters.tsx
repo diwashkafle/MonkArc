@@ -254,7 +254,7 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                   </div>
                   
                   <Link
-                    href={`/journey/${journey.id}`}
+                    href={journey.completedAt?`/arc/${journey.id}`:`/journey/${journey.id}`}
                     className="text-sm text-blue-600 hover:underline"
                   >
                     View →

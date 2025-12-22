@@ -176,8 +176,11 @@ export async function editJourney(journeyId: string, formData: FormData) {
   
   revalidatePath(`/journey/${journeyId}`)
   revalidatePath('/dashboard')
-  
-  redirect(`/journey/${journeyId}`)
+  if(journey.completedAt){
+  redirect(`/arc/${journeyId}`)
+  }else{
+      redirect(`/journey/${journeyId}`)
+  }
 }
 
 // DELETE JOURNEY
