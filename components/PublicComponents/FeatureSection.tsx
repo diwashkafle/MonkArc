@@ -1,4 +1,4 @@
-import { Target, Github, TrendingUp, Users, Zap, CheckCircle, Sparkles, ArrowUpRight } from 'lucide-react'
+import { Target, Github, TrendingUp, Users, Zap, CheckCircle, Sparkles } from 'lucide-react'
 
 export default function FeaturesSection() {
   return (
@@ -51,11 +51,6 @@ export default function FeaturesSection() {
               Set learning goals, track daily check-ins, and watch your progress grow. From Seed to Arc phase.
             </p>
             
-            {/* Subtle Arrow Indicator */}
-            <div className="flex items-center gap-1 text-sm text-slate-400 group-hover:text-blue-600 transition-colors">
-              <span className="font-medium">Learn more</span>
-              <ArrowUpRight className="h-4 w-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
           </div>
 
           {/* Feature 2 - GitHub Integration */}
@@ -76,10 +71,7 @@ export default function FeaturesSection() {
               Connect your repositories and automatically track commits. Your code, your progress.
             </p>
             
-            <div className="flex items-center gap-1 text-sm text-slate-400 group-hover:text-slate-700 transition-colors">
-              <span className="font-medium">Learn more</span>
-              <ArrowUpRight className="h-4 w-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
+          
           </div>
 
           {/* Feature 3 - Build Streaks */}
@@ -99,11 +91,7 @@ export default function FeaturesSection() {
             <p className="text-slate-600 leading-relaxed mb-4">
               Consistency is key. Build daily streaks and celebrate milestones along your journey.
             </p>
-            
-            <div className="flex items-center gap-1 text-sm text-slate-400 group-hover:text-orange-600 transition-colors">
-              <span className="font-medium">Learn more</span>
-              <ArrowUpRight className="h-4 w-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
+          
           </div>
 
           {/* Feature 4 - Community Feed */}
@@ -124,10 +112,7 @@ export default function FeaturesSection() {
               Share your journey, get inspired by others, and grow together with the community.
             </p>
             
-            <div className="flex items-center gap-1 text-sm text-slate-400 group-hover:text-emerald-600 transition-colors">
-              <span className="font-medium">Learn more</span>
-              <ArrowUpRight className="h-4 w-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
+          
           </div>
 
           {/* Feature 5 - Resource Manager */}
@@ -148,10 +133,7 @@ export default function FeaturesSection() {
               Save learning resources, videos, and docs. Everything you need in one place.
             </p>
             
-            <div className="flex items-center gap-1 text-sm text-slate-400 group-hover:text-yellow-600 transition-colors">
-              <span className="font-medium">Learn more</span>
-              <ArrowUpRight className="h-4 w-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
+           
           </div>
 
           {/* Feature 6 - Flexible Goals */}
@@ -172,10 +154,7 @@ export default function FeaturesSection() {
               Extend journeys, pause when needed, or mark complete. Adapt to your learning pace.
             </p>
             
-            <div className="flex items-center gap-1 text-sm text-slate-400 group-hover:text-purple-600 transition-colors">
-              <span className="font-medium">Learn more</span>
-              <ArrowUpRight className="h-4 w-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
+
           </div>
         </div>
       </div>
