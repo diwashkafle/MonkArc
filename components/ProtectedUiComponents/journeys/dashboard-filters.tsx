@@ -196,9 +196,15 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="text-lg font-semibold text-slate-900">
+                      <Link
+                    href={journey.completedAt?`/arc/${journey.id}`:`/journey/${journey.id}`}
+                    className="hover:underline"
+                  >
+                    <h4 className="text-lg font-semibold text-slate-900">
                       {journey.title.length > 40 ? journey.title.slice(0,30)+"...":journey.title}
                       </h4>
+                  </Link>
+                     
                       {journey.phase === 'seed' && (
                         <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
                          <span className='text-base'><SiCodefresh/></span> Seed
@@ -253,12 +259,14 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                     </div>
                   </div>
                   
-                  <Link
-                    href={journey.completedAt?`/arc/${journey.id}`:`/journey/${journey.id}`}
+                  {
+                    !journey.completedAt ? <Link
+                    href={`/journey/${journey.id}/check-in`}
                     className="text-sm text-blue-600 hover:underline"
                   >
-                    View →
-                  </Link>
+                    Check-in
+                  </Link>: null
+                  }
                 </div>
               </div>
             )
