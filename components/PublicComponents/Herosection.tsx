@@ -1,7 +1,8 @@
 import { 
   Code2,      // Represents coding/development
   Rocket,     // Represents launching/shipping projects
-  Flame       // Represents streak/momentum
+  Flame,       // Represents streak/momentum
+  Trophy
 } from 'lucide-react'
 import { ArrowRight, CheckCircle, Zap, Target, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
@@ -92,10 +93,10 @@ const HeroSection = () => {
           <div className="group relative bg-linear-to-br from-white to-slate-50/50 rounded-xl p-6 border border-slate-200/60 shadow-sm hover:shadow-md transition-all">
             <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all" />
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <Target className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-purple-50 rounded-lg">
+                <Trophy className="h-5 w-5 text-purple-600" />
               </div>
-              <span className="text-slate-600 text-sm font-medium">Arcs Achieved</span>
+              <span className="text-slate-600 text-sm font-medium">Completed Journey</span>
             </div>
             <div className="text-5xl font-bold text-slate-900 tracking-tight">8</div>
             <div className="mt-2 text-xs text-slate-500">Milestones reached</div>

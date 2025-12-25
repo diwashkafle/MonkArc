@@ -21,6 +21,7 @@ import { IoIosDocument } from "react-icons/io";
 import { CgWebsite } from "react-icons/cg";
 import { FaLink } from "react-icons/fa6";
 import { FaBook, FaGraduationCap } from "react-icons/fa";
+import { JOURNEY_ICONS } from "@/lib/constant/icons";
 
 interface JourneyDetailPageProps {
   params: Promise<{
@@ -38,6 +39,10 @@ export default async function JourneyDetailPage({
   const journey = await getJourneyById(id, session.user.id);
 
   if (!journey) notFound();
+
+  const SeedIcon = JOURNEY_ICONS.seed
+  const ArcIcon = JOURNEY_ICONS.arc
+  
 
   // Get check-ins
   const checkIns = await getJourneyCheckIns(id);
@@ -144,11 +149,11 @@ export default async function JourneyDetailPage({
                   <span>
                     {journey.phase === "seed" ? (
                       <div className="flex gap-1 items-center">
-                        <SiCodefresh /> <span>Seed</span>
+                        <SeedIcon className="h-3.5 w-3.5"/> <span>Seed</span>
                       </div>
                     ) : (
                       <div className="flex gap-1 items-center">
-                        <GiAzulFlake /> <span>Arc</span>
+                        <ArcIcon className="h-3.5 w-3.5"/> <span>Arc</span>
                       </div>
                     )}
                   </span>
@@ -437,18 +442,19 @@ export default async function JourneyDetailPage({
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
                           <div className="text-2xl"><SlCalender/></div>
-                          <div>
                             <div className="font-semibold text-slate-900">
                               {formattedDate}
                             </div>
-                            <div className="mt-1 text-sm text-slate-600">
-                              Prompt: {checkIn.promptUsed}
-                            </div>
-                          </div>
                         </div>
 
-                        <div className="mt-4 text-slate-700 line-clamp-3">
-                          {checkIn.accomplishment}
+
+                        <div className="mt-4 text-slate-700 ">
+                          <p>
+                            {checkIn.accomplishment.length>50 ? checkIn.accomplishment.slice(0,50):checkIn.accomplishment}
+                          </p>
+                          <p className="ml-2 text-xs text-slate-500 line-clamp-1">
+                            {checkIn.notes}
+                          </p>
                         </div>
 
                         <div className="mt-4 flex items-center gap-4 text-sm text-slate-500">

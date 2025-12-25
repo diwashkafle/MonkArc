@@ -1,14 +1,10 @@
-import { auth} from '@/lib/auth'
+import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { ensureUsername } from '@/lib/server-actions/user-action'
 import { getUserJourneys, getJourneyStats } from '@/lib/queries/journey-queries'
 import { DashboardFilters } from '@/components/ProtectedUiComponents/journeys/dashboard-filters'
 import Link from 'next/link'
-import { SiAlwaysdata } from "react-icons/si";
-import { FaCalendarCheck } from "react-icons/fa";
-import { DiCodeigniter } from "react-icons/di";
-import { SiCodefresh, SiCodeigniter } from 'react-icons/si'
-import { GiAzulFlake } from 'react-icons/gi'
+import { JOURNEY_ICONS, JOURNEY_COLORS } from '@/lib/constant/icons';
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -27,56 +23,100 @@ export default async function DashboardPage() {
   // Fetch user's journeys
   const journeys = await getUserJourneys(session.user.id)
   const stats = await getJourneyStats(session.user.id)
+
+  // Get icon components
+  const ActiveIcon = JOURNEY_ICONS.activeCount
+  const SeedIcon = JOURNEY_ICONS.seed
+  const ArcIcon = JOURNEY_ICONS.arc
+  const StreakIcon = JOURNEY_ICONS.LongestStreak
+  const CheckInsIcon = JOURNEY_ICONS.checkIns
+
+  // Get colors
+  const activeColors = JOURNEY_COLORS.active
+  const seedColors = JOURNEY_COLORS.seed
+  const arcColors = JOURNEY_COLORS.arc
+  const streakColors = JOURNEY_COLORS.streak
+  const checkInsColors = JOURNEY_COLORS.neutral
   
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Navigation */}
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* Welcome Header */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-slate-900">
-          Your Dashboard, {session.user.name}
+            Your Dashboard, {session.user.name}
           </h2>
           <p className="mt-1 text-sm text-slate-600">
-           Create new journey of your learning by building.
+            Create new journey of your learning by building.
           </p>
         </div>
         
         {/* Stats Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          <div className="rounded-lg bg-white p-6 shadow-sm">
-            <div className="text-sm flex items-center gap-2 text-slate-600">Active Journeys  <span className='text-2xl'><SiAlwaysdata/></span></div>
-            <div className="mt-2 text-2xl  font-bold text-slate-700">
-             {stats.active}
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {/* Active Journeys */}
+          <div className={`group rounded-xl ${activeColors.bg} border ${activeColors.border} p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1`}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-1.5 bg-blue-100 rounded-lg">
+                <ActiveIcon className={`h-4 w-4 ${activeColors.icon}`} />
+              </div>
             </div>
+            <div className="text-2xl font-bold text-slate-900">
+              {stats.active}
+            </div>
+            <div className="text-xs text-slate-600 mt-1">Active Journeys</div>
           </div>
           
-          <div className="rounded-lg bg-white p-6 shadow-sm">
-            <div className="text-sm flex items-center gap-2 text-slate-600">Seeds <span className='text-2xl'><SiCodefresh/></span></div>
-            <div className="mt-2 text-2xl font-bold text-gray-600">
+          {/* Seeds */}
+          <div className={`group rounded-xl ${seedColors.bg} border ${seedColors.border} p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1`}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-1.5 bg-emerald-100 rounded-lg">
+                <SeedIcon className={`h-4 w-4 ${seedColors.icon}`} />
+              </div>
+            </div>
+            <div className="text-2xl font-bold text-slate-900">
               {stats.seeds}
             </div>
+            <div className="text-xs text-slate-600 mt-1">Seeds</div>
           </div>
-          <div className="rounded-lg bg-white p-6 shadow-sm">
-            <div className="text-sm flex items-center gap-2 text-slate-600">Arcs <span className='text-2xl'><GiAzulFlake/></span></div>
-            <div className="mt-2 text-2xl font-bold text-gray-600">
+
+          {/* Arcs */}
+          <div className={`group rounded-xl ${arcColors.bg} border ${arcColors.border} p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1`}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-1.5 bg-orange-100 rounded-lg">
+                <ArcIcon className={`h-4 w-4 ${arcColors.icon}`} />
+              </div>
+            </div>
+            <div className="text-2xl font-bold text-slate-900">
               {stats.arcs}
             </div>
+            <div className="text-xs text-slate-600 mt-1">Arcs</div>
           </div>
           
-          <div className="rounded-lg bg-white p-6 shadow-sm">
-            <div className="text-sm flex items-center gap-2 text-slate-600">Longest Streak <span className='text-2xl'><DiCodeigniter/></span></div>
-            <div className="mt-2 text-2xl font-bold text-gray-600">
+          {/* Longest Streak */}
+          <div className={`group rounded-xl ${streakColors.bg} border ${streakColors.border} p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1`}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-1.5 bg-amber-100 rounded-lg">
+                <StreakIcon className="h-4 w-4 text-amber-600" />
+              </div>
+            </div>
+            <div className="text-2xl font-bold text-slate-900">
               {stats.longestStreak}
             </div>
+            <div className="text-xs text-slate-600 mt-1">Longest Streak</div>
           </div>
           
-          <div className="rounded-lg bg-white p-6 shadow-sm">
-            <div className="text-sm flex items-center gap-2 text-slate-600">Total Check-ins<span className='text-2xl'><FaCalendarCheck/></span></div>
-            <div className="mt-2 text-2xl font-bold text-gray-600">
+          {/* Total Check-ins */}
+          <div className={`group rounded-xl ${checkInsColors.bg} border ${checkInsColors.border} p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1`}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-1.5 bg-slate-100 rounded-lg">
+                <CheckInsIcon className={`h-4 w-4 ${checkInsColors.icon}`} />
+              </div>
+            </div>
+            <div className="text-2xl font-bold text-slate-900">
               {stats.totalCheckIns}
             </div>
+            <div className="text-xs text-slate-600 mt-1">Total Check-ins</div>
           </div>
         </div>
         
@@ -86,7 +126,7 @@ export default async function DashboardPage() {
             <h3 className="text-xl font-bold text-slate-900">Your Journeys</h3>
             <Link
               href="/journey/new"
-              className="rounded-lg bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
             >
               + New Journey
             </Link>
@@ -95,7 +135,10 @@ export default async function DashboardPage() {
           {/* Journey List with Filters */}
           {journeys.length === 0 ? (
             <div className="rounded-lg bg-white p-12 text-center shadow-sm">
-              <h4 className="mt-4 text-lg font-semibold text-slate-900">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 mb-4">
+                <SeedIcon className="h-8 w-8 text-emerald-600" />
+              </div>
+              <h4 className="text-lg font-semibold text-slate-900">
                 No journeys yet
               </h4>
               <p className="mt-2 text-slate-600">
@@ -103,7 +146,7 @@ export default async function DashboardPage() {
               </p>
               <Link
                 href="/journey/new"
-                className="mt-6 inline-block rounded-lg bg-gray-600 px-6 py-3 font-medium text-white hover:bg-gray-700"
+                className="mt-6 inline-block rounded-lg bg-slate-900 px-6 py-3 font-medium text-white hover:bg-slate-800 transition-colors"
               >
                 Create First Journey
               </Link>

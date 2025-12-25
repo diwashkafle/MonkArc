@@ -5,10 +5,7 @@ import { Search } from 'lucide-react'
 import Link from 'next/link'
 import { InferSelectModel } from 'drizzle-orm'
 import { journeys } from '@/db/schema'
-import { SiCodefresh, SiCodeigniter } from 'react-icons/si'
-import { MdSevereCold } from "react-icons/md"
-import { IoCheckmarkDoneCircleSharp } from "react-icons/io5";
-import { GiDeathNote, GiAzulFlake } from "react-icons/gi"
+import { JOURNEY_ICONS, JOURNEY_COLORS } from '@/lib/constant/icons';
 import {
   Select,
   SelectContent,
@@ -76,6 +73,14 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
     dead: journeys.filter(j => j.status === 'dead').length,
     completed: journeys.filter(j => j.status === 'completed').length,
   }
+
+  // Get icon components
+  const SeedIcon = JOURNEY_ICONS.seed
+  const ArcIcon = JOURNEY_ICONS.arc
+  const FrozenIcon = JOURNEY_ICONS.frozen
+  const DeadIcon = JOURNEY_ICONS.dead
+  const CompletedIcon = JOURNEY_ICONS.completed
+  const StreakIcon = JOURNEY_ICONS.currentStreak
   
   return (
     <div>
@@ -112,24 +117,16 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                 All ({counts.all})
               </SelectItem>
               <SelectItem value="active">
-                <span className="flex items-center gap-2">
-                  Active ({counts.active})
-                </span>
+                Active ({counts.active})
               </SelectItem>
               <SelectItem value="frozen">
-                <span className="flex items-center gap-2">
-                  Frozen ({counts.frozen})
-                </span>
+                Frozen ({counts.frozen})
               </SelectItem>
               <SelectItem value="dead">
-                <span className="flex items-center gap-2">
-                  Dead ({counts.dead})
-                </span>
+                Dead ({counts.dead})
               </SelectItem>
               <SelectItem value="completed">
-                <span className="flex items-center gap-2">
-                  Completed ({counts.completed})
-                </span>
+                Completed ({counts.completed})
               </SelectItem>
             </SelectContent>
           </Select>
@@ -153,13 +150,13 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
               </SelectItem>
               <SelectItem value="seed">
                 <span className="flex items-center gap-2">
-                  <SiCodefresh className="h-4 w-4" />
+                  <SeedIcon className="h-4 w-4" />
                   Seed
                 </span>
               </SelectItem>
               <SelectItem value="arc">
                 <span className="flex items-center gap-2">
-                  <GiAzulFlake className="h-4 w-4" />
+                  <ArcIcon className="h-4 w-4" />
                   Arc
                 </span>
               </SelectItem>
@@ -187,52 +184,65 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
         <div className="space-y-4">
           {filteredJourneys.map((journey) => {
             const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate)
+            const seedColors = JOURNEY_COLORS.seed
+            const arcColors = JOURNEY_COLORS.arc
+            const frozenColors = JOURNEY_COLORS.frozen
+            const deadColors = JOURNEY_COLORS.dead
+            const completedColors = JOURNEY_COLORS.completed
             
             return (
               <div
                 key={journey.id}
-                className={`rounded-lg bg-white p-6 shadow-sm`}
+                className="rounded-lg bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <Link
-                    href={journey.completedAt?`/arc/${journey.id}`:`/journey/${journey.id}`}
-                    className="hover:underline"
-                  >
-                    <h4 className="text-lg font-semibold text-slate-900">
-                      {journey.title.length > 40 ? journey.title.slice(0,30)+"...":journey.title}
-                      </h4>
-                  </Link>
-                     
+                        href={journey.completedAt ? `/arc/${journey.id}` : `/journey/${journey.id}`}
+                        className="hover:underline"
+                      >
+                        <h4 className="text-lg font-semibold text-slate-900">
+                          {journey.title.length > 40 ? journey.title.slice(0, 30) + "..." : journey.title}
+                        </h4>
+                      </Link>
+                      
+                      {/* Phase Badge */}
                       {journey.phase === 'seed' && (
-                        <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
-                         <span className='text-base'><SiCodefresh/></span> Seed
+                        <span className={`inline-flex items-center gap-1.5 rounded-lg ${seedColors.badge} px-2.5 py-1 text-xs font-medium ${seedColors.badgeText} border ${seedColors.badgeBorder}`}>
+                          <SeedIcon className="h-3 w-3" />
+                          <span>Seed</span>
                         </span>
                       )}
                       {journey.phase === 'arc' && journey.status !== 'dead' && (
-                        <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
-                         <span className='text-base'><GiAzulFlake/></span> Arc
+                        <span className={`inline-flex items-center gap-1.5 rounded-lg ${arcColors.badge} px-2.5 py-1 text-xs font-medium ${arcColors.badgeText} border ${arcColors.badgeBorder}`}>
+                          <ArcIcon className="h-3 w-3" />
+                          <span>Arc</span>
                         </span>
                       )}
+                      
+                      {/* Status Badges */}
                       {journey.status === 'frozen' && (
-                        <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
-                         <span className='text-base'> <MdSevereCold/></span>Frozen
+                        <span className={`inline-flex items-center gap-1.5 rounded-lg ${frozenColors.badge} px-2.5 py-1 text-xs font-medium ${frozenColors.badgeText} border ${frozenColors.badgeBorder}`}>
+                          <FrozenIcon className="h-3 w-3" />
+                          <span>Frozen</span>
                         </span>
                       )}
                       {journey.status === 'dead' && (
-                        <span className="rounded-full flex items-center gap-1 bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
-                         <span className='text-base'><GiDeathNote /></span> Dead
+                        <span className={`inline-flex items-center gap-1.5 rounded-lg ${deadColors.badge} px-2.5 py-1 text-xs font-medium ${deadColors.badgeText} border ${deadColors.badgeBorder}`}>
+                          <DeadIcon className="h-3 w-3" />
+                          <span>Dead</span>
                         </span>
                       )}
                       {journey.status === 'completed' && (
-                        <span className="rounded-full flex items-center gap-1 bg-gray-100 px-3 py-1 font-medium text-gray-700">
-                          <IoCheckmarkDoneCircleSharp/> <span className='text-xs py-1'>Completed</span>
+                        <span className={`inline-flex items-center gap-1.5 rounded-lg ${completedColors.badge} px-2.5 py-1 text-xs font-medium ${completedColors.badgeText} border ${completedColors.badgeBorder}`}>
+                          <CompletedIcon className="h-3 w-3" />
+                          <span>Completed</span>
                         </span>
                       )}
                     </div>
                     
-                    <p className="mt-2 text-sm text-slate-600">
+                    <p className="mt-2 text-sm text-slate-600 line-clamp-2">
                       {journey.description}
                     </p>
                     
@@ -242,31 +252,34 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                       </span>
                       <span>•</span>
                       <span>
-                        {journey.currentStreak > 0 
-                          ? (<div className='flex gap-1 items-center'>
-                            <h1>{journey.currentStreak} day streak</h1> <span className='text-gray-800'><SiCodeigniter/></span>
-                          </div>)
-                          : 'No current streak'}
+                        {journey.currentStreak > 0 ? (
+                          <div className='flex gap-1.5 items-center text-orange-600'>
+                            <StreakIcon className="h-4 w-4" />
+                            <span>{journey.currentStreak} day streak</span>
+                          </div>
+                        ) : (
+                          'No current streak'
+                        )}
                       </span>
                       {journey.status === 'active' && daysSince > 0 && (
                         <>
                           <span>•</span>
                           <span className={daysSince >= 2 ? 'text-yellow-600 font-medium' : ''}>
-                            {daysSince} {daysSince === 1 ? 'day' : 'days'} since last check-in
+                            {daysSince} {daysSince === 1 ? 'day' : 'days'} ago
                           </span>
                         </>
                       )}
                     </div>
                   </div>
                   
-                  {
-                    !journey.completedAt ? <Link
-                    href={`/journey/${journey.id}/check-in`}
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    Check-in
-                  </Link>: null
-                  }
+                  {!journey.completedAt && (
+                    <Link
+                      href={`/journey/${journey.id}/check-in`}
+                      className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                    >
+                      Check-in
+                    </Link>
+                  )}
                 </div>
               </div>
             )
