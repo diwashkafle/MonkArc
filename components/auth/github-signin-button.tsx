@@ -20,11 +20,10 @@ export default function GithubSignInButton() {
   }
 
   return (
-    <Button
+    <button
       onClick={handleSignIn}
       disabled={isLoading}
-      variant="outline"
-      className="w-full"
+      className="w-full relative cursor-pointer border border-gray-300 rounded-lg p-2 text-base text-black flex items-center justify-center"
     >
       {isLoading ? (
         <>
@@ -37,6 +36,6 @@ export default function GithubSignInButton() {
           Continue with GitHub
         </div>
       )}
-    </Button>
+    </button>
   )
 }

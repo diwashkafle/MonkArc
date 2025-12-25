@@ -20,11 +20,10 @@ export default function GoogleSignInButton() {
   }
 
   return (
-    <Button
+    <button
       onClick={handleSignIn}
       disabled={isLoading}
-      variant="outline"
-      className="w-full relative"
+      className="w-full relative cursor-pointer border border-gray-300 rounded-lg p-2 text-base text-black flex items-center justify-center"
     >
       {isLoading ? (
         <>
@@ -37,6 +36,6 @@ export default function GoogleSignInButton() {
           Continue with Google
         </div>
       )}
-    </Button>
+    </button>
   )
 }

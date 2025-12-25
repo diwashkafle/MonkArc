@@ -1,83 +1,83 @@
-import { auth } from '@/lib/auth'
-import { getJourneyById } from '@/lib/queries/journey-queries'
-import { getJourneyCheckIns } from '@/lib/queries/check-in-queries'
-import { notFound, redirect } from 'next/navigation'
-import { ArcHeader } from '@/components/PublicComponents/Arc/ArcHeader'
-import { ArcStats } from '@/components/PublicComponents/Arc/ArcStats'
-import { ArcTimeline } from '@/components/PublicComponents/Arc/ArcTimeline'
-import { ArcDaysGrid } from '@/components/PublicComponents/Arc/ArcDaysGrid'
-import { Lock } from 'lucide-react'
+import { auth } from "@/lib/auth";
+import { getJourneyById } from "@/lib/queries/journey-queries";
+import { getJourneyCheckIns } from "@/lib/queries/check-in-queries";
+import { notFound, redirect } from "next/navigation";
+import { ArcHeader } from "@/components/PublicComponents/Arc/ArcHeader";
+import { ArcStats } from "@/components/PublicComponents/Arc/ArcStats";
+import { ArcTimeline } from "@/components/PublicComponents/Arc/ArcTimeline";
+import { ArcDaysGrid } from "@/components/PublicComponents/Arc/ArcDaysGrid";
+import { Lock } from "lucide-react";
 import {
   calculateMissedDays,
   calculateTotalCommits,
   calculateTotalWords,
   calculateJourneyDuration,
-  calculateCompletionRate
-} from '@/lib/arc/act-stats'
-import Link from 'next/link'
-import ArcNavbar from '@/components/PublicComponents/Arc/ArcNavbar'
-import { db } from '@/db'
-import { eq } from 'drizzle-orm'
-import { users } from '@/db/schema'
+  calculateCompletionRate,
+} from "@/lib/arc/act-stats";
+import Link from "next/link";
+import ArcNavbar from "@/components/PublicComponents/Arc/ArcNavbar";
+import { db } from "@/db";
+import { eq } from "drizzle-orm";
+import { users } from "@/db/schema";
 
 interface ArcPageProps {
   params: Promise<{
-    id: string
-  }>
+    id: string;
+  }>;
 }
 
 export default async function ArcPage({ params }: ArcPageProps) {
-  const session = await auth()
-  const { id } = await params
+  const session = await auth();
+  const { id } = await params;
 
   // Get journey without user check (public page)
-  const journey = await getJourneyById(id)
+  const journey = await getJourneyById(id);
 
   if (!journey) {
-    notFound()
+    notFound();
   }
   const user = await db.query.users.findFirst({
-        where: eq(users.id, journey?.userId),
-  })
+    where: eq(users.id, journey?.userId),
+  });
 
   // If journey is not completed, redirect to journey page
-  if (journey.status !== 'completed') {
-    redirect(`/journey/${id}`)
+  if (journey.status !== "completed") {
+    redirect(`/journey/${id}`);
   }
 
   // Check if user is the owner
-  const isOwner = session?.user?.id === journey.userId
+  const isOwner = session?.user?.id === journey.userId;
 
   // If private and not owner, show private message
   if (!journey.isPublic && !isOwner) {
     return (
       <main>
-        <ArcNavbar IsOwner={isOwner} id={id}/>
+        <ArcNavbar IsOwner={isOwner} id={id} />
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-lg">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 mb-6">
-            <Lock className="h-10 w-10 text-slate-400" />
+          <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-lg">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 mb-6">
+              <Lock className="h-10 w-10 text-slate-400" />
+            </div>
+            <h1 className="text-2xl font-bold text-slate-900 mb-3">
+              This Arc is Private
+            </h1>
+            <p className="text-slate-600 mb-6">
+              This journey has been marked as private by its owner.
+            </p>
+            <Link
+              href="/dashboard"
+              className="inline-block px-6 py-3 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-900 transition-colors"
+            >
+              <h1>Go to Dashboard</h1>
+            </Link>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-3">
-            This Arc is Private
-          </h1>
-          <p className="text-slate-600 mb-6">
-            This journey has been marked as private by its owner.
-          </p>
-          <Link
-            href="/dashboard"
-            className="inline-block px-6 py-3 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-900 transition-colors"
-          >
-            <h1>Go to Dashboard</h1>
-          </Link>
         </div>
-      </div>
       </main>
-    )
+    );
   }
 
   // Get all check-ins
-  const checkIns = await getJourneyCheckIns(id)
+  const checkIns = await getJourneyCheckIns(id);
 
   // Calculate stats
   const missedDays = calculateMissedDays(
@@ -85,26 +85,35 @@ export default async function ArcPage({ params }: ArcPageProps) {
     journey.completedAt!,
     journey.totalCheckIns,
     journey.pausedDays
-  )
+  );
 
-  const totalCommits = calculateTotalCommits(checkIns)
-  const totalWords = calculateTotalWords(checkIns)
-  const journeyDuration = calculateJourneyDuration(journey.startDate, journey.completedAt!)
+  const totalCommits = calculateTotalCommits(checkIns);
+  const totalWords = calculateTotalWords(checkIns);
+  const journeyDuration = calculateJourneyDuration(
+    journey.startDate,
+    journey.completedAt!
+  );
   const completionRate = calculateCompletionRate(
     journey.totalCheckIns,
     journeyDuration,
     journey.pausedDays
-  )
+  );
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Navigation Bar */}
-        <ArcNavbar IsOwner={isOwner} id={id}/>
+      <ArcNavbar IsOwner={isOwner} id={id} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-12 space-y-8">
         {/* Header */}
-        <ArcHeader journey={journey} isOwner={isOwner} image={user?.image} name={user?.name} username={user?.username} />
+        <ArcHeader
+          journey={journey}
+          isOwner={isOwner}
+          image={user?.image}
+          name={user?.name}
+          username={user?.username}
+        />
 
         {/* Stats */}
         <ArcStats
@@ -116,6 +125,13 @@ export default async function ArcPage({ params }: ArcPageProps) {
           journeyDuration={journeyDuration}
           completionRate={completionRate}
           totalWords={totalWords}
+          pausedDays={journey.pausedDays}
+          extendedDays={
+            journey.originalTarget
+              ? journey.targetCheckIns - journey.originalTarget
+              : 0
+          }
+          isExtended={journey.isExtended}
         />
 
         {/* Days Grid */}
@@ -170,24 +186,24 @@ export default async function ArcPage({ params }: ArcPageProps) {
           </div>
         )}
 
-       {
-        !session ?
-        <div className="rounded-2xl bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 p-12 text-center text-white">
-          <h2 className="text-3xl font-bold mb-4">
-            Ready to Start Your Journey?
-          </h2>
-          <p className="text-slate-300 mb-8 max-w-2xl mx-auto">
-            Track your progress, build streaks, and reach your Arc phase just like this one.
-          </p>
-          <a
-            href="/auth/sign-in"
-            className="inline-block px-8 py-4 bg-white text-slate-900 rounded-lg font-semibold hover:bg-slate-100 transition-colors shadow-xl"
-          >
-            Start Building Today
-          </a>
-        </div>: null
-       }
+        {!session ? (
+          <div className="rounded-2xl bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 p-12 text-center text-white">
+            <h2 className="text-3xl font-bold mb-4">
+              Ready to Start Your Journey?
+            </h2>
+            <p className="text-slate-300 mb-8 max-w-2xl mx-auto">
+              Track your progress, build streaks, and reach your Arc phase just
+              like this one.
+            </p>
+            <a
+              href="/auth/sign-in"
+              className="inline-block px-8 py-4 bg-white text-slate-900 rounded-lg font-semibold hover:bg-slate-100 transition-colors shadow-xl"
+            >
+              Start Building Today
+            </a>
+          </div>
+        ) : null}
       </main>
     </div>
-  )
+  );
 }

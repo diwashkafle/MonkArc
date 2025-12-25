@@ -1,4 +1,4 @@
-import { Target, Flame, TrendingUp, GitCommit, Calendar, Award, FileText, BarChart3 } from 'lucide-react'
+import { JOURNEY_ICONS, JOURNEY_COLORS } from '@/lib/constant/icons';
 
 interface ArcStatsProps {
   totalCheckIns: number
@@ -9,6 +9,9 @@ interface ArcStatsProps {
   journeyDuration: number
   completionRate: number
   totalWords: number
+  pausedDays: number
+  extendedDays: number
+  isExtended: boolean
 }
 
 export function ArcStats({
@@ -18,81 +21,99 @@ export function ArcStats({
   missedDays,
   totalCommits,
   journeyDuration,
-  completionRate,
-  totalWords
+  totalWords,
+  pausedDays,
+  extendedDays,
+  isExtended,
 }: ArcStatsProps) {
-  const stats = [
+  const CheckInsIcon = JOURNEY_ICONS.checkIns
+  const StreakIcon = JOURNEY_ICONS.LongestStreak
+  const CommitsIcon = JOURNEY_ICONS.commits
+  const WordsIcon = JOURNEY_ICONS.words
+  const TimeIcon = JOURNEY_ICONS.time
+  const PausedIcon = JOURNEY_ICONS.paused
+  const ExtendedIcon = JOURNEY_ICONS.extended
+  const TargetIcon = JOURNEY_ICONS.target
+
+  const completedColors = JOURNEY_COLORS.completed
+  const streakColors = JOURNEY_COLORS.streak
+  const neutralColors = JOURNEY_COLORS.neutral
+  const seedColors = JOURNEY_COLORS.seed
+  const activeColors = JOURNEY_COLORS.active
+  const pausedColors = JOURNEY_COLORS.paused
+  const arcColors = JOURNEY_COLORS.arc
+  const deadColors = JOURNEY_COLORS.dead
+
+  const avgDailyWords = totalCheckIns > 0 ? Math.round(totalWords / totalCheckIns) : 0
+
+  // Core stats (always show)
+  const coreStats = [
     {
-      icon: Target,
+      icon: CheckInsIcon,
       label: 'Check-ins Completed',
-      value: `${totalCheckIns} / ${targetCheckIns}`,
-      color: 'emerald',
-      bgColor: 'bg-emerald-50',
-      iconColor: 'text-emerald-600',
-      borderColor: 'border-emerald-200/60'
+      value: `${totalCheckIns}/${targetCheckIns}`,
+      colors: completedColors,
     },
     {
-      icon: Flame,
+      icon: StreakIcon,
       label: 'Longest Streak',
       value: `${longestStreak} days`,
-      color: 'orange',
-      bgColor: 'bg-orange-50',
-      iconColor: 'text-orange-600',
-      borderColor: 'border-orange-200/60'
+      colors: streakColors,
     },
     {
-      icon: Calendar,
+      icon: TimeIcon,
       label: 'Journey Duration',
       value: `${journeyDuration} days`,
-      color: 'blue',
-      bgColor: 'bg-blue-50',
-      iconColor: 'text-blue-600',
-      borderColor: 'border-blue-200/60'
+      colors: activeColors,
     },
     {
-      icon: BarChart3,
-      label: 'Completion Rate',
-      value: `${completionRate}%`,
-      color: 'purple',
-      bgColor: 'bg-purple-50',
-      iconColor: 'text-purple-600',
-      borderColor: 'border-purple-200/60'
-    },
-    {
-      icon: TrendingUp,
+      icon: TargetIcon,
       label: 'Missed Days',
       value: missedDays.toString(),
-      color: 'slate',
-      bgColor: 'bg-slate-50',
-      iconColor: 'text-slate-600',
-      borderColor: 'border-slate-200/60'
+      colors: deadColors,
     },
     {
-      icon: GitCommit,
+      icon: CommitsIcon,
       label: 'Total Commits',
       value: totalCommits > 0 ? totalCommits.toString() : 'N/A',
-      color: 'indigo',
-      bgColor: 'bg-indigo-50',
-      iconColor: 'text-indigo-600',
-      borderColor: 'border-indigo-200/60'
+      colors: neutralColors,
     },
+    {
+      icon: ExtendedIcon,
+      label: 'Extended Days',
+      value: `${extendedDays} days`,
+      colors: arcColors,
+    },
+    {
+      icon: PausedIcon,
+      label: 'Paused Days',
+      value: `${pausedDays} days`,
+      colors: pausedColors,
+    }
   ]
+
+
+
+
+  const allStats = [...coreStats]
 
   return (
     <div className="rounded-2xl bg-white border border-slate-200 p-6 md:p-8 shadow-sm">
       <h2 className="text-2xl font-bold text-slate-900 mb-6">Journey Stats</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {stats.map((stat, index) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {allStats.map((stat, index) => {
           const Icon = stat.icon
           return (
             <div
               key={index}
-              className={`group relative rounded-xl ${stat.bgColor} border ${stat.borderColor} px-4 p-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
+              className={`group relative rounded-xl ${stat.colors.bg} border ${stat.colors.border} p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
             >
               {/* Icon */}
-              <div className={`mb-3 ${stat.iconColor}`}>
-                <Icon className="h-6 w-6" />
+              <div className="mb-3">
+                <div className={`inline-flex p-2 rounded-lg ${stat.colors.badge}`}>
+                  <Icon className={`h-5 w-5 ${stat.colors.icon}`} />
+                </div>
               </div>
 
               {/* Value */}
@@ -101,7 +122,7 @@ export function ArcStats({
               </div>
 
               {/* Label */}
-              <div className="text-sm text-slate-600">
+              <div className="text-xs text-slate-600">
                 {stat.label}
               </div>
             </div>

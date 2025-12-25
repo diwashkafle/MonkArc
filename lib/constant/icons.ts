@@ -15,6 +15,7 @@ import {
   FileText,      // Words/Content
   Activity,      // Active journeys count
   type LucideIcon,
+  ArrowUp01,
 } from 'lucide-react'
 
 // Icon mapping for all journey-related statuses and metrics
@@ -29,7 +30,7 @@ export const JOURNEY_ICONS = {
   frozen: Snowflake,
   dead: Skull,
   completed: Trophy,
-  extended: TrendingUp,
+  extended: ArrowUp01,
   
   // Metrics
   LongestStreak: TrendingUp,
