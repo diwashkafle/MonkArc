@@ -1,5 +1,9 @@
 import { auth } from "@/lib/auth";
-import { getJourneyById, isJourneyStuckInArc } from "@/lib/queries/journey-queries";
+import {
+  getJourneyById,
+  isExtendedJourneyStuckInArc,
+  isJourneyStuckInArc,
+} from "@/lib/queries/journey-queries";
 import {
   getJourneyCheckIns,
   hasCheckedInToday,
@@ -24,10 +28,12 @@ interface JourneyDetailPageProps {
   params: Promise<{
     id: string;
   }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function JourneyDetailPage({
   params,
+  searchParams,
 }: JourneyDetailPageProps) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
@@ -37,19 +43,37 @@ export default async function JourneyDetailPage({
 
   if (!journey) notFound();
 
-
-  if(journey.completedAt){
-    redirect('/arc/'+id);
+  if (journey.completedAt) {
+    redirect("/arc/" + id);
   }
 
-  const SeedIcon = JOURNEY_ICONS.seed
-  const ArcIcon = JOURNEY_ICONS.arc
-  
-  const isJourneyStuckInArcBool = await isJourneyStuckInArc(journey.id, session.user.id);
+  console.log("=== JOURNEY DEBUG ===");
+  console.log("Journey ID:", journey.id);
+  console.log("Phase:", journey.phase);
+  console.log("Status:", journey.status);
+  console.log("BecameArcAt:", journey.becameArcAt);
+  console.log("CompletedAt:", journey.completedAt);
+  console.log("IsExtended:", journey.isExtended);
+  console.log("Total Check-ins:", journey.totalCheckIns);
+  console.log("Target Check-ins:", journey.targetCheckIns);
 
-  if(isJourneyStuckInArcBool){
-    alert('hello it is stucked')
-    redirect(`/journey/${journey.id}?became-arc=true`)
+  const SeedIcon = JOURNEY_ICONS.seed;
+  const ArcIcon = JOURNEY_ICONS.arc;
+
+  const isStuckInArc = await isJourneyStuckInArc(journey.id, session.user.id);
+  const isExtendedArcStuck = await isExtendedJourneyStuckInArc(journey.id, session.user.id);
+
+  const searchParamsResolved = await searchParams;
+  const showArcModal = searchParamsResolved["became-arc"] === "true";
+  const showExtendedModal = searchParamsResolved["should-complete"] === "true";
+
+  if (isStuckInArc && !showArcModal) {
+    redirect(`/journey/${journey.id}?became-arc=true`);
+  }
+
+  if(isExtendedArcStuck && !showExtendedModal){
+    redirect(`/journey/${journey.id}?should-complete=true`)
+
   }
 
   // Get check-ins
@@ -157,11 +181,11 @@ export default async function JourneyDetailPage({
                   <span>
                     {journey.phase === "seed" ? (
                       <div className="flex gap-1 items-center">
-                        <SeedIcon className="h-3.5 w-3.5"/> <span>Seed {isJourneyStuckInArcBool}</span>
+                        <SeedIcon className="h-3.5 w-3.5" /> <span>Seed</span>
                       </div>
                     ) : (
                       <div className="flex gap-1 items-center">
-                        <ArcIcon className="h-3.5 w-3.5"/> <span>Arc</span>
+                        <ArcIcon className="h-3.5 w-3.5" /> <span>Arc</span>
                       </div>
                     )}
                   </span>
@@ -250,9 +274,9 @@ export default async function JourneyDetailPage({
             )}
 
             <div>
-             <Link href={`/journey/${id}/edit`}>
-             < IoSettingsOutline size={20}/>
-             </Link>
+              <Link href={`/journey/${id}/edit`}>
+                <IoSettingsOutline size={20} />
+              </Link>
             </div>
           </div>
         </div>
@@ -262,7 +286,7 @@ export default async function JourneyDetailPage({
           <div className="mt-8 rounded-xl bg-white p-8 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-slate-900">
-               Learning Resources
+                Learning Resources
               </h3>
               <Link
                 href={`/journey/${journey.id}/edit`}
@@ -277,18 +301,18 @@ export default async function JourneyDetailPage({
                 const getTypeIcon = (type: string) => {
                   switch (type) {
                     case "video":
-                      return <RiVideoFill/>
+                      return <RiVideoFill />;
                     case "docs":
-                      return <IoIosDocument/>
+                      return <IoIosDocument />;
                     case "article":
-                      return <CgWebsite/>
-                     case 'course': 
-                          return <FaGraduationCap/>
-                        case 'book': 
-                          return <FaBook/>
-                        case 'other': 
+                      return <CgWebsite />;
+                    case "course":
+                      return <FaGraduationCap />;
+                    case "book":
+                      return <FaBook />;
+                    case "other":
                     default:
-                      return <FaLink/>
+                      return <FaLink />;
                   }
                 };
 
@@ -424,7 +448,9 @@ export default async function JourneyDetailPage({
 
           {checkIns.length === 0 ? (
             <div className="mt-6 text-center flex flex-col items-center py-12">
-              <div className="text-6xl"><PiNotePencilLight/></div>
+              <div className="text-6xl">
+                <PiNotePencilLight />
+              </div>
               <p className="mt-4 text-slate-600">No check-ins yet.</p>
               <p className="mt-1 text-sm text-slate-500">
                 Start your journey by checking in today!
@@ -449,16 +475,19 @@ export default async function JourneyDetailPage({
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
-                          <div className="text-2xl"><SlCalender/></div>
-                            <div className="font-semibold text-slate-900">
-                              {formattedDate}
-                            </div>
+                          <div className="text-2xl">
+                            <SlCalender />
+                          </div>
+                          <div className="font-semibold text-slate-900">
+                            {formattedDate}
+                          </div>
                         </div>
-
 
                         <div className="mt-4 text-slate-700 ">
                           <p>
-                            {checkIn.accomplishment.length>50 ? checkIn.accomplishment.slice(0,50):checkIn.accomplishment}
+                            {checkIn.accomplishment.length > 50
+                              ? checkIn.accomplishment.slice(0, 50)
+                              : checkIn.accomplishment}
                           </p>
                           <p className="ml-2 text-xs text-slate-500 line-clamp-1">
                             {checkIn.notes}

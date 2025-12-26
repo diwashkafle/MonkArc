@@ -121,13 +121,39 @@ export async function isJourneyStuckInArc(
     )
   })
 
-  if (!journey) return false
+  if (!journey){
+    return false
+  }
 
   return (
     journey.phase === 'arc' &&
     journey.status === 'active' &&
-    !!journey.becameArcAt &&
+    journey.becameArcAt !==null &&
     !journey.completedAt &&
     !journey.isExtended
+  )
+}
+
+export async function isExtendedJourneyStuckInArc(
+  journeyId: string, 
+  userId: string
+): Promise<boolean> {
+  const journey = await db.query.journeys.findFirst({
+    where: and(
+      eq(journeys.id, journeyId),
+      eq(journeys.userId, userId)
+    )
+  })
+
+  if (!journey){
+    return false
+  }
+
+  return (
+    journey.phase === 'arc' &&
+    journey.status === 'active' &&
+    journey.isExtended &&
+    journey.becameArcAt !==null &&
+    !journey.completedAt
   )
 }

@@ -162,6 +162,7 @@ export async function createCheckIn(formData: FormData) {
       longestStreak: newLongestStreak,
       lastCheckInDate: data.date,
       phase: shouldBecomeArc ? 'arc' : journey.phase,
+      becameArcAt: new Date(),
       status: 'active', 
       frozenAt: null,   
       deadAt: null,
@@ -174,7 +175,8 @@ export async function createCheckIn(formData: FormData) {
   // Redirect with celebration flag if became Arc
   if (shouldBecomeArc) {
     redirect(`/journey/${data.journeyId}?became-arc=true`)
-  } else if(shouldCompletion){
+  } 
+  else if(shouldCompletion){
     redirect(`/journey/${data.journeyId}?should-complete=true`)
   }
   else {
