@@ -5,6 +5,8 @@ import { getUserJourneys, getJourneyStats } from '@/lib/queries/journey-queries'
 import { DashboardFilters } from '@/components/ProtectedUiComponents/journeys/dashboard-filters'
 import Link from 'next/link'
 import { JOURNEY_ICONS, JOURNEY_COLORS } from '@/lib/constant/icons';
+import { shouldShowGitHubWarning } from '@/lib/github/github-status'
+import { LinkGitHubWarning } from '@/components/ProtectedUiComponents/warnings/link-github-warning'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -12,7 +14,8 @@ export default async function DashboardPage() {
   if (!session?.user?.id) {
     redirect('/login')
   }
-  
+    const showGitHubWarning = await shouldShowGitHubWarning(session.user.id);
+
   // Ensure username exists
   await ensureUsername(
     session.user.id,
@@ -40,6 +43,9 @@ export default async function DashboardPage() {
   
   return (
     <div className="min-h-screen bg-slate-50">
+       {
+        showGitHubWarning && <LinkGitHubWarning userName={session.user.name}/>
+      }
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* Welcome Header */}

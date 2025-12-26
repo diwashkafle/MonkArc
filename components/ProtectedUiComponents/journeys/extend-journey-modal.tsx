@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -75,14 +74,14 @@ export function ExtendJourney({
           <DialogTitle className="text-center text-3xl">
             {!isExtendJourney ? "Target Complete!" :" Extend your journey"}
           </DialogTitle>
-          <DialogDescription className="text-center text-base pt-4">
+          <div className="text-center text-base pt-4">
              {!isExtendJourney ? <div className="flex items-center flex-col">
               <h1>Congratulations {username}</h1>
                <h1>Extended target reached for <strong>{journeyTitle}</strong>!</h1>
               </div>: <div>
                 <h1>Add new target days to extend your journey. You can complete it anytime you want when you are in extended state.</h1>
                 </div>}
-          </DialogDescription>
+          </div>
         </DialogHeader>
 
         {!isExtendJourney ? <section>
@@ -109,11 +108,11 @@ export function ExtendJourney({
           
         </div>
 
-        <div className="flex  justify-end gap-5">
+        <div className="flex  justify-end gap-2">
           <Button disabled={isSubmitting} onClick={()=>setIsExtendJourney(true)} className="cursor-pointer">
             Extend journey
           </Button>
-          <Button disabled={isSubmitting} onClick={handleClose} className="cursor-pointer">
+          <Button variant={'outline'} disabled={isSubmitting} onClick={handleClose} className="cursor-pointer">
             {isSubmitting?<p className="flex gap-1 items-center"><Loader2 className="animate-spin"/> Completing</p>:<p>Complete journey</p>}
           </Button>
         </div>

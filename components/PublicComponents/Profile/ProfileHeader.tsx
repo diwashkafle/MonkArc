@@ -23,7 +23,7 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ user, stats, isOwnProfile,profileUrl }: ProfileHeaderProps) {
   return (
-    <div className="rounded-2xl mt-10 bg-white border border-slate-200 p-8 shadow-sm">
+    <div className="rounded-2xl bg-white border border-slate-200 p-8 shadow-sm">
       {/* User Info */}
       <div className="flex items-start justify-between mb-8">
         <div className="flex items-center gap-6">

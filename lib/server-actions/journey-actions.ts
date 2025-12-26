@@ -335,6 +335,7 @@ export async function completeJourney(journeyId: string) {
   await db
     .update(journeys)
     .set({
+      becameArcAt:new Date(),
       status: "completed",
       completedAt: new Date(),
     })

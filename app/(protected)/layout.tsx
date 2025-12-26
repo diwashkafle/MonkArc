@@ -6,6 +6,7 @@ import Header from "@/components/ProtectedUiComponents/ProtectedHeader/Header";
 
 
 
+
 interface LayoutProps {
   children: ReactNode;
 }
@@ -20,9 +21,11 @@ export default async function DashBoardLayout({
   }
 
 
+
   return (
     <div>
       <Header session={session}/>
+     
       <main className="">{children}</main>
       <Toaster/>
     </div>

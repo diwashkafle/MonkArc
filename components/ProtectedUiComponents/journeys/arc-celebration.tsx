@@ -6,16 +6,14 @@ import confetti from "canvas-confetti";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { SiCodefresh, SiCodeigniter } from "react-icons/si";
 import { MdArrowRightAlt } from "react-icons/md";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { completeJourney, extendJourney } from "@/lib/server-actions/journey-actions";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sprout, Trophy } from "lucide-react";
 
 
 interface ArcCelebrationProps {
@@ -37,8 +35,11 @@ export function ArcCelebration({
   const router = useRouter();
   const [isExtendJourney, setIsExtendJourney] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
   // ✅ Derive state directly from URL - no useState needed!
-  const isOpen = searchParams.get("became-arc") === "true";
+
+
+  const isOpen = searchParams.get("became-arc") === "true"  ;
 
   // Only use useEffect for SIDE EFFECTS (confetti)
   useEffect(() => {
@@ -74,8 +75,16 @@ export function ArcCelebration({
   }, [isOpen]); // Only fire when isOpen changes
 
   const handleClose = async () => {
-    await completeJourney(journeyId);
+    setIsComplete(true);
+    try{
+ await completeJourney(journeyId);
     router.replace(window.location.pathname);
+    setIsComplete(false);
+    }catch(error){
+      console.log(error)
+      setIsComplete(false);
+    }
+   
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -104,27 +113,27 @@ export function ArcCelebration({
         if (!open) handleClose();
       }}
     >
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-white! text-slate-900! border-slate-200 [&>button]:text-slate-500! [&>button:hover]:text-slate-900!">
         <DialogHeader>
-          <DialogTitle className="text-center text-3xl">
+          <DialogTitle className="text-center text-3xl text-slate-900!">
             {!isExtendJourney ? "Target Complete!" :" Extend your journey"}
           </DialogTitle>
-          <DialogDescription className="text-center text-base pt-4">
+          <div className="text-center text-base pt-4 text-slate-600!">
              {!isExtendJourney ? <div className="flex items-center flex-col">
               <h1>Congratulations {username}</h1>
               <div className="flex items-center justify-center gap-2">
-               <span className="flex gap-1 items-center"><SiCodefresh /> seed</span>  <MdArrowRightAlt size={25}/>  <span className="flex gap-1 items-center"><SiCodeigniter /> arc</span>
+               <span className="flex gap-1 items-center"><Sprout size={15}/> seed</span>  <MdArrowRightAlt size={25}/>  <span className="flex gap-1 items-center"><Trophy size={15}/> arc</span>
               </div>
                <h1>Arc phase achieved for <strong>{journeyTitle}</strong></h1>
               </div>: <div>
                 <h1>Add new target days to extend your journey. You can complete it anytime you want when you are in extended state.</h1>
                 </div>}
-          </DialogDescription>
+          </div>
         </DialogHeader>
 
         {!isExtendJourney ? <section>
           <div className="space-y-4 py-4">
-          <div className="rounded-lg bg-emerald-50 p-6 text-center">
+          <div className="rounded-lg bg-emerald-50 p-6 text-center border border-emerald-200">
             <div className="text-sm font-medium text-emerald-900">
               Achievement Unlocked
             </div>
@@ -137,39 +146,42 @@ export function ArcCelebration({
           </div>
         </div>
         <div className="flex flex-col gap-1 my-4">
-          <p className="flex gap-1 text-xs items-center text-gray-500">
+          <h1 className="flex gap-1 text-xs items-center text-slate-500">
             <IoMdInformationCircleOutline/> <span>If your project is yet to finish, you can extended your journey.</span>
-          </p>
-           <p className="flex gap-1 text-xs items-center text-gray-500">
+          </h1>
+           <h1 className="flex gap-1 text-xs items-center text-slate-500">
             <IoMdInformationCircleOutline/> <span>If your project is finished, you can complete your journey.</span>
-          </p>
+          </h1>
           
         </div>
 
-        <div className="flex  justify-evenly">
+        <div className="flex justify-end gap-2">
           <Button onClick={()=>setIsExtendJourney(true)} className="cursor-pointer">
             Extend journey
           </Button>
-          <Button onClick={handleClose} className="cursor-pointer">
-            Complete journey
+          <Button variant={'outline'} disabled={isComplete} onClick={handleClose} className="cursor-pointer">
+           {
+            isComplete ? <span className="flex items-center gap-1">
+              <Loader2 className="animate-spin"/> Completing... </span> : <span>Complete</span>
+           }
           </Button>
         </div>
         </section> : <section>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
            <div className="flex flex-col gap-1">
-             <label>Add additional days</label>
+             <label className="text-slate-900 font-medium">Add additional days</label>
             <input
             name="daysToAdd"
-            className="border-gray-300 border p-1 rounded-sm outline-none"
+            className="border-slate-300 no-spinner bg-white text-slate-900 border p-2 rounded-lg outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
             type="number"
             min={1}
             max={30}
             required
             />
-            <p className="text-xs text-gray-500">Additional days should be between 1 to 30</p>
+            <p className="text-xs text-slate-500">Additional days should be between 1 to 30</p>
            </div>
            <div className="flex justify-end gap-5">
-            <Button onClick={()=>setIsExtendJourney(false)} variant="outline" className="cursor-pointer" type="submit">
+            <Button onClick={()=>setIsExtendJourney(false)} variant="outline" className="cursor-pointer border-slate-300 text-slate-700 hover:bg-slate-100 hover:text-slate-900" type="button">
             Cancel
            </Button>
            <Button disabled={isSubmitting} className="cursor-pointer" type="submit">

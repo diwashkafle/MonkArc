@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { getJourneyById } from "@/lib/queries/journey-queries";
+import { getJourneyById, isJourneyStuckInArc } from "@/lib/queries/journey-queries";
 import {
   getJourneyCheckIns,
   hasCheckedInToday,
@@ -10,9 +10,7 @@ import { ArcCelebration } from "@/components/ProtectedUiComponents/journeys/arc-
 import { daysSinceLastCheckIn } from "@/lib/journey/journey-status";
 import { CheckInTracker } from "@/components/ProtectedUiComponents/journeys/check-in-tracker";
 import { Resource } from "@/lib/validation/journey-validation";
-import { SiCodefresh } from "react-icons/si";
 import { ExtendJourney } from "@/components/ProtectedUiComponents/journeys/extend-journey-modal";
-import { GiAzulFlake } from "react-icons/gi";
 import { IoSettingsOutline } from "react-icons/io5";
 import { PiNotePencilLight } from "react-icons/pi";
 import { SlCalender } from "react-icons/sl";
@@ -22,7 +20,6 @@ import { CgWebsite } from "react-icons/cg";
 import { FaLink } from "react-icons/fa6";
 import { FaBook, FaGraduationCap } from "react-icons/fa";
 import { JOURNEY_ICONS } from "@/lib/constant/icons";
-
 interface JourneyDetailPageProps {
   params: Promise<{
     id: string;
@@ -40,9 +37,20 @@ export default async function JourneyDetailPage({
 
   if (!journey) notFound();
 
+
+  if(journey.completedAt){
+    redirect('/arc/'+id);
+  }
+
   const SeedIcon = JOURNEY_ICONS.seed
   const ArcIcon = JOURNEY_ICONS.arc
   
+  const isJourneyStuckInArcBool = await isJourneyStuckInArc(journey.id, session.user.id);
+
+  if(isJourneyStuckInArcBool){
+    alert('hello it is stucked')
+    redirect(`/journey/${journey.id}?became-arc=true`)
+  }
 
   // Get check-ins
   const checkIns = await getJourneyCheckIns(id);
@@ -149,7 +157,7 @@ export default async function JourneyDetailPage({
                   <span>
                     {journey.phase === "seed" ? (
                       <div className="flex gap-1 items-center">
-                        <SeedIcon className="h-3.5 w-3.5"/> <span>Seed</span>
+                        <SeedIcon className="h-3.5 w-3.5"/> <span>Seed {isJourneyStuckInArcBool}</span>
                       </div>
                     ) : (
                       <div className="flex gap-1 items-center">

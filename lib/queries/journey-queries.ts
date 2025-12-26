@@ -109,3 +109,25 @@ export async function getPublicStats() {
     totalCheckIns,
   }
 }
+
+export async function isJourneyStuckInArc(
+  journeyId: string, 
+  userId: string
+): Promise<boolean> {
+  const journey = await db.query.journeys.findFirst({
+    where: and(
+      eq(journeys.id, journeyId),
+      eq(journeys.userId, userId)
+    )
+  })
+
+  if (!journey) return false
+
+  return (
+    journey.phase === 'arc' &&
+    journey.status === 'active' &&
+    !!journey.becameArcAt &&
+    !journey.completedAt &&
+    !journey.isExtended
+  )
+}

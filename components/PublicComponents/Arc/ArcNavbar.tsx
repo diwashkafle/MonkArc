@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/tooltip" 
 import { LiaBookMedicalSolid } from "react-icons/lia";
 import { MdOutlineDashboard } from "react-icons/md";
+import { Settings2 } from "lucide-react";
 type ArcNavbarPop = {
     IsOwner: boolean;
     id:string;
@@ -41,7 +42,7 @@ const ArcNavbar = async({IsOwner,id}:ArcNavbarPop) => {
       <TooltipTrigger asChild>
         <button className="border border-gray-300 cursor-pointer rounded-md p-1"><LiaBookMedicalSolid className="text-gray-700" size={25}/></button>
       </TooltipTrigger>
-      <TooltipContent>
+      <TooltipContent className="bg-black! text-white!">
         <p>Create new journey</p>
       </TooltipContent>
     </Tooltip>
@@ -52,19 +53,26 @@ const ArcNavbar = async({IsOwner,id}:ArcNavbarPop) => {
       <TooltipTrigger asChild>
         <button className="border border-gray-300 cursor-pointer rounded-md p-1"><MdOutlineDashboard className="text-gray-700" size={25}/></button>
       </TooltipTrigger>
-      <TooltipContent>
+      <TooltipContent  className="bg-black! text-white!">
         <p>Go to Dashboard</p>
       </TooltipContent>
     </Tooltip>
+    </Link>
      {IsOwner && (
               <Link
-                href={`/journey/${id}/edit`}
-                className="px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
-              >
-                Edit Journey
+                href={`/journey/${id}/edit`}              >
+                <Tooltip>
+      <TooltipTrigger asChild>
+        <button className="border border-gray-300 cursor-pointer rounded-md p-1"> <Settings2 className="text-gray-700" size={25}/></button>
+      </TooltipTrigger>
+      <TooltipContent  className="bg-black! text-white!">
+        <p>Edit Arc</p>
+      </TooltipContent>
+    </Tooltip>
+               
               </Link>
             )}
-          </Link>
+          
 
           <DropdownMenuHeader username={session?.user.username} image={session?.user.image} />
               </div>
