@@ -154,6 +154,7 @@ export async function isExtendedJourneyStuckInArc(
     journey.status === 'active' &&
     journey.isExtended &&
     journey.becameArcAt !==null &&
-    !journey.completedAt
+    !journey.completedAt && 
+    journey.totalCheckIns >=(journey.extendedTarget || journey.targetCheckIns)
   )
 }

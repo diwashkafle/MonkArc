@@ -387,7 +387,7 @@ export async function extendJourney(journeyId: string, formData: FormData) {
   // ✅ FIXED: Update with proper types
   await db.update(journeys)
     .set({
-      isExtended: true,  // ✅ Add this
+      isExtended: true, 
       extendedTarget: newTarget,  
       targetCheckIns: newTarget,
       originalTarget: journey.originalTarget || journey.targetCheckIns,

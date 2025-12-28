@@ -107,7 +107,7 @@ export function ArcCelebration({
     };
 
   return (
-    <Dialog
+    <Dialog 
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) handleClose();

@@ -24,6 +24,8 @@ import { CgWebsite } from "react-icons/cg";
 import { FaLink } from "react-icons/fa6";
 import { FaBook, FaGraduationCap } from "react-icons/fa";
 import { JOURNEY_ICONS } from "@/lib/constant/icons";
+import { Button } from "@/components/ui/button";
+import CompleteButton from "@/components/ProtectedUiComponents/journeys/complete-button";
 interface JourneyDetailPageProps {
   params: Promise<{
     id: string;
@@ -255,7 +257,9 @@ export default async function JourneyDetailPage({
 
           {/* Action Buttons */}
           <div className="mt-8 flex flex-wrap justify-between items-center gap-3 border-t pt-6">
-            {!checkedInToday &&
+            <section className="flex items-center gap-3">
+              <div>
+                {!checkedInToday &&
               (journey.status === "active" ||
                 journey.status === "frozen" ||
                 journey.status === "extended") && (
@@ -272,6 +276,9 @@ export default async function JourneyDetailPage({
                 ✓ Checked in today!
               </div>
             )}
+              </div>
+             <CompleteButton journeyId = {journey.id}/>
+            </section>
 
             <div>
               <Link href={`/journey/${id}/edit`}>
