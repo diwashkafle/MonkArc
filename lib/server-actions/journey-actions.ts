@@ -186,12 +186,9 @@ export async function editJourney(journeyId: string, formData: FormData) {
 // DELETE JOURNEY
 
 export async function deleteJourney(journeyId: string) {
-  console.log("deleteJourney called with id:", journeyId);
   const session = await auth();
-  console.log("session:", session);
 
   if (!session?.user?.id) {
-    console.log("no session user id");
     throw new Error("Unauthorized");
   }
 
@@ -202,19 +199,12 @@ export async function deleteJourney(journeyId: string) {
       eq(journeys.userId, session.user.id)
     ),
   });
-  console.log("Journey found:", journey ? "YES" : "NO");
 
   if (!journey) {
-    console.log("❌ Journey not found or access denied");
-
     throw new Error("Journey not found or access denied");
   }
-  console.log("✅ Deleting journey...");
 
-  // Delete (cascades to daily_progress, milestones, leaves)
   await db.delete(journeys).where(eq(journeys.id, journeyId));
-  console.log('✅ Journey deleted successfully')
-  console.log('===================================')
 
   revalidatePath("/dashboard");
   redirect("/dashboard");

@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from '../../ui/button'
+import { Loader2 } from 'lucide-react'
 
 interface DeleteJourneyButtonProps {
   journeyId: string
@@ -71,7 +72,7 @@ export function DeleteJourneyButton({ journeyId, journeyTitle }: DeleteJourneyBu
             onClick={handleDelete}
             disabled={isDeleting}
           >
-            {isDeleting ? 'Deleting...' : 'Delete Permanently'}
+            {isDeleting ? <span className='flex items-center gap-1'><Loader2 className='animate-spin'/><h1>Deleting...</h1></span> : 'Delete Permanently'}
           </Button>
         </DialogFooter>
       </DialogContent>

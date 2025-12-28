@@ -1,21 +1,25 @@
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { ensureUsername } from '@/lib/server-actions/user-action'
-import { getUserJourneys, getJourneyStats } from '@/lib/queries/journey-queries'
+import { getUserJourneys, getJourneyStats, isJourneyStuckInArc, isExtendedJourneyStuckInArc } from '@/lib/queries/journey-queries'
 import { DashboardFilters } from '@/components/ProtectedUiComponents/journeys/dashboard-filters'
 import Link from 'next/link'
 import { JOURNEY_ICONS, JOURNEY_COLORS } from '@/lib/constant/icons';
 import { shouldShowGitHubWarning } from '@/lib/github/github-status'
 import { LinkGitHubWarning } from '@/components/ProtectedUiComponents/warnings/link-github-warning'
+import { hasCheckedInToday } from '@/lib/queries/check-in-queries'
 
 export default async function DashboardPage() {
+
   const session = await auth()
   
-  if (!session?.user?.id) {
+  if (!session?.user?.id) { 
     redirect('/login')
   }
-    const showGitHubWarning = await shouldShowGitHubWarning(session.user.id);
 
+const showGitHubWarning = await shouldShowGitHubWarning(session.user.id);
+
+  
   // Ensure username exists
   await ensureUsername(
     session.user.id,
@@ -25,6 +29,7 @@ export default async function DashboardPage() {
   
   // Fetch user's journeys
   const journeys = await getUserJourneys(session.user.id)
+
   const stats = await getJourneyStats(session.user.id)
 
   // Get icon components
@@ -40,6 +45,15 @@ export default async function DashboardPage() {
   const arcColors = JOURNEY_COLORS.arc
   const streakColors = JOURNEY_COLORS.streak
   const checkInsColors = JOURNEY_COLORS.neutral
+
+  const journeysWithStatus = await Promise.all(
+  journeys.map(async (journey) => ({
+    ...journey,
+    isCheckedInToday: await hasCheckedInToday(journey.id),
+    isStuckInArc: await isJourneyStuckInArc(journey.id, session.user.id),
+    isExtendedStuckInArc: await isExtendedJourneyStuckInArc(journey.id, session.user.id),
+  }))
+)
   
   return (
     <div className="min-h-screen bg-slate-50">
@@ -157,8 +171,8 @@ export default async function DashboardPage() {
                 Create First Journey
               </Link>
             </div>
-          ) : (
-            <DashboardFilters journeys={journeys} />
+          ) : ( 
+            <DashboardFilters journeys={journeysWithStatus} /> 
           )}
         </div>
       </main>

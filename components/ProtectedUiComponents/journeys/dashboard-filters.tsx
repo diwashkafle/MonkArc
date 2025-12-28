@@ -11,14 +11,23 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue, 
 } from "@/components/ui/select"
+import { Button } from '@/components/ui/button'
+import { hasCheckedInToday } from '@/lib/queries/check-in-queries'
+import { isExtendedJourneyStuckInArc, isJourneyStuckInArc } from '@/lib/queries/journey-queries'
 
+// At top of file, create the type:
+type JourneyWithStatus = InferSelectModel<typeof journeys> & {
+  isCheckedInToday: boolean
+  isStuckInArc: boolean
+  isExtendedStuckInArc: boolean
+}
 interface DashboardFiltersProps {
-  journeys: InferSelectModel<typeof journeys>[]
+  journeys: JourneyWithStatus[]
 }
 
-type StatusFilter = 'all' | 'active' | 'frozen' | 'dead' | 'completed'
+type StatusFilter = 'all' | 'active' | 'frozen' | 'dead' | 'completed' | 'extended'
 type PhaseFilter = 'all' | 'seed' | 'arc'
 
 export function DashboardFilters({ journeys }: DashboardFiltersProps) {
@@ -272,12 +281,17 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                     </div>
                   </div>
                   
-                  {!journey.completedAt && (
-                    <Link
+                  {!journey.completedAt && !journey.isStuckInArc && !journey.isExtendedStuckInArc && (
+                    journey.isCheckedInToday ? <Button disabled className='bg-green-400' variant={'outline'}>
+                       Checked-in
+                     </Button>
+                     : <Link
                       href={`/journey/${journey.id}/check-in`}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                      className="text-sm cursor-pointer font-medium text-slate-600 hover:text-slate-700 hover:underline"
                     >
-                      Check-in
+                     <Button variant={'outline'}>
+                       Check-in
+                     </Button>
                     </Link>
                   )}
                 </div>
