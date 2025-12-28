@@ -277,7 +277,9 @@ export default async function JourneyDetailPage({
               </div>
             )}
               </div>
-             <CompleteButton journeyId = {journey.id}/>
+              {journey.becameArcAt && 
+              <CompleteButton journeyId={journey.id} />
+              }
             </section>
 
             <div>

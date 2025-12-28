@@ -96,7 +96,7 @@ export function NewJourneyForm({
           min={1}
           max={365}
           defaultValue={30}
-          className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          className="w-full no-spinner rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
         <p className="mt-1 text-xs text-slate-500">
           How many days do you want to work on this? (7-365 days)

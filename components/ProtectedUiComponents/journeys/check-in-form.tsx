@@ -129,6 +129,7 @@ export function SimpleCheckInForm({
       <div className="flex items-center justify-end gap-3 pt-4 border-t">
         <button
           type="button"
+          disabled={isSubmitting}
           onClick={() => router.back()}
           className="rounded-lg border border-slate-300 bg-white px-6 py-3 font-medium text-slate-700 hover:bg-slate-50"
         >

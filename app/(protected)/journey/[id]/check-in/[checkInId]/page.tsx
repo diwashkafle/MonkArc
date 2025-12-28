@@ -50,12 +50,19 @@ export default async function CheckInDetailPage({
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="mx-auto pt-6 max-w-4xl px-4">
-        <Link
+        {
+          !!journey.completedAt ? <Link
+          href={`/arc/${id}`}
+          className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 transition-colors"
+        >
+          ← Back to Arc
+        </Link> : <Link
           href={`/journey/${id}`}
           className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 transition-colors"
         >
           ← Back to Journey
         </Link>
+        }
       </div>
 
       {/* Main Content */}

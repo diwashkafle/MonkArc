@@ -13,6 +13,7 @@ import {
   calculateTotalWords,
   calculateJourneyDuration,
   calculateCompletionRate,
+  calculateExtendedDays,  // ✅ Added
 } from "@/lib/arc/act-stats";
 import Link from "next/link";
 import ArcNavbar from "@/components/PublicComponents/Arc/ArcNavbar";
@@ -79,24 +80,36 @@ export default async function ArcPage({ params }: ArcPageProps) {
   // Get all check-ins
   const checkIns = await getJourneyCheckIns(id);
 
-  // Calculate stats
+  // ✅ Calculate journey duration first (needed for other calculations)
+  const journeyDuration = calculateJourneyDuration(
+    journey.startDate,
+    journey.completedAt!,
+    journey.lastCheckInDate  // ✅ Added
+  );
+
+  // ✅ Calculate stats
   const missedDays = calculateMissedDays(
     journey.startDate,
     journey.completedAt!,
+    journey.lastCheckInDate,  // ✅ Added
     journey.totalCheckIns,
     journey.pausedDays
   );
 
   const totalCommits = calculateTotalCommits(checkIns);
   const totalWords = calculateTotalWords(checkIns);
-  const journeyDuration = calculateJourneyDuration(
-    journey.startDate,
-    journey.completedAt!
-  );
+  
   const completionRate = calculateCompletionRate(
     journey.totalCheckIns,
     journeyDuration,
     journey.pausedDays
+  );
+
+  // ✅ Calculate extended days properly
+  const extendedDays = calculateExtendedDays(
+    journeyDuration,
+    journey.originalTarget || journey.targetCheckIns,
+    journey.isExtended
   );
 
   return (
@@ -126,12 +139,9 @@ export default async function ArcPage({ params }: ArcPageProps) {
           completionRate={completionRate}
           totalWords={totalWords}
           pausedDays={journey.pausedDays}
-          extendedDays={
-            journey.originalTarget
-              ? journey.targetCheckIns - journey.originalTarget
-              : 0
-          }
+          extendedDays={extendedDays} 
           isExtended={journey.isExtended}
+          originalTarget={journey.originalTarget}
         />
 
         {/* Days Grid */}
@@ -142,7 +152,7 @@ export default async function ArcPage({ params }: ArcPageProps) {
         />
 
         {/* Timeline */}
-        <ArcTimeline checkIns={checkIns} />
+        <ArcTimeline isOwner={isOwner} journeyId={journey.id} checkIns={checkIns} />
 
         {/* Learning Resources (if any) */}
         {journey.resources && journey.resources.length > 0 && (
@@ -152,7 +162,7 @@ export default async function ArcPage({ params }: ArcPageProps) {
             </h2>
             <div className="grid gap-3">
               {journey.resources.map((resource) => (
-                <a
+                <Link
                   key={resource.id}
                   href={resource.url}
                   target="_blank"
@@ -180,7 +190,7 @@ export default async function ArcPage({ params }: ArcPageProps) {
                       d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                     />
                   </svg>
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -195,12 +205,12 @@ export default async function ArcPage({ params }: ArcPageProps) {
               Track your progress, build streaks, and reach your Arc phase just
               like this one.
             </p>
-            <a
+            <Link
               href="/auth/sign-in"
               className="inline-block px-8 py-4 bg-white text-slate-900 rounded-lg font-semibold hover:bg-slate-100 transition-colors shadow-xl"
             >
               Start Building Today
-            </a>
+            </Link>
           </div>
         ) : null}
       </main>

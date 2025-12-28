@@ -88,7 +88,7 @@ export async function createCheckIn(formData: FormData) {
     throw new Error('Journey not found or access denied')
   }
   
-  // Check if already checked in for this date
+  // ✅ CRITICAL: Check if already checked in BEFORE transaction
   const existingCheckIn = await getCheckInByDate(data.journeyId, data.date)
   
   if (existingCheckIn) {
@@ -101,7 +101,6 @@ export async function createCheckIn(formData: FormData) {
   
   // Create journal text for legacy field (backwards compatibility)
   const question = "What's your progress today?"
-  
   
   // Fetch GitHub commits if this is a project journey
   let commitCount = 0
@@ -128,60 +127,70 @@ export async function createCheckIn(formData: FormData) {
       // Don't fail the check-in if GitHub fetch fails
     }
   }
-  
-  // Create check-in
-  await db.insert(dailyProgress).values({
-    journeyId: data.journeyId,
-    date: data.date,
-    accomplishment: data.accomplishment,
-    notes: data.notes || null,
-    wordCount,
-    promptUsed: question,
-    commitCount,
-    githubCommits,
-  })
-  
-  // Calculate new streak
+
+  // ✅ NEW: Calculate streak BEFORE transaction (uses read-only query)
   const newStreak = await calculateStreak(data.journeyId, data.date)
   
-  // Update journey stats
+  // Calculate new stats
   const newTotalCheckIns = journey.totalCheckIns + 1
   const newLongestStreak = Math.max(journey.longestStreak, newStreak)
   
   const shouldBecomeArc = 
-  journey.phase === 'seed' && 
-  newTotalCheckIns >= journey.targetCheckIns
+    journey.phase === 'seed' && 
+    newTotalCheckIns >= journey.targetCheckIns
 
-  const shouldCompletion =   newTotalCheckIns >= journey.targetCheckIns;
+  const shouldCompletion = newTotalCheckIns >= journey.targetCheckIns
 
-  
-  await db.update(journeys)
-    .set({
-      totalCheckIns: newTotalCheckIns,
-      currentStreak: newStreak,
-      longestStreak: newLongestStreak,
-      lastCheckInDate: data.date,
-      phase: shouldBecomeArc ? 'arc' : journey.phase,
-      becameArcAt: new Date(),
-      status: 'active', 
-      frozenAt: null,   
-      deadAt: null,
+  // ✅ CRITICAL: Use transaction - all or nothing
+  try {
+    await db.transaction(async (tx) => {
+      // 1. Create check-in
+      await tx.insert(dailyProgress).values({
+        journeyId: data.journeyId,
+        date: data.date,
+        accomplishment: data.accomplishment,
+        notes: data.notes || null,
+        wordCount,
+        promptUsed: question,
+        commitCount,
+        githubCommits,
+      })
+      
+      // 2. Update journey stats
+      await tx.update(journeys)
+        .set({
+          totalCheckIns: newTotalCheckIns,
+          currentStreak: newStreak,
+          longestStreak: newLongestStreak,
+          lastCheckInDate: data.date,
+          phase: shouldBecomeArc ? 'arc' : journey.phase,
+          becameArcAt: shouldBecomeArc ? new Date() : journey.becameArcAt,
+          status: 'active', 
+          frozenAt: null,   
+          deadAt: null,
+        })
+        .where(eq(journeys.id, data.journeyId))
     })
-    .where(eq(journeys.id, data.journeyId))
-  
-  revalidatePath(`/journey/${data.journeyId}`)
-  revalidatePath('/dashboard')
-  
+    
+    // ✅ Transaction succeeded - now revalidate and redirect
+    revalidatePath(`/journey/${data.journeyId}`)
+    revalidatePath('/dashboard')
+    
+  } catch (error) {
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+    throw error 
+  }
   // Redirect with celebration flag if became Arc
-  if (shouldBecomeArc) {
-    redirect(`/journey/${data.journeyId}?became-arc=true`)
-  } 
-  else if(shouldCompletion){
-    redirect(`/journey/${data.journeyId}?should-complete=true`)
-  }
-  else {
-    redirect(`/journey/${data.journeyId}`)
-  }
+    if (shouldBecomeArc) {
+      redirect(`/journey/${data.journeyId}?became-arc=true`)
+    } 
+    else if (shouldCompletion) {
+      redirect(`/journey/${data.journeyId}?should-complete=true`)
+    }
+    else {
+      redirect(`/journey/${data.journeyId}`)
+    }
+}
 }
 
 // ========================================
@@ -250,4 +259,3 @@ export async function editCheckIn(checkInId: string, formData: FormData) {
   // Redirect back to check-in view
   redirect(`/journey/${checkIn.journeyId}/check-in/${checkInId}`)
 }
-

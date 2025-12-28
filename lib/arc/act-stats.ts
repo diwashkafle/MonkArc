@@ -6,18 +6,20 @@ type CheckIn = typeof dailyProgress.$inferSelect
 export function calculateMissedDays(
   startDate: string,
   completedAt: Date,
+  lastCheckInDate: string | null,  // ✅ Added
   totalCheckIns: number,
   pausedDays: number = 0
 ): number {
   const start = new Date(startDate)
-  const end = new Date(completedAt)
+  // ✅ Use last check-in date if available, otherwise completedAt
+  const endDate = lastCheckInDate ? new Date(lastCheckInDate) : new Date(completedAt)
   
   // Reset to midnight for accurate calculation
   start.setHours(0, 0, 0, 0)
-  end.setHours(0, 0, 0, 0)
+  endDate.setHours(0, 0, 0, 0)
   
   // Calculate total days in journey
-  const totalDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+  const totalDays = Math.floor((endDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
   
   // Subtract paused days from total
   const activeDays = totalDays - pausedDays
@@ -41,15 +43,27 @@ export function calculateTotalWords(checkIns: CheckIn[]): number {
 // Calculate journey duration in days
 export function calculateJourneyDuration(
   startDate: string,
-  completedAt: Date
+  completedAt: Date,
+  lastCheckInDate: string | null  // ✅ Added
 ): number {
   const start = new Date(startDate)
-  const end = new Date(completedAt)
+  // ✅ Use last check-in date if available, otherwise completedAt
+  const endDate = lastCheckInDate ? new Date(lastCheckInDate) : new Date(completedAt)
   
   start.setHours(0, 0, 0, 0)
-  end.setHours(0, 0, 0, 0)
+  endDate.setHours(0, 0, 0, 0)
   
-  return Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+  return Math.floor((endDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+}
+
+// ✅ NEW: Calculate extended days used
+export function calculateExtendedDays(
+  journeyDuration: number,
+  originalTarget: number,
+  isExtended: boolean
+): number {
+  if (!isExtended) return 0
+  return Math.max(0, journeyDuration - originalTarget)
 }
 
 // Calculate completion rate (percentage of days checked in)
