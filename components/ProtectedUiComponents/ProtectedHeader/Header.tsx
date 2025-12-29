@@ -17,8 +17,9 @@ const Header = ({ session }: HeaderProp) => {
   return (
     <nav className=" px-4 py-4 border-b border-slate-200 bg-white/50 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
-        <Link href="/dashboard" className="text-xl font-bold">
+        <Link href="/dashboard" className="text-xl flex items-center gap-1 font-bold">
           <Image src={"/MonkArc.svg"} alt="MonkArc" height={80} width={40} />
+          <h1 className="text-lg font-semibold">MonkArc</h1>
         </Link>
 
         <div className="flex items-center gap-4">
