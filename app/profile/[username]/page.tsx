@@ -92,11 +92,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      {session ? <Header session={session} /> : <PublicHeader />}
+      {session?.user.id ? <Header session={session} /> : <PublicHeader />}
       
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-4 py-12">
-        {/* Profile Header with Stats */}
+      <main className={session?.user.id ? "mx-auto max-w-7xl pt-12" : "mx-auto max-w-7xl pt-22 sm:pt-25"}>
+        {/* Profile Header with Stats */} 
         <div className="mb-8 flex items-start justify-between">
           <div className="flex-1">
             <ProfileHeader 
