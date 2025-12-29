@@ -362,7 +362,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 🗺️ Roadmap
+<!-- ## 🗺️ Roadmap
 
 - [ ] Email notifications for frozen/dead journeys
 - [ ] Team journeys (collaborate with friends)
@@ -373,7 +373,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Export journey data (PDF/JSON)
 - [ ] Integration with more platforms (GitLab, Bitbucket)
 
----
+--- -->
 
 <div align="center">
 
