@@ -90,15 +90,12 @@ export async function updateJourneyStatusByActivity(journeyId: string) {
       .set(updates)
       .where(eq(journeys.id, journeyId))
     
-    console.log(`🔄 Journey ${journeyId} status changed: ${journey.status} → ${newStatus}`)
   }
   
   return { ...journey, status: newStatus }
 }
 
-// ========================================
 // BATCH UPDATE ALL ACTIVE JOURNEYS
-// ========================================
 
 export async function updateAllJourneyStatuses() {
   const today = new Date()
@@ -113,19 +110,13 @@ export async function updateAllJourneyStatuses() {
   sevenDaysAgo.setDate(today.getDate() - 7)
   const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0]
   
-  console.log('🔄 Updating journey statuses...', {
-    today: today.toISOString().split('T')[0],
-    freezeThreshold: threeDaysAgoStr,
-    deadThreshold: sevenDaysAgoStr
-  })
-  
-  // ✅ BATCH UPDATE 1: Freeze active journeys (3+ days inactive)
+  //  BATCH UPDATE 1: Freeze active journeys (3+ days inactive)
   const frozenResult = await db
     .update(journeys)
     .set({
       status: 'frozen',
       frozenAt: sql`COALESCE(frozen_at, NOW())`, // Only set if not already set
-      // ✅ Don't reset streak on freeze - preserve it!
+      // Don't reset streak on freeze - preserve it!
     })
     .where(
       and(
@@ -137,19 +128,14 @@ export async function updateAllJourneyStatuses() {
   
   const frozenCount = frozenResult.length
   
-  if (frozenCount > 0) {
-    console.log(`❄️ Frozen ${frozenCount} journeys:`, 
-      frozenResult.map(j => j.title).join(', ')
-    )
-  }
   
-  // ✅ BATCH UPDATE 2: Kill frozen journeys (7+ days inactive total)
+  // BATCH UPDATE 2: Kill frozen journeys (7+ days inactive total)
   const deadResult = await db
     .update(journeys)
     .set({
       status: 'dead',
       deadAt: sql`COALESCE(dead_at, NOW())`, // Only set if not already set
-      currentStreak: 0, // ✅ Reset streak when dead
+      currentStreak: 0, //  Reset streak when dead
     })
     .where(
       and(
@@ -161,16 +147,9 @@ export async function updateAllJourneyStatuses() {
   
   const deadCount = deadResult.length
   
-  if (deadCount > 0) {
-    console.log(`💀 Killed ${deadCount} journeys:`, 
-      deadResult.map(j => j.title).join(', ')
-    )
-  }
   
-  // ✅ Summary
-  const total = frozenCount + deadCount
-  console.log(`✅ Status update complete: ${frozenCount} frozen, ${deadCount} dead`)
-  
+  //  Summary
+  const total = frozenCount + deadCount  
   return {
     total,
     updated: {

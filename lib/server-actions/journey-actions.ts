@@ -56,7 +56,7 @@ export async function createJourney(formData: FormData) {
     targetCheckIns: parseInt(formData.get('targetCheckIns') as string),
     startDate: formData.get('startDate') as string,
     isPublic: formData.get('isPublic') === 'on',
-    repoURL: formData.get('repoURL') as string || null, // ✅ null not empty string
+    repoURL: formData.get('repoURL') as string || null, 
     techStack, 
     resources,
     status,
@@ -66,8 +66,6 @@ export async function createJourney(formData: FormData) {
   const validationResult = createJourneySchema.safeParse(rawData);
 
   if (!validationResult.success) {
-    // ✅ Better error logging
-    console.error('Validation failed:', validationResult.error.issues)
     const firstError = validationResult.error.issues[0];
     throw new Error(`${firstError.path.join('.')}: ${firstError.message}`);
   }
@@ -94,7 +92,7 @@ export async function createJourney(formData: FormData) {
   }).returning()
   
   revalidatePath('/dashboard')
-  redirect(`/journey/${journey.id}`)
+  redirect(`/journey/${journey.id}?created=true`)
 }
 
 // EDIT JOURNEY
@@ -177,9 +175,9 @@ export async function editJourney(journeyId: string, formData: FormData) {
   revalidatePath(`/journey/${journeyId}`)
   revalidatePath('/dashboard')
   if(journey.completedAt){
-  redirect(`/arc/${journeyId}`)
+  redirect(`/arc/${journeyId}?updated=true`)
   }else{
-      redirect(`/journey/${journeyId}`)
+      redirect(`/journey/${journeyId}?updated=true`)
   }
 }
 
@@ -207,7 +205,7 @@ export async function deleteJourney(journeyId: string) {
   await db.delete(journeys).where(eq(journeys.id, journeyId));
 
   revalidatePath("/dashboard");
-  redirect("/dashboard");
+  redirect("/dashboard?deleted=true");
 }
 
 // PAUSE JOURNEY
@@ -335,9 +333,7 @@ export async function completeJourney(journeyId: string) {
   revalidatePath("/dashboard");
 }
 
-// ========================================
 // Extend journey
-// ========================================
 
 export async function extendJourney(journeyId: string, formData: FormData) {
   const session = await auth()
@@ -384,7 +380,6 @@ export async function extendJourney(journeyId: string, formData: FormData) {
   const data = validationResult.data
   const newTarget = journey.targetCheckIns + data.daysToAdd
 
-  // ✅ FIXED: Update with proper types
   await db.update(journeys)
     .set({
       isExtended: true, 
@@ -398,14 +393,13 @@ export async function extendJourney(journeyId: string, formData: FormData) {
         {
           id: crypto.randomUUID(),
           date: new Date(),
-          daysAdded: data.daysToAdd,  // ✅ Now guaranteed to be number
+          daysAdded: data.daysToAdd,  
           newTarget: newTarget
         }
       ],
     })
     .where(eq(journeys.id, journeyId))
 
-  // ✅ Add revalidation and redirect
   revalidatePath(`/journey/${journeyId}`)
   revalidatePath('/dashboard')
 

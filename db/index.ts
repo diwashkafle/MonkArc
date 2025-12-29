@@ -1,4 +1,3 @@
-// db/index.ts (or wherever you initialize db)
 
 import { drizzle } from 'drizzle-orm/neon-serverless'
 import { Pool } from '@neondatabase/serverless' 

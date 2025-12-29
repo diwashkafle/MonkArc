@@ -33,7 +33,7 @@ export function ExtendJourney({
   const router = useRouter();
   const [isExtendJourney, setIsExtendJourney] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // ✅ Derive state directly from URL - no useState needed!
+  // Derive state directly from URL - no useState needed!
   const isOpen = searchParams.get("should-complete") === "true";
 
   const handleClose = async () => {

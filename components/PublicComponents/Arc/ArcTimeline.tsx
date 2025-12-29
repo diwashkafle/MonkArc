@@ -6,7 +6,7 @@ import { useState } from "react";
 
 type CheckIn = typeof dailyProgress.$inferSelect;
 
-// ✅ Define the commit type
+// Define the commit type
 interface GitHubCommit {
   sha: string;
   message: string;
@@ -26,7 +26,7 @@ export function ArcTimeline({
   isOwner,
   journeyId,
 }: ArcTimelineProps) {
-  // ✅ Track which check-in has commits expanded (by check-in ID)
+  // Track which check-in has commits expanded (by check-in ID)
   const [expandedCommits, setExpandedCommits] = useState<Set<string>>(new Set());
 
   const toggleCommits = (checkInId: string) => {
@@ -73,7 +73,7 @@ export function ArcTimeline({
           const isLast = index === checkIns.length - 1;
           const isExpanded = expandedCommits.has(checkIn.id);
 
-          // ✅ Parse GitHub commits from JSON
+          // Parse GitHub commits from JSON
           const commits = checkIn.githubCommits 
             ? (Array.isArray(checkIn.githubCommits) 
                 ? checkIn.githubCommits 
@@ -177,7 +177,7 @@ export function ArcTimeline({
                     )}
                   </div>
 
-                  {/* ✅ Commits dropdown (only for owner) */}
+                  {/* Commits dropdown (only for owner) */}
                   {isOwner && isExpanded && commits.length > 0 && (
                     <div className="mt-4 rounded-lg bg-slate-50 border border-slate-200 p-4">
                       <div className="text-xs font-semibold text-slate-700 mb-3 flex items-center gap-2">

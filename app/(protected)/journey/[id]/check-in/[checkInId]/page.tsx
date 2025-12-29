@@ -7,6 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { Calendar, GitCommit, Edit3 } from "lucide-react";
 import { GitHubCommit, GitHubCommits } from "@/types/github-commits";
+import { ToastHandler } from "@/components/toast/toast-handler";
 interface CheckInDetailPageProps {
   params: Promise<{
     id: string;
@@ -48,6 +49,7 @@ export default async function CheckInDetailPage({
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <ToastHandler/>
       {/* Header */}
       <div className="mx-auto pt-6 max-w-4xl px-4">
         {

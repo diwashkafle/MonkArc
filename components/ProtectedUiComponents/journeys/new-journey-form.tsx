@@ -7,6 +7,7 @@ import { ResourceManager } from "@/components/ProtectedUiComponents/journeys/res
 import { LinkGitHubButton } from "@/components/ProtectedUiComponents/journeys/github/link-github-button";
 import { Loader2 } from "lucide-react";
 import clsx from "clsx";
+import toast from "react-hot-toast";
 
 type Resource = {
   id: string;
@@ -43,9 +44,7 @@ export function NewJourneyForm({
         throw error;
       }
       console.error("Real error:", error);
-      alert(
-        error instanceof Error ? error.message : "Failed to create journey"
-      );
+      toast.error("Error occurred, please try again later");
       setIsSubmitting(false);
     }
   };

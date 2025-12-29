@@ -26,6 +26,7 @@ import { FaBook, FaGraduationCap } from "react-icons/fa";
 import { JOURNEY_ICONS } from "@/lib/constant/icons";
 import { Button } from "@/components/ui/button";
 import CompleteButton from "@/components/ProtectedUiComponents/journeys/complete-button";
+import { ToastHandler } from "@/components/toast/toast-handler";
 interface JourneyDetailPageProps {
   params: Promise<{
     id: string;
@@ -89,6 +90,7 @@ export default async function JourneyDetailPage({
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <ToastHandler/>
       <ArcCelebration
         journeyId={journey.id}
         username={session?.user?.name}

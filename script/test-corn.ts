@@ -1,5 +1,3 @@
-// Run this with: npx ts-node scripts/test-cron.ts
-
 
 async function testCron() {
   const cronSecret = process.env.CRON_SECRET

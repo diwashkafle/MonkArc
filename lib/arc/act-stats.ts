@@ -6,12 +6,12 @@ type CheckIn = typeof dailyProgress.$inferSelect
 export function calculateMissedDays(
   startDate: string,
   completedAt: Date,
-  lastCheckInDate: string | null,  // ✅ Added
+  lastCheckInDate: string | null,  
   totalCheckIns: number,
   pausedDays: number = 0
 ): number {
   const start = new Date(startDate)
-  // ✅ Use last check-in date if available, otherwise completedAt
+  // Use last check-in date if available, otherwise completedAt
   const endDate = lastCheckInDate ? new Date(lastCheckInDate) : new Date(completedAt)
   
   // Reset to midnight for accurate calculation
@@ -44,10 +44,10 @@ export function calculateTotalWords(checkIns: CheckIn[]): number {
 export function calculateJourneyDuration(
   startDate: string,
   completedAt: Date,
-  lastCheckInDate: string | null  // ✅ Added
+  lastCheckInDate: string | null  
 ): number {
   const start = new Date(startDate)
-  // ✅ Use last check-in date if available, otherwise completedAt
+  // Use last check-in date if available, otherwise completedAt
   const endDate = lastCheckInDate ? new Date(lastCheckInDate) : new Date(completedAt)
   
   start.setHours(0, 0, 0, 0)
@@ -56,7 +56,7 @@ export function calculateJourneyDuration(
   return Math.floor((endDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
 }
 
-// ✅ NEW: Calculate extended days used
+// Calculate extended days used
 export function calculateExtendedDays(
   journeyDuration: number,
   originalTarget: number,

@@ -47,7 +47,7 @@ interface FetchCommitsOptions {
   repoURL: string
   since?: string
   until?: string
-  userToken?: string // ✅ ADD THIS
+  userToken?: string
 }
 
 export async function fetchGitHubCommits(options: FetchCommitsOptions): Promise<GitHubCommit[]> {
@@ -79,7 +79,7 @@ export async function fetchGitHubCommits(options: FetchCommitsOptions): Promise<
     'User-Agent': 'MonkArc-App',
   }
   
-  // ✅ PRIORITY: User token > Environment token
+  // PRIORITY: User token > Environment token
   const token = userToken || process.env.GITHUB_TOKEN
   
   if (token) {
@@ -114,7 +114,7 @@ export async function fetchGitHubCommits(options: FetchCommitsOptions): Promise<
   }
 }
 
-// ✅ UPDATE getCommitsForDate too
+//UPDATE getCommitsForDate too
 export async function getCommitsForDate(
   repoURL: string, 
   date: string,

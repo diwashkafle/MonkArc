@@ -11,10 +11,7 @@ import { getCheckInByDate } from '@/lib/queries/check-in-queries'
 import { getCommitsForDate } from '@/lib/github/github-client'
 import { getGitHubAccessToken } from '../github/github-status'
 
-// ========================================
 // HELPER: CALCULATE STREAK
-// ========================================
-
 async function calculateStreak(journeyId: string, newCheckInDate: string): Promise<number> {
   const checkIns = await db.query.dailyProgress.findMany({
     where: eq(dailyProgress.journeyId, journeyId),
@@ -47,9 +44,7 @@ async function calculateStreak(journeyId: string, newCheckInDate: string): Promi
   return streak
 }
 
-// ========================================
 // CREATE CHECK-IN
-// ========================================
 
 export async function createCheckIn(formData: FormData) {
   const session = await auth()
@@ -121,14 +116,13 @@ export async function createCheckIn(formData: FormData) {
         url: c.html_url,
       }))
       
-      console.log(`✅ Fetched ${commitCount} commits for ${data.date}`)
     } catch (error) {
       console.error('Failed to fetch GitHub commits:', error)
       // Don't fail the check-in if GitHub fetch fails
     }
   }
 
-  // ✅ NEW: Calculate streak BEFORE transaction (uses read-only query)
+  //  NEW: Calculate streak BEFORE transaction (uses read-only query)
   const newStreak = await calculateStreak(data.journeyId, data.date)
   
   // Calculate new stats
@@ -172,7 +166,6 @@ export async function createCheckIn(formData: FormData) {
         .where(eq(journeys.id, data.journeyId))
     })
     
-    // ✅ Transaction succeeded - now revalidate and redirect
     revalidatePath(`/journey/${data.journeyId}`)
     revalidatePath('/dashboard')
     
@@ -180,7 +173,7 @@ export async function createCheckIn(formData: FormData) {
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
     throw error 
   }
-  // Redirect with celebration flag if became Arc
+} // Redirect with celebration flag if became Arc
     if (shouldBecomeArc) {
       redirect(`/journey/${data.journeyId}?became-arc=true`)
     } 
@@ -188,14 +181,11 @@ export async function createCheckIn(formData: FormData) {
       redirect(`/journey/${data.journeyId}?should-complete=true`)
     }
     else {
-      redirect(`/journey/${data.journeyId}`)
+      redirect(`/journey/${data.journeyId}?checkin=true`)
     }
 }
-}
 
-// ========================================
 // EDIT CHECK-IN
-// ========================================
 
 export async function editCheckIn(checkInId: string, formData: FormData) {
   const session = await auth()
@@ -257,5 +247,5 @@ export async function editCheckIn(checkInId: string, formData: FormData) {
   revalidatePath(`/journey/${checkIn.journeyId}/check-in/${checkInId}`)
 
   // Redirect back to check-in view
-  redirect(`/journey/${checkIn.journeyId}/check-in/${checkInId}`)
+  redirect(`/journey/${checkIn.journeyId}/check-in/${checkInId}?checkin-updated=true`)
 }

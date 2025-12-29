@@ -8,6 +8,7 @@ import { JOURNEY_ICONS, JOURNEY_COLORS } from '@/lib/constant/icons';
 import { shouldShowGitHubWarning } from '@/lib/github/github-status'
 import { LinkGitHubWarning } from '@/components/ProtectedUiComponents/warnings/link-github-warning'
 import { hasCheckedInToday } from '@/lib/queries/check-in-queries'
+import { ToastHandler } from '@/components/toast/toast-handler'
 
 export default async function DashboardPage() {
 
@@ -57,6 +58,7 @@ const showGitHubWarning = await shouldShowGitHubWarning(session.user.id);
   
   return (
     <div className="min-h-screen bg-slate-50">
+      <ToastHandler/>
        {
         showGitHubWarning && <LinkGitHubWarning userName={session.user.name}/>
       }

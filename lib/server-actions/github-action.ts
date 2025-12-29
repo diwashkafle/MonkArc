@@ -6,9 +6,7 @@ import { accounts } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 
-// ========================================
 // DISCONNECT GITHUB
-// ========================================
 
 export async function disconnectGitHub() {
   const session = await auth()
@@ -28,7 +26,6 @@ export async function disconnectGitHub() {
         )
       )
     
-    console.log('✅ GitHub account disconnected')
     
     // Revalidate pages that show GitHub status
     revalidatePath('/settings')

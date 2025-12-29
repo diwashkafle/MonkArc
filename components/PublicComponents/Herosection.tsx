@@ -1,7 +1,7 @@
 import { 
-  Code2,      // Represents coding/development
-  Rocket,     // Represents launching/shipping projects
-  Flame,       // Represents streak/momentum
+  Code2,      
+  Rocket,    
+  Flame,    
   Trophy
 } from 'lucide-react'
 import { ArrowRight, CheckCircle, Zap, Target, TrendingUp } from 'lucide-react';

@@ -263,7 +263,7 @@ export function EditJourneyForm({
       {/* Submit */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t">
         <Link
-          href="/dashboard"
+          href={`/journey/${journey.id}`}
           aria-disabled={isSubmitting}
           tabIndex={isSubmitting ? -1 : 0}
           className={clsx(
