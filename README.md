@@ -7,7 +7,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
 
-[Live Demo](https://monkarc.app) • [Documentation](#documentation) • [Report Bug](https://github.com/yourusername/monkarc/issues) • [Request Feature](https://github.com/yourusername/monkarc/issues)
+[Live Demo](https://monkarc.app) • [Documentation](#documentation) • [Report Bug](https://github.com/diwashkafle/monkarc/issues) • [Request Feature](https://github.com/diwashkafle/monkarc/issues)
 
 ---
 
@@ -96,7 +96,7 @@ MonkArc is a habit-tracking app designed specifically for developers. Unlike gen
 - [GitHub API](https://docs.github.com/en/rest) - Commit tracking
 
 ---
-
+<div id="documentation"></div>
 ## 📦 Installation
 
 ### Prerequisites
@@ -159,23 +159,19 @@ MonkArc is a habit-tracking app designed specifically for developers. Unlike gen
 
 ---
 
-## 🎨 Screenshots
+## 🎨 Screenshots 
 
 ### Dashboard
-![Dashboard](./docs/images/dashboard.png)
+![Dashboard](./doc/image/dashboard.png)
 *Track all your active journeys in one place*
 
 ### Journey Detail
-![Journey Detail](./docs/images/journey.png)
+![Journey Detail](./doc/image/journey.png)
 *See your progress, streak, and upcoming check-ins*
 
 ### Arc Showcase
-![Arc Showcase](./docs/images/arc.png)
+![Arc Showcase](./doc/image/arc.png)
 *Share your completed journey as a beautiful Arc*
-
-### Check-in Flow
-![Check-in](./docs/images/checkin.png)
-*Simple daily check-ins with GitHub commit tracking*
 
 ---
 
@@ -366,14 +362,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📧 Contact
-
-**Diwash** - [@yourtwitter](https://twitter.com/yourtwitter)
-
-Project Link: [https://github.com/yourusername/monkarc](https://github.com/yourusername/monkarc)
-
----
-
 ## 🗺️ Roadmap
 
 - [ ] Email notifications for frozen/dead journeys
@@ -389,7 +377,7 @@ Project Link: [https://github.com/yourusername/monkarc](https://github.com/youru
 
 <div align="center">
 
-**Built with ❤️ by developers, for developers**
+**Built with ❤️ new for developers**
 
 [⭐ Star this repo](https://github.com/yourusername/monkarc) • [🐛 Report Bug](https://github.com/yourusername/monkarc/issues) • [💡 Request Feature](https://github.com/yourusername/monkarc/issues)
 

@@ -265,9 +265,12 @@ export default async function JourneyDetailPage({
                 journey.status === "extended") && (
                 <Link
                   href={`/journey/${id}/check-in`}
-                  className="rounded-lg bg-gray-600 px-6 py-3 font-medium text-white hover:bg-gray-700"
                 >
-                  ✓ Check-In Today
+                 <Button 
+                  className="cursor-pointer"
+                  variant={'outline'}>
+                   ✓ Check-In Today
+                 </Button>
                 </Link>
               )}
 
