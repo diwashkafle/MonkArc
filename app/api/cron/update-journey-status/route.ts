@@ -4,21 +4,26 @@ import { updateAllJourneyStatuses } from '@/lib/journey/journey-status'
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
-// This endpoint is called by Vercel Cron or manually
 export async function GET(request: Request) { 
   try {
-    // Verify authorization
+    // ✅ CRITICAL: Verify authorization
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET
     
-    // Check if request is from Vercel Cron or has valid secret
-    // const isVercelCron = request.headers.get('user-agent')?.includes('vercel-cron')
-    // const hasValidSecret = cronSecret && authHeader === `Bearer ${cronSecret}`
+    if (!cronSecret) {
+      console.error('❌ CRON_SECRET not configured')
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
+    }
     
-    // if ( !hasValidSecret) {
-    //   console.log('❌ Unauthorized cron attempt')
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
+    const hasValidSecret = authHeader === `Bearer ${cronSecret}`
+    
+    if (!hasValidSecret) {
+      console.log('❌ Unauthorized cron attempt:', {
+        ip: request.headers.get('x-forwarded-for'),
+        timestamp: new Date().toISOString()
+      })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     
     console.log('🔄 Starting journey status update cron job...')
     
@@ -26,7 +31,12 @@ export async function GET(request: Request) {
     const result = await updateAllJourneyStatuses()
     const duration = Date.now() - startTime
     
-    console.log(`✅ Cron job completed in ${duration}ms`)
+    console.log('✅ Cron job completed:', {
+      duration: `${duration}ms`,
+      frozen: result.updated.frozen,
+      dead: result.updated.dead,
+      timestamp: new Date().toISOString()
+    })
     
     return NextResponse.json({
       success: true,
@@ -47,7 +57,7 @@ export async function GET(request: Request) {
   }
 }
 
-// Also support POST for manual triggers
+// Support POST for manual testing
 export async function POST(request: Request) {
   return GET(request)
 }

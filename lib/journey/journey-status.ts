@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { db } from '@/db'
 import { journeys } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { and, eq, lt, sql } from 'drizzle-orm'
 
 // CALCULATE DAYS SINCE LAST CHECK-IN
 
@@ -101,54 +101,81 @@ export async function updateJourneyStatusByActivity(journeyId: string) {
 // ========================================
 
 export async function updateAllJourneyStatuses() {
-  // Get all active or frozen journeys (not paused, not completed, not dead)
-  const activeJourneys = await db.query.journeys.findMany({
-    where: eq(journeys.status, 'active')
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  
+  // Calculate cutoff dates
+  const threeDaysAgo = new Date(today)
+  threeDaysAgo.setDate(today.getDate() - 3)
+  const threeDaysAgoStr = threeDaysAgo.toISOString().split('T')[0]
+  
+  const sevenDaysAgo = new Date(today)
+  sevenDaysAgo.setDate(today.getDate() - 7)
+  const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0]
+  
+  console.log('🔄 Updating journey statuses...', {
+    today: today.toISOString().split('T')[0],
+    freezeThreshold: threeDaysAgoStr,
+    deadThreshold: sevenDaysAgoStr
   })
   
-  const frozenJourneys = await db.query.journeys.findMany({
-    where: eq(journeys.status, 'frozen')
-  })
-  
-  const allJourneys = [...activeJourneys, ...frozenJourneys]
-  
-  console.log(`🔄 Checking ${allJourneys.length} journeys for status updates...`)
-  
-  let updatedCount = 0
-  
-  for (const journey of allJourneys) {
-    const daysSince = daysSinceLastCheckIn(journey.lastCheckInDate, journey.startDate)
-    const newStatus = determineJourneyStatus(
-      journey.status,
-      daysSince,
-      false
+  // ✅ BATCH UPDATE 1: Freeze active journeys (3+ days inactive)
+  const frozenResult = await db
+    .update(journeys)
+    .set({
+      status: 'frozen',
+      frozenAt: sql`COALESCE(frozen_at, NOW())`, // Only set if not already set
+      // ✅ Don't reset streak on freeze - preserve it!
+    })
+    .where(
+      and(
+        eq(journeys.status, 'active'),
+        lt(journeys.lastCheckInDate, threeDaysAgoStr)
+      )
     )
-    
-    if (newStatus !== journey.status) {
-      const updates: any = {
-        status: newStatus,
-      }
-      
-      if (newStatus === 'frozen' && !journey.frozenAt) {
-        updates.frozenAt = new Date()
-        updates.currentStreak = 0
-      }
-      
-      if (newStatus === 'dead' && !journey.deadAt) {
-        updates.deadAt = new Date()
-        updates.currentStreak = 0
-      }
-      
-      await db.update(journeys)
-        .set(updates)
-        .where(eq(journeys.id, journey.id))
-      
-      updatedCount++
-      console.log(`✅ Updated journey "${journey.title}": ${journey.status} → ${newStatus}`)
-    }
+    .returning({ id: journeys.id, title: journeys.title })
+  
+  const frozenCount = frozenResult.length
+  
+  if (frozenCount > 0) {
+    console.log(`❄️ Frozen ${frozenCount} journeys:`, 
+      frozenResult.map(j => j.title).join(', ')
+    )
   }
   
-  console.log(`✅ Updated ${updatedCount} journey statuses`)
+  // ✅ BATCH UPDATE 2: Kill frozen journeys (7+ days inactive total)
+  const deadResult = await db
+    .update(journeys)
+    .set({
+      status: 'dead',
+      deadAt: sql`COALESCE(dead_at, NOW())`, // Only set if not already set
+      currentStreak: 0, // ✅ Reset streak when dead
+    })
+    .where(
+      and(
+        eq(journeys.status, 'frozen'),
+        lt(journeys.lastCheckInDate, sevenDaysAgoStr)
+      )
+    )
+    .returning({ id: journeys.id, title: journeys.title })
   
-  return { total: allJourneys.length, updated: updatedCount }
+  const deadCount = deadResult.length
+  
+  if (deadCount > 0) {
+    console.log(`💀 Killed ${deadCount} journeys:`, 
+      deadResult.map(j => j.title).join(', ')
+    )
+  }
+  
+  // ✅ Summary
+  const total = frozenCount + deadCount
+  console.log(`✅ Status update complete: ${frozenCount} frozen, ${deadCount} dead`)
+  
+  return {
+    total,
+    updated: {
+      frozen: frozenCount,
+      dead: deadCount
+    }
+  }
 }
