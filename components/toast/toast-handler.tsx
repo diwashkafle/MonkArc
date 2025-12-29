@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 
 export function ToastHandler() {
   const router = useRouter()
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams() 
   
   useEffect(() => {
     // Journey created
@@ -36,11 +36,14 @@ export function ToastHandler() {
     }
     
     // Settings updated
-    
+    if (searchParams.get('username-updated') === 'true') {
+      toast.success('Username updated successfully!', { duration: 4000 })
+    }
     // GitHub connected
     if (searchParams.get('github-connected') === 'true') {
       toast.success('GitHub connected successfully!', { duration: 4000 })
     }
+    
     
     // Generic success
     const success = searchParams.get('success')

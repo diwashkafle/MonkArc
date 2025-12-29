@@ -50,7 +50,9 @@ export function DropdownMenuHeader({ image,username }: DropdownMenuProp) {
           </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Support</DropdownMenuItem>
+       <Link href="/support">
+            <DropdownMenuItem>Support</DropdownMenuItem>
+          </Link>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
          SignOut
