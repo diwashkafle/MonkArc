@@ -4,7 +4,7 @@ import {
   Flame,    
   Trophy
 } from 'lucide-react'
-import { ArrowRight, CheckCircle, Zap, Target, TrendingUp } from 'lucide-react';
+import { ArrowRight, CheckCircle, Zap, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 
 const HeroSection = () => {
@@ -41,9 +41,9 @@ const HeroSection = () => {
       
       {/* Heading */}
       <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1] tracking-tight">
-        Master coding through
+        Build consistently.
         <span className="block mt-3 bg-linear-to-r from-slate-600 via-slate-900 to-slate-700 bg-clip-text text-transparent">
-          consistent building
+Turn effort into momentum.
         </span>
       </h1>
       
