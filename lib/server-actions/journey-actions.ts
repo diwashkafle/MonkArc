@@ -403,5 +403,5 @@ export async function extendJourney(journeyId: string, formData: FormData) {
   revalidatePath(`/journey/${journeyId}`)
   revalidatePath('/dashboard')
 
-  redirect(`/journey/${journeyId}`)
+  redirect(`/journey/${journeyId}?extend_journey=true`)
 }

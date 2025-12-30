@@ -24,6 +24,10 @@ export function ToastHandler() {
     if (searchParams.get('deleted') === 'true') {
       toast.success('Journey deleted', { duration: 3000 })
     }
+
+    if (searchParams.get('extend_journey') === 'true') {
+      toast.success('Journey Extended', { duration: 3000 })
+    }
     
     // Check-in created
     if (searchParams.get('checkin') === 'true') {
@@ -56,9 +60,12 @@ export function ToastHandler() {
     if (error) {
       toast.error(decodeURIComponent(error), { duration: 5000 })
     }
+
+     const isModalParam = 
+      searchParams.get('became-arc') === 'true' ||
+      searchParams.get('should-complete') === 'true'
     
-    // ✅ Clean up URL after showing toast
-    if (searchParams.toString()) {
+    if (searchParams.toString() && !isModalParam) {
       // Remove all params without scrolling
       router.replace(window.location.pathname, { scroll: false })
     }

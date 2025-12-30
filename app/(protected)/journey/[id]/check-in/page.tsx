@@ -1,8 +1,7 @@
 import { auth } from '@/lib/auth'
-import { getJourneyById } from '@/lib/queries/journey-queries'
+import { getJourneyById, isExtendedJourneyStuckInArc, isJourneyStuckInArc } from '@/lib/queries/journey-queries'
 import { hasCheckedInToday } from '@/lib/queries/check-in-queries'
 import { notFound, redirect } from 'next/navigation'
-import Link from 'next/link'
 import { SimpleCheckInForm } from '@/components/ProtectedUiComponents/journeys/check-in-form'
 
 interface NewCheckInPageProps {
@@ -10,7 +9,7 @@ interface NewCheckInPageProps {
     id: string
   }>
 }
-
+ 
 export default async function NewCheckInPage({ params }: NewCheckInPageProps) {
   const session = await auth()
   if (!session) redirect('/login')
@@ -21,10 +20,36 @@ export default async function NewCheckInPage({ params }: NewCheckInPageProps) {
   if (!journey) notFound()
   
   // Check if already checked in today
-  const checkedIn = await hasCheckedInToday(id)
-  if (checkedIn) {
+  const [isCheckedInToday, isStuckInArc, isExtendedStuckInArc] = await Promise.all([
+  hasCheckedInToday(journey.id),
+  isJourneyStuckInArc(journey.id, session.user.id),
+  isExtendedJourneyStuckInArc(journey.id, session.user.id),
+])
+
+const journeyWithStatus = {
+  ...journey,
+  isCheckedInToday,
+  isStuckInArc,
+  isExtendedStuckInArc,
+}
+
+
+  if(journeyWithStatus.isStuckInArc || journeyWithStatus.isExtendedStuckInArc){
     redirect(`/journey/${id}`)
   }
+
+  // Before redirecting, set a message
+if (journeyWithStatus.isCheckedInToday) {
+  redirect(`/journey/${id}?error=${encodeURIComponent('Already checked in today!')}`)
+}
+
+if (journey.status === 'completed') {
+  redirect(`/journey/${id}?error=${encodeURIComponent('Journey is already completed')}`)
+}
+
+if (journey.status === 'scheduled') {
+  redirect(`/journey/${id}?error=${encodeURIComponent('Journey has not started yet')}`)
+}
   
   const today = new Date().toISOString().split('T')[0]
   

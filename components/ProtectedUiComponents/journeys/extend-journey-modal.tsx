@@ -12,6 +12,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { completeJourney, extendJourney } from "@/lib/server-actions/journey-actions";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 
 interface ExtendJourneyProp {
@@ -55,8 +56,8 @@ export function ExtendJourney({
           throw error;
         }
         console.error("Real error:", error);
-        alert(
-          error instanceof Error ? error.message : "Failed to create journey"
+        toast.error(
+          error instanceof Error ? error.message : "Failed to extend journey"
         );
         setIsSubmitting(false);
       }

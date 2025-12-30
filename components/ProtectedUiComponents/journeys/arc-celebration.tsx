@@ -36,11 +36,11 @@ export function ArcCelebration({
   const [isExtendJourney, setIsExtendJourney] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  // ✅ Derive state directly from URL - no useState needed!
 
 
   const isOpen = searchParams.get("became-arc") === "true"  ;
 
+  
   // Only use useEffect for SIDE EFFECTS (confetti)
   useEffect(() => {
     if (isOpen) {
