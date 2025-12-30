@@ -281,7 +281,7 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                     </div>
                   </div>
                   
-                  {!journey.completedAt && !journey.isStuckInArc && !journey.isExtendedStuckInArc && (
+                  {journey.status !== "scheduled" && !journey.completedAt && !journey.isStuckInArc && !journey.isExtendedStuckInArc && (
                     journey.isCheckedInToday ? <Button disabled className='bg-green-400' variant={'outline'}>
                        Checked-in
                      </Button>
