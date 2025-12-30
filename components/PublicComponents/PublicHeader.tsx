@@ -18,6 +18,7 @@ const PublicHeader = async() => {
           <div className="flex justify-between items-center h-16">
              <Link href="/" className="text-xl flex items-center gap-1 font-bold">
           <Image src={"/MonkArc.svg"} alt="MonkArc" height={80} width={40} />
+          <span className="text-xs font-semibold absolute top-11 left-[200px] ">Beta</span>
           <span className="text-lg font-semibold">MonkArc</span>
         </Link> 
             <div className="hidden md:flex items-center gap-8">
