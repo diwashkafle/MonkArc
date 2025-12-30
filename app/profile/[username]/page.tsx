@@ -3,7 +3,6 @@ import { users, journeys } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { auth } from '@/lib/auth'
-import { ShareProfileButton } from '@/components/ProtectedUiComponents/journeys/share-profile-button'
 import Header from '@/components/ProtectedUiComponents/ProtectedHeader/Header'
 import PublicHeader from '@/components/PublicComponents/PublicHeader'
 import { ProfileHeader } from '@/components/PublicComponents/Profile/ProfileHeader'
@@ -109,14 +108,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           
           {/* Share Button (Desktop) */}
           
-        </div>
-
-        {/* Share Button (Mobile) */}
-        <div className="mb-8 md:hidden">
-          <ShareProfileButton 
-            profileUrl={profileUrl}
-            username={user.username || 'user'}
-          />
         </div>
         
         {/* Journeys Section */}

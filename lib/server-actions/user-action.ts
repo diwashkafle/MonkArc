@@ -24,7 +24,7 @@ export async function ensureUsername(userId: string, name: string, email: string
   if (user?.username) return user.username
   
   // 2. Generate base username
-  const baseUsername = slugify(name || email.split('@')[0] || 'user')
+  const baseUsername = slugify(email.split('@')[0] || 'user')
   
   // 3. Find available username (1 query with regex)
   const existingUsernames = await db

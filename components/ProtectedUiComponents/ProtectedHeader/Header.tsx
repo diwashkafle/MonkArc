@@ -19,6 +19,7 @@ const Header = ({ session }: HeaderProp) => {
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link href="/dashboard" className="text-xl flex items-center gap-1 font-bold">
           <Image src={"/MonkArc.svg"} alt="MonkArc" height={80} width={40} />
+          <span className="text-xs font-semibold absolute top-10 left-10 ">Beta</span>
           <h1 className="text-lg font-semibold">MonkArc</h1>
         </Link>
 

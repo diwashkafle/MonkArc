@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Trophy, Flame, CheckCircle, Target, Sprout, Activity } from 'lucide-react'
+import { Trophy, Flame, CheckCircle, Target, Sprout, Activity, Calendar } from 'lucide-react'
 import type { users } from '@/db/schema'
 import { ShareProfileButton } from '@/components/ProtectedUiComponents/journeys/share-profile-button'
 
@@ -124,7 +124,7 @@ export function ProfileHeader({ user, stats, isOwnProfile,profileUrl }: ProfileH
         <div className="group relative rounded-xl bg-slate-50 border border-slate-200/60 p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-1">
           <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 bg-slate-100 rounded-lg">
-              <Target className="h-4 w-4 text-slate-600" />
+              <Calendar className="h-4 w-4 text-slate-600" />
             </div>
           </div>
           <div className="text-2xl font-bold text-slate-900">{stats.totalCheckIns}</div>

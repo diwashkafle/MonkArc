@@ -2,7 +2,8 @@ import { ReactNode } from "react";
 import { auth } from "@/lib/auth";
 import {redirect } from "next/navigation";
 import { Toaster } from "sonner";
-import Header from "@/components/ProtectedUiComponents/ProtectedHeader/Header";
+import Header from "@/components/ProtectedUiComponents/ProtectedHeader/Header"; 
+import { ensureUsername } from "@/lib/server-actions/user-action";
 
 
 
@@ -20,11 +21,27 @@ export default async function DashBoardLayout({
     redirect("/auth/sign-in");
   }
 
+  const username = await ensureUsername(
+    session.user.id,
+    session.user.name || '',
+    session.user.email || ''
+  )
+  
+  // ✅ Add username to session for Navbar
+  const updatedSession = {
+    ...session,
+    user: {
+      ...session.user,
+      username, // Now guaranteed to exist
+    }
+  }
+  
+
 
 
   return (
     <div>
-      <Header session={session}/>
+      <Header session={updatedSession}/>
      
       <main className="">{children}</main>
       <Toaster/>

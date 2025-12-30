@@ -1,6 +1,5 @@
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { ensureUsername } from '@/lib/server-actions/user-action'
 import { getUserJourneys, getJourneyStats, isJourneyStuckInArc, isExtendedJourneyStuckInArc } from '@/lib/queries/journey-queries'
 import { DashboardFilters } from '@/components/ProtectedUiComponents/journeys/dashboard-filters'
 import Link from 'next/link'
@@ -19,14 +18,6 @@ export default async function DashboardPage() {
   }
 
 const showGitHubWarning = await shouldShowGitHubWarning(session.user.id);
-
-  
-  // Ensure username exists
-  await ensureUsername(
-    session.user.id,
-    session.user.name || '',
-    session.user.email || ''
-  )
   
   // Fetch user's journeys
   const journeys = await getUserJourneys(session.user.id)
