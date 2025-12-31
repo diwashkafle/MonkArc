@@ -7,9 +7,9 @@ export default async function CronAdminPage() {
   if (!session) redirect('/login')
   
   // Optional: Add admin check
-  // if (session.user.email !== 'your-admin-email@example.com') {
-  //   redirect('/dashboard')
-  // }
+  if (session.user.email !== 'diwashhkafle66@gmail.com') {
+    redirect('/dashboard')
+  }
   
   return (
     <div className="min-h-screen bg-slate-50">
