@@ -16,6 +16,7 @@ import {
   Activity,      // Active journeys count
   type LucideIcon,
   ArrowUp01,
+  CalendarRange
 } from 'lucide-react'
 
 // Icon mapping for all journey-related statuses and metrics
@@ -31,7 +32,7 @@ export const JOURNEY_ICONS = {
   dead: Skull,
   completed: Trophy,
   extended: ArrowUp01,
-  
+  scheduled: CalendarRange,
   // Metrics
   LongestStreak: TrendingUp,
   currentStreak: Flame,

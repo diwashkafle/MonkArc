@@ -90,6 +90,7 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
   const DeadIcon = JOURNEY_ICONS.dead
   const CompletedIcon = JOURNEY_ICONS.completed
   const StreakIcon = JOURNEY_ICONS.currentStreak
+  const ScheduledIcon = JOURNEY_ICONS.scheduled
   
   return (
     <div>
@@ -198,6 +199,7 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
             const frozenColors = JOURNEY_COLORS.frozen
             const deadColors = JOURNEY_COLORS.dead
             const completedColors = JOURNEY_COLORS.completed
+            const scheduledColors = JOURNEY_COLORS.neutral
             
             return (
               <div
@@ -247,6 +249,12 @@ export function DashboardFilters({ journeys }: DashboardFiltersProps) {
                         <span className={`inline-flex items-center gap-1.5 rounded-lg ${completedColors.badge} px-2.5 py-1 text-xs font-medium ${completedColors.badgeText} border ${completedColors.badgeBorder}`}>
                           <CompletedIcon className="h-3 w-3" />
                           <span>Completed</span>
+                        </span>
+                      )}
+                      {journey.status === 'scheduled' && (
+                        <span className={`inline-flex items-center gap-1.5 rounded-lg ${scheduledColors.badge} px-2.5 py-1 text-xs font-medium ${scheduledColors.badgeText} border ${scheduledColors.badgeBorder}`}>
+                          <ScheduledIcon className="h-3 w-3" />
+                          <span>scheduled</span>
                         </span>
                       )}
                     </div>

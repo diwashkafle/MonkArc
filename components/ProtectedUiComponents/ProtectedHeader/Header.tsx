@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/tooltip"
 import { LiaBookMedicalSolid } from "react-icons/lia";
 import { MdOutlineDashboard } from "react-icons/md";
+import { Badge } from "@/components/ui/badge";
 
 type HeaderProp = {
   session: Session | null;
@@ -19,8 +20,8 @@ const Header = ({ session }: HeaderProp) => {
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link href="/dashboard" className="text-xl flex items-center gap-1 font-bold">
           <Image src={"/MonkArc.svg"} alt="MonkArc" height={80} width={40} />
-          <span className="text-xs font-semibold absolute top-11 left-[200px] ">Beta</span>
           <h1 className="text-lg font-semibold">MonkArc</h1>
+          <Badge variant={'outline'} className="">Beta</Badge>
         </Link>
 
         <div className="flex items-center gap-4">
