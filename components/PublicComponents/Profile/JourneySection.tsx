@@ -17,7 +17,7 @@ export function JourneysSection({
 }: JourneysSectionProps) {
   // Separate journeys by status
   const activeJourneys = journeys.filter(j => 
-    j.status === 'active' || j.status === 'frozen' || j.status === 'extended'
+    j.status === 'active' || j.status === 'frozen' || j.status === 'extended' || j.status === 'scheduled'
   )
   const completedJourneys = journeys.filter(j => j.status === 'completed')
   const deadJourneys = journeys.filter(j => j.status === 'dead')
