@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -18,17 +19,14 @@ type Resource = {
 };
 
 interface NewJourneyFormProps {
-  githubConnected: boolean;
-  githubUsername?: string | null;
+  githubAppInstalled: boolean; 
+   installationId?: number
 }
 
-export function NewJourneyForm({
-  githubConnected,
-}: NewJourneyFormProps) {
+export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourneyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resources, setResources] = useState<Resource[]>([]);
-  const [selectedRepo, setSelectedRepo] = useState<string>('')
-
+  const [selectedRepo, setSelectedRepo] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -62,7 +60,7 @@ export function NewJourneyForm({
           required
           minLength={3}
           maxLength={500}
-          placeholder={`Building e-commerece to master MERN`}
+          placeholder="Building e-commerce to master MERN"
           className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
       </div>
@@ -78,7 +76,7 @@ export function NewJourneyForm({
           minLength={10}
           maxLength={5000}
           rows={4}
-          placeholder={`I want to learn Frontend, Backend, System design and basic of devlops to master MERN and fullstack development.`}
+          placeholder="I want to learn Frontend, Backend, System design and basic of devops to master MERN and fullstack development."
           className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
         />
       </div>
@@ -98,7 +96,7 @@ export function NewJourneyForm({
           className="w-full no-spinner rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
         <p className="mt-1 text-xs text-slate-500">
-          How many days do you want to work on this? (7-365 days)
+          How many days do you want to work on this? (1-365 days)
         </p>
       </div>
 
@@ -121,40 +119,41 @@ export function NewJourneyForm({
       </div>
 
       {/* Learning Resources */}
-
       <div>
         <label className="block text-sm font-medium text-slate-900 mb-3">
           Resources <span className="text-slate-400">(Optional)</span>
         </label>
-        <ResourceManager initialResources={resources} onChange={setResources} />
+        <ResourceManager
+          initialResources={resources}
+          onChange={setResources}
+        />
         <p className="mt-2 text-xs text-slate-500">
           {`Add videos, articles, or documentation you're using or learning from`}
         </p>
       </div>
 
-      {/* GitHub Repo (for projects) */}
+      {/* GitHub Repo */}
       <div>
         <label className="block text-sm font-medium text-slate-900 mb-2">
           GitHub Repository <span className="text-slate-400">(Optional)</span>
         </label>
 
-        
         <LinkGitHubButton
           variant="card"
-          isConnected={githubConnected}
+          isInstalled={githubAppInstalled}
           onRepoSelect={(repoUrl) => setSelectedRepo(repoUrl)}
           currentRepo={selectedRepo}
+          installationId={installationId}
         />
-        
-        {/* Hidden input to submit with form */}
+
         <input type="hidden" name="repoURL" value={selectedRepo} />
+        
         <p className="mt-2 text-xs text-slate-500">
-          Track commits automatically.{" "}
-          {!githubConnected && "Connect GitHub to access private repositories."}
+          Install the GitHub App to track commits from your repositories (public and private).
         </p>
       </div>
 
-      {/* Tech Stack (for projects) */}
+      {/* Tech Stack */}
       <div>
         <label className="block text-sm font-medium text-slate-900 mb-2">
           Tech Stack <span className="text-slate-400">(Optional)</span>
@@ -212,8 +211,8 @@ export function NewJourneyForm({
         >
           {isSubmitting ? (
             <div className="flex items-center gap-1">
-              <Loader2 className="h-4 w-4 animate-spin" />{" "}
-              <span> Creating</span>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Creating</span>
             </div>
           ) : (
             "Create Seed"

@@ -76,7 +76,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   
   // Calculate stats
   const stats = {
-    totalSeeds: userJourneys.filter(j => j.phase === 'seed').length,
+    totalSeeds: userJourneys.filter(j => j.phase === 'seed').length, 
     totalArcs: userJourneys.filter(j => j.phase === 'arc').length,
     activeJourneys: userJourneys.filter(j => 
       j.status === 'active' || j.status === 'frozen' || j.status === 'extended'

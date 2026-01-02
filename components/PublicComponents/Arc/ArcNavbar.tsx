@@ -10,6 +10,7 @@ import {
 import { LiaBookMedicalSolid } from "react-icons/lia";
 import { MdOutlineDashboard } from "react-icons/md";
 import { Settings2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 type ArcNavbarPop = {
     IsOwner: boolean;
     id:string;
@@ -25,6 +26,8 @@ const ArcNavbar = async({IsOwner,id}:ArcNavbarPop) => {
              <Link href="/" className="text-xl flex items-center gap-1 font-bold">
           <Image src={"/MonkArc.svg"} alt="MonkArc" height={80} width={40} />
           <span className="text-lg font-semibold">MonkArc</span>
+          <Badge variant={'outline'} className="">Beta</Badge>å
+
         </Link> 
             {
                 !session ? <div className="hidden md:flex items-center gap-8">

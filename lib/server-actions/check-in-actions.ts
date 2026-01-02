@@ -10,6 +10,7 @@ import { checkInSchema } from '@/lib/validation/check-in-validation'
 import { getCheckInByDate } from '@/lib/queries/check-in-queries'
 import { getCommitsForDate } from '@/lib/github/github-client'
 import { getGitHubAccessToken } from '../github/github-status'
+import { fetchCommitsViaApp } from '../github-app/fetch-commits'
 
 // HELPER: CALCULATE STREAK
 async function calculateStreak(journeyId: string, newCheckInDate: string): Promise<number> {
@@ -103,19 +104,23 @@ export async function createCheckIn(formData: FormData) {
   
   if (journey.repoURL) {
     try {
-      const userToken = await getGitHubAccessToken(session.user.id)
-      const commits = await getCommitsForDate(journey.repoURL, data.date, userToken || undefined)
-      commitCount = commits.length
-      
-      // Store commit data
-      githubCommits = commits.map(c => ({
-        sha: c.sha,
-        message: c.commit.message,
-        author: c.commit.author.name,
-        date: c.commit.author.date,
-        url: c.html_url,
-      }))
-      
+      const commits = await fetchCommitsViaApp(
+      session.user.id,
+      journey.repoURL,
+      `${data.date}T00:00:00Z`,
+      `${data.date}T23:59:59Z`
+    )
+    
+    commitCount = commits.length
+    
+    githubCommits = commits.map(c => ({
+      sha: c.sha,
+      message: c.message,
+      author: c.author,
+      date: c.date,
+      url: c.url,
+    }))
+          console.log(`✅ Fetched ${commitCount} commits for ${data.date}`)
     } catch (error) {
       console.error('Failed to fetch GitHub commits:', error)
       // Don't fail the check-in if GitHub fetch fails

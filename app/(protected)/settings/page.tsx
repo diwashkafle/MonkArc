@@ -1,16 +1,18 @@
+// app/settings/page.tsx
 
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/db'
-import { accounts } from '@/db/schema'
+import { accounts, githubInstallations } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { AccountInfo } from '@/components/ProtectedUiComponents/settings/account-info'
 import { ProfileSection } from '@/components/ProtectedUiComponents/settings/profile-section'
-import { GitHubConnectionSettings } from '@/components/ProtectedUiComponents/settings/github-connection-settings'
+import { GitHubAppSettings } from '@/components/ProtectedUiComponents/journeys/github/github-app-setting'
 import { PreferencesSection } from '@/components/ProtectedUiComponents/settings/preferences-section'
 import { ConnectedAccounts } from '@/components/ProtectedUiComponents/settings/connected-accounts'
 import { DeleteAccountButton } from '@/components/ProtectedUiComponents/settings/delete-account-button'
 import { ToastHandler } from '@/components/toast/toast-handler'
+import { getInstallationOctokit } from '@/lib/github-app/client'
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -18,7 +20,7 @@ export default async function SettingsPage() {
     redirect('/login')
   }
   
-  // Check GitHub connection
+  // Check old GitHub OAuth connection (legacy)
   const githubAccount = await db.query.accounts.findFirst({
     where: and(
       eq(accounts.userId, session.user.id),
@@ -27,6 +29,25 @@ export default async function SettingsPage() {
   })
   
   const isGitHubConnected = !!githubAccount
+  
+  // ✅ Check GitHub App installation
+  const installation = await db.query.githubInstallations.findFirst({
+    where: eq(githubInstallations.userId, session.user.id),
+  })
+  
+  // ✅ Fetch repo count if installed
+  let repoCount = 0
+  if (installation) {
+    try {
+      const octokit = await getInstallationOctokit(installation.installationId)
+      const { data } = await octokit.request('GET /installation/repositories', {
+        per_page: 1, // Just get count, not all repos
+      })
+      repoCount = data.total_count
+    } catch (error) {
+      console.error('Failed to fetch repo count:', error)
+    }
+  }
   
   return (
     <div className="min-h-screen bg-slate-50">
@@ -38,7 +59,9 @@ export default async function SettingsPage() {
             Manage your account preferences and integrations
           </p>
         </div>
-        <ToastHandler/>
+        
+        <ToastHandler />
+        
         <div className="space-y-6">
           {/* Account Info (Server - Read Only) */}
           <AccountInfo 
@@ -52,12 +75,17 @@ export default async function SettingsPage() {
             userId={session.user.id}
           />
           
-          {/* GitHub Integration */}
-          <GitHubConnectionSettings
-            isConnected={isGitHubConnected}
-            githubUsername={githubAccount?.providerAccountId || null}
-            githubEmail={session.user.email}
-          />
+          {/* ✅ GitHub App Integration (New) */}
+          <div>
+            <h2 className="text-xl font-semibold text-slate-900 mb-4">
+              GitHub Integration
+            </h2>
+            <GitHubAppSettings 
+              isInstalled={!!installation}
+              installationId={installation?.installationId}
+              repoCount={repoCount}
+            />
+          </div>
           
           {/* Preferences (Client - Toggles) */}
           <PreferencesSection userId={session.user.id} />

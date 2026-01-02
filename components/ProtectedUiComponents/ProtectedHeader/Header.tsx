@@ -21,7 +21,7 @@ const Header = ({ session }: HeaderProp) => {
         <Link href="/dashboard" className="text-xl flex items-center gap-1 font-bold">
           <Image src={"/MonkArc.svg"} alt="MonkArc" height={80} width={40} />
           <h1 className="text-lg font-semibold">MonkArc</h1>
-          <Badge variant={'outline'} className="">Beta</Badge>
+          <Badge variant={'outline'} className="mt-4">Beta</Badge>
         </Link>
 
         <div className="flex items-center gap-4">

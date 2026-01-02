@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, integer, date, timestamp, boolean, pgEnum, primaryKey, jsonb, unique, json } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, varchar, text, integer, date, timestamp, boolean, pgEnum, primaryKey, jsonb, unique, json, serial, index } from 'drizzle-orm/pg-core'
 import type { AdapterAccount } from 'next-auth/adapters'
 
 // AUTH.JS TABLES
@@ -151,3 +151,12 @@ export const milestones = pgTable('milestones', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
+
+export const githubInstallations = pgTable('github_installations', {
+  id: serial('id').primaryKey(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  installationId: integer('installation_id').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+

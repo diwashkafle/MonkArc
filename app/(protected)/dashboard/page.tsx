@@ -4,8 +4,6 @@ import { getUserJourneys, getJourneyStats, isJourneyStuckInArc, isExtendedJourne
 import { DashboardFilters } from '@/components/ProtectedUiComponents/journeys/dashboard-filters'
 import Link from 'next/link'
 import { JOURNEY_ICONS, JOURNEY_COLORS } from '@/lib/constant/icons';
-import { shouldShowGitHubWarning } from '@/lib/github/github-status'
-import { LinkGitHubWarning } from '@/components/ProtectedUiComponents/warnings/link-github-warning'
 import { hasCheckedInToday } from '@/lib/queries/check-in-queries'
 import { ToastHandler } from '@/components/toast/toast-handler'
 
@@ -16,8 +14,6 @@ export default async function DashboardPage() {
   if (!session?.user?.id) { 
     redirect('/login')
   }
-
-const showGitHubWarning = await shouldShowGitHubWarning(session.user.id);
   
   // Fetch user's journeys
   const journeys = await getUserJourneys(session.user.id)
@@ -50,9 +46,6 @@ const showGitHubWarning = await shouldShowGitHubWarning(session.user.id);
   return (
     <div className="min-h-screen bg-slate-50">
       <ToastHandler/>
-       {
-        showGitHubWarning && <LinkGitHubWarning userName={session.user.name}/>
-      }
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* Welcome Header */}
