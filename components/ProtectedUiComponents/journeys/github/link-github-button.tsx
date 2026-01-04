@@ -79,7 +79,7 @@ export function LinkGitHubButton({
                 }
               }}
             >
-              <button>Click on to add your repos form github</button>
+              <h1>Click on to add your repos form github</h1>
               <ExternalLink className="h-3 w-3" />
             </Link>
           </div>
@@ -104,7 +104,7 @@ export function LinkGitHubButton({
     >
       <button className="flex items-center gap-2" type="button">
         <FaGithub />
-        Install GitHub App
+       Click on to add your repos form github
       </button>
     </Link>
   );
