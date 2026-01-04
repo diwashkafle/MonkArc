@@ -5,7 +5,7 @@ import { EditJourneyForm } from '@/components/ProtectedUiComponents/journeys/edi
 import { hasGitHubConnected } from '@/lib/github/github-status'
 import { db } from '@/db'
 import { and, eq } from 'drizzle-orm'
-import { accounts } from '@/db/schema'
+import { accounts, githubInstallations } from '@/db/schema'
 
 import {
   Tabs,
@@ -27,19 +27,11 @@ interface EditJourneyPageProps {
 export default async function EditJourneyPage({ params }: EditJourneyPageProps) {
   const session = await auth()
   if (!session) redirect('/login')
-   const githubConnected = await hasGitHubConnected(session.user.id);
-      
-        let githubUsername: string | null = null;
-        if (githubConnected) {
-          const githubAccount = await db.query.accounts.findFirst({
-            where: and(
-              eq(accounts.userId, session.user.id),
-              eq(accounts.provider, "github")
-            ),
-          });
-      
-          githubUsername = githubAccount?.providerAccountId || null;
-        }
+   const installation = await db.query.githubInstallations.findFirst({
+      where: eq(githubInstallations.userId, session.user.id),
+    });
+  
+    const isGitHubAppInstalled = !!installation;
   const { id } = await params
   const journey = await getJourneyById(id, session.user.id)
   
@@ -63,7 +55,7 @@ export default async function EditJourneyPage({ params }: EditJourneyPageProps) 
               </h1>
               <p className='text-sm text-gray-600'>You can edit your journey and hit save button to save any changes.</p>
             </section>
-          <EditJourneyForm githubConnected={githubConnected} githubUsername={githubUsername} journey={journey} />
+          <EditJourneyForm githubAppInstalled={isGitHubAppInstalled} installationId={installation?.installationId} journey={journey} />
           </main>
 
         </TabsContent>

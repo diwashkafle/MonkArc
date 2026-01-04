@@ -30,12 +30,12 @@ export default async function SettingsPage() {
   
   const isGitHubConnected = !!githubAccount
   
-  // ✅ Check GitHub App installation
+  // Check GitHub App installation
   const installation = await db.query.githubInstallations.findFirst({
     where: eq(githubInstallations.userId, session.user.id),
   })
   
-  // ✅ Fetch repo count if installed
+  // Fetch repo count if installed
   let repoCount = 0
   if (installation) {
     try {
@@ -75,7 +75,7 @@ export default async function SettingsPage() {
             userId={session.user.id}
           />
           
-          {/* ✅ GitHub App Integration (New) */}
+          {/* GitHub App Integration (New) */}
           <div>
             <h2 className="text-xl font-semibold text-slate-900 mb-4">
               GitHub Integration

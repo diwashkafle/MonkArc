@@ -1,14 +1,12 @@
-
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { createJourney } from "@/lib/server-actions/journey-actions";
 import { ResourceManager } from "@/components/ProtectedUiComponents/journeys/resource-manager";
 import { LinkGitHubButton } from "@/components/ProtectedUiComponents/journeys/github/link-github-button";
 import { Loader2 } from "lucide-react";
-import clsx from "clsx";
 import toast from "react-hot-toast";
+import { CancelButton } from "./cancel-button-new-journey";
 
 type Resource = {
   id: string;
@@ -19,24 +17,136 @@ type Resource = {
 };
 
 interface NewJourneyFormProps {
-  githubAppInstalled: boolean; 
-   installationId?: number
+  githubAppInstalled: boolean;
+  installationId?: number;
 }
 
-export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourneyFormProps) {
+const DRAFT_KEY = "journey-draft";
+
+// Helper function to get initial state
+function getInitialFormState() {
+  if (typeof window === "undefined") {
+    return {
+      title: "",
+      description: "",
+      targetCheckIns: 30,
+      startDate: new Date().toISOString().split("T")[0],
+      techStack: "",
+      isPublic: true,
+    };
+  }
+
+  const saved = sessionStorage.getItem(DRAFT_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      // Show toast notification
+      setTimeout(() => {
+        toast.success("Draft restored!", { duration: 2000 });
+      }, 100);
+      return parsed.formData;
+    } catch (error) {
+      console.error("Failed to restore draft:", error);
+      sessionStorage.removeItem(DRAFT_KEY);
+    }
+  }
+
+  return {
+    title: "",
+    description: "",
+    targetCheckIns: 30,
+    startDate: new Date().toISOString().split("T")[0],
+    techStack: "",
+    isPublic: true,
+  };
+}
+
+function getInitialResources(): Resource[] {
+  if (typeof window === "undefined") return [];
+
+  const saved = sessionStorage.getItem(DRAFT_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      return parsed.resources || [];
+    } catch (error) {
+      return [];
+    }
+  }
+  return [];
+}
+
+function getInitialRepo(): string {
+  if (typeof window === "undefined") return "";
+
+  const saved = sessionStorage.getItem(DRAFT_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      return parsed.selectedRepo || "";
+    } catch (error) {
+      return "";
+    }
+  }
+  return "";
+}
+
+export function NewJourneyForm({
+  githubAppInstalled,
+  installationId,
+}: NewJourneyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [selectedRepo, setSelectedRepo] = useState<string>("");
+
+  // Initialize state directly from sessionStorage (no useEffect needed)
+  const [formData, setFormData] = useState(getInitialFormState);
+  const [resources, setResources] = useState<Resource[]>(getInitialResources);
+  const [selectedRepo, setSelectedRepo] = useState<string>(getInitialRepo);
+
+ useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Debounce to avoid saving on every keystroke
+    const timeoutId = setTimeout(() => {
+      const draft = {
+        formData,
+        resources,
+        selectedRepo,
+        savedAt: new Date().toISOString(),
+      };
+
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    }, 500); // Save 500ms after user stops typing
+
+    return () => clearTimeout(timeoutId);
+  }, [formData, resources, selectedRepo]);
+
+  const hasFormData = () => {
+    return (
+      formData.title.trim() !== "" ||
+      formData.description.trim() !== "" ||
+      formData.techStack.trim() !== "" ||
+      resources.length > 0 ||
+      selectedRepo !== ""
+    );
+  };
+
+  // Clear draft function
+  const clearDraft = () => {
+    if (typeof window === "undefined") return;
+    sessionStorage.removeItem(DRAFT_KEY);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
-    formData.append("resources", JSON.stringify(resources));
+    const formDataToSubmit = new FormData(e.currentTarget);
+    formDataToSubmit.append("resources", JSON.stringify(resources));
+    
+      clearDraft(); // Clear on success
 
     try {
-      await createJourney(formData);
+      await createJourney(formDataToSubmit);
     } catch (error) {
       if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
         throw error;
@@ -60,6 +170,10 @@ export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourney
           required
           minLength={3}
           maxLength={500}
+          value={formData.title}
+          onChange={(e) =>
+            setFormData({ ...formData, title: e.target.value })
+          }
           placeholder="Building e-commerce to master MERN"
           className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
@@ -76,6 +190,10 @@ export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourney
           minLength={10}
           maxLength={5000}
           rows={4}
+          value={formData.description}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
           placeholder="I want to learn Frontend, Backend, System design and basic of devops to master MERN and fullstack development."
           className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
         />
@@ -92,7 +210,13 @@ export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourney
           required
           min={1}
           max={365}
-          defaultValue={30}
+          value={formData.targetCheckIns}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              targetCheckIns: parseInt(e.target.value) || 1,
+            })
+          }
           className="w-full no-spinner rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
         <p className="mt-1 text-xs text-slate-500">
@@ -110,7 +234,10 @@ export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourney
           name="startDate"
           required
           min={new Date().toISOString().split("T")[0]}
-          defaultValue={new Date().toISOString().split("T")[0]}
+          value={formData.startDate}
+          onChange={(e) =>
+            setFormData({ ...formData, startDate: e.target.value })
+          }
           className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
         <p className="mt-1 text-xs text-slate-500">
@@ -128,7 +255,8 @@ export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourney
           onChange={setResources}
         />
         <p className="mt-2 text-xs text-slate-500">
-          {`Add videos, articles, or documentation you're using or learning from`}
+          {`Add videos, articles, or documentation you're using or learning from
+`}
         </p>
       </div>
 
@@ -144,12 +272,14 @@ export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourney
           onRepoSelect={(repoUrl) => setSelectedRepo(repoUrl)}
           currentRepo={selectedRepo}
           installationId={installationId}
+          redirectSource="new-journey"
         />
 
         <input type="hidden" name="repoURL" value={selectedRepo} />
-        
+
         <p className="mt-2 text-xs text-slate-500">
-          Install the GitHub App to track commits from your repositories (public and private).
+          Install the GitHub App to track commits from your repositories
+          (public and private).
         </p>
       </div>
 
@@ -161,6 +291,10 @@ export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourney
         <input
           type="text"
           name="techStack"
+          value={formData.techStack}
+          onChange={(e) =>
+            setFormData({ ...formData, techStack: e.target.value })
+          }
           placeholder="React, TypeScript, Next.js (comma-separated)"
           className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
@@ -175,7 +309,10 @@ export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourney
           <input
             type="checkbox"
             name="isPublic"
-            defaultChecked={true}
+            checked={formData.isPublic}
+            onChange={(e) =>
+              setFormData({ ...formData, isPublic: e.target.checked })
+            }
             className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
           />
           <div>
@@ -191,19 +328,11 @@ export function NewJourneyForm({ githubAppInstalled,installationId }: NewJourney
 
       {/* Submit */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t">
-        <Link
-          href="/dashboard"
-          aria-disabled={isSubmitting}
-          tabIndex={isSubmitting ? -1 : 0}
-          className={clsx(
-            "inline-flex items-center rounded-md px-4 py-2",
-            isSubmitting
-              ? "pointer-events-none opacity-50"
-              : "hover:bg-gray-100"
-          )}
-        >
-          Cancel
-        </Link>
+        <CancelButton
+          hasFormData={hasFormData()}
+          onClear={clearDraft}
+          isDisabled={isSubmitting}
+        />
         <button
           type="submit"
           disabled={isSubmitting}

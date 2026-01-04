@@ -6,6 +6,7 @@ import { editJourney } from "@/lib/server-actions/journey-actions";
 import { ResourceManager } from "@/components/ProtectedUiComponents/journeys/resource-manager";
 import type { Resource } from "@/lib/validation/journey-validation";
 import { LinkGitHubButton } from "./github/link-github-button";
+import { RepoDisplay } from "@/components/ProtectedUiComponents/journeys/github/repo-display";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 
@@ -31,20 +32,22 @@ interface Journey {
 
 interface EditJourneyFormProps {
   journey: Journey;
-  githubConnected: boolean;
-  githubUsername?: string | null;
+  githubAppInstalled: boolean;
+  installationId?: number;
 }
 
 export function EditJourneyForm({
   journey,
-  githubConnected,
-  githubUsername,
+  githubAppInstalled,
+  installationId,
 }: EditJourneyFormProps) {
   const [resources, setResources] = useState<Resource[]>(
     journey.resources || []
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedRepo, setSelectedRepo] = useState<string>("");
+  const [selectedRepo, setSelectedRepo] = useState<string>(
+    journey.repoURL || ""
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,7 +58,6 @@ export function EditJourneyForm({
 
     try {
       await editJourney(journey.id, formData);
-      // Redirect happens in action
     } catch (error) {
       if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
         throw error;
@@ -101,6 +103,7 @@ export function EditJourneyForm({
         />
       </div>
 
+      {/* Target Check-ins & Start Date */}
       {journey.status !== "scheduled" ? (
         <div>
           <div className="grid grid-cols-2 gap-4">
@@ -126,7 +129,7 @@ export function EditJourneyForm({
           </div>
         </div>
       ) : (
-        <div>
+        <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-900 mb-2">
               Target Check-ins <span className="text-red-500">*</span>
@@ -174,59 +177,45 @@ export function EditJourneyForm({
         <ResourceManager initialResources={resources} onChange={setResources} />
       </div>
 
+      {/* GitHub Repo - CONDITIONAL LOGIC */}
       <div>
         <label className="block text-sm font-medium text-slate-900 mb-2">
           GitHub Repository <span className="text-slate-400">(Optional)</span>
         </label>
 
-        {/* GitHub Connection Status */}
-        <div className="mt-3">
-          {githubConnected && journey.repoURL?.length ? (
-
-           <div className="flex flex-col gap-2">
-            <div className="py-2 px-4 text-gray-600 border flex items-center gap-2 border-gray-600 rounded-lg">
-              <p>{journey.repoURL}</p><span className="text-xs">{"(Can not be changed)"}</span>
-            </div>
-             <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg p-3 border border-green-200">
-              <svg
-                className="h-5 w-5 shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <div className="flex-1">
-                <span className="font-medium">GitHub Connected</span>
-                {githubUsername && (
-                  <span className="text-green-600 ml-1">@{githubUsername}</span>
-                )}
-                <p className="text-xs text-green-600 mt-0.5">
-                  Can access private repositories
-                </p>
-              </div>
-            </div>
-           </div>
-          ) : (
+        {journey.repoURL ? (
+          // ALREADY HAS REPO - Show read-only
+          <>
+            <RepoDisplay repoURL={journey.repoURL} />
+            <p className="mt-2 text-xs text-slate-500">
+              Repository cannot be changed after creation. Create a new journey
+              to track a different repo.
+            </p>
+          </>
+        ) : (
+          //  NO REPO YET - Allow selection
+          <>
             <LinkGitHubButton
               variant="card"
-              isConnected={githubConnected}
+              isInstalled={githubAppInstalled}
               onRepoSelect={(repoUrl) => setSelectedRepo(repoUrl)}
               currentRepo={selectedRepo}
+              installationId={installationId}
+              redirectSource="edit-journey"
+              journeyId={journey.id}
             />
-          )}
-        </div>
 
-        <p className="mt-2 text-xs text-slate-500">
-          Track commits automatically.{" "}
-          {!githubConnected && "Connect GitHub to access private repositories."}
-        </p>
+            <input type="hidden" name="repoURL" value={selectedRepo} />
+
+            <p className="mt-2 text-xs text-slate-500">
+              Install the GitHub App to track commits from your repositories
+              (public and private).
+            </p>
+          </>
+        )}
       </div>
 
-      {/* Tech Stack (for projects) */}
+      {/* Tech Stack */}
       <div>
         <label className="block text-sm font-medium text-slate-900 mb-2">
           Tech Stack <span className="text-slate-400">(Optional)</span>
@@ -282,7 +271,7 @@ export function EditJourneyForm({
         >
           {isSubmitting ? (
             <div className="flex items-center gap-1">
-              <Loader2 className="h-4 w-4 animate-spin" /> <span> Saving</span>
+              <Loader2 className="h-4 w-4 animate-spin" /> <span>Saving</span>
             </div>
           ) : (
             "Save"
