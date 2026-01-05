@@ -51,11 +51,18 @@ function getInitialFormState() {
     }
   }
 
+  // Get today's date in user's timezone
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const todayString = `${year}-${month}-${day}`;
+
   return {
     title: "",
     description: "",
     targetCheckIns: 30,
-    startDate: new Date().toISOString().split("T")[0],
+    startDate: todayString,
     techStack: "",
     isPublic: true,
   };
@@ -142,7 +149,7 @@ export function NewJourneyForm({
 
     const formDataToSubmit = new FormData(e.currentTarget);
     formDataToSubmit.append("resources", JSON.stringify(resources));
-    
+
       clearDraft(); // Clear on success
 
     try {
