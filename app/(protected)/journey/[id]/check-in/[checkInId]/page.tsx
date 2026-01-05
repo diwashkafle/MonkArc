@@ -102,10 +102,10 @@ export default async function CheckInDetailPage({
               </h2>
             </div>
             <div className="rounded-xl bg-emerald-50 border border-emerald-200/60 p-6">
-              <p className="text-lg text-slate-900 leading-relaxed whitespace-pre-wrap">
-                {checkIn.accomplishment}
-              </p>
-            </div>
+  <p className="text-lg text-slate-900 leading-relaxed whitespace-pre-wrap wrap-break-word">
+    {checkIn.accomplishment}
+  </p>
+</div>
           </div>
 
           {/* Notes - Detailed Progress */}

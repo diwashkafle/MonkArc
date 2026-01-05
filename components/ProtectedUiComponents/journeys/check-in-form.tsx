@@ -74,15 +74,15 @@ export function SimpleCheckInForm({
         <label className="block text-sm font-medium text-slate-900 mb-2">
           {question} <span className="text-red-500">*</span>
         </label>
-        <input
-          type="text"
+        <textarea
           value={accomplishment}
           onChange={(e) => setAccomplishment(e.target.value)}
           required
+          rows={1}
           minLength={10}
-          maxLength={500}
+          maxLength={100}
           placeholder="Keep it concise - a few words or sentences"
-          className="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          className="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
         />
         <div className="mt-2 flex items-center justify-between text-xs">
           <span className="text-slate-500">
@@ -91,11 +91,11 @@ export function SimpleCheckInForm({
           <span className={`font-medium ${
             accomplishmentLength < 10 
               ? 'text-red-500' 
-              : accomplishmentLength > 450 
+              : accomplishmentLength > 100 
                 ? 'text-orange-500' 
                 : 'text-slate-500'
           }`}>
-            {accomplishmentLength} / 500
+            {accomplishmentLength} / 100
           </span>
         </div>
       </div>
