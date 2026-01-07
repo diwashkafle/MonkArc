@@ -89,7 +89,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const profileUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/profile/${username}`
   
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 pb-10">
       {/* Header */}
       {session?.user.id ? <Header session={session} /> : <PublicHeader />}
       
