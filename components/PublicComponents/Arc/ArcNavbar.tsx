@@ -26,7 +26,7 @@ const ArcNavbar = async({IsOwner,id}:ArcNavbarPop) => {
              <Link href="/" className="text-xl flex items-center gap-1 font-bold">
           <Image src={"/MonkArc.svg"} alt="MonkArc" height={80} width={40} />
           <span className="text-lg font-semibold">MonkArc</span>
-          <Badge variant={'outline'} className="">Beta</Badge>å
+          <Badge variant={'outline'} className="">Beta</Badge>
 
         </Link> 
             {

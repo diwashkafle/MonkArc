@@ -33,7 +33,7 @@ export default function Footer() {
             <div className="flex items-center gap-4">
               {/* Twitter */}
               <a 
-                href="https://twitter.com/monkarc" 
+                href="https://twitter.com/" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative p-3 rounded-xl bg-white border border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-lg"
@@ -44,7 +44,7 @@ export default function Footer() {
 
               {/* LinkedIn */}
               <a 
-                href="https://linkedin.com/company/monkarc" 
+                href="https://linkedin.com/company/" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative p-3 rounded-xl bg-white border border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-lg"
